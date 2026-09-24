@@ -1,0 +1,73 @@
+            <div class="chat">
+              <p class="msg me">Chatbot agla word kaise guess karta hai? Kya usko grammar rules diye jaate hain?</p>
+              <p class="msg dost">Rules se zyada examples. Usko bahut saare sentences dikhao. Phir woh seekhta hai: “chai” ke baad “piyo” aa sakta hai, “train” ke baad “late” aa sakta hai.</p>
+              <p class="msg me">Toh language model fortune teller hai?</p>
+              <p class="msg dost">Haan, par calculator wala fortune teller. Har next token ko probability deta hai.</p>
+            </div>
+            <h4>Language model kya karta hai: P(sentence)</h4>
+            <p>Language model sentence ko ek probability deta hai. Natural sentence ko zyada chance, ajeeb sentence ko kam. “Aaj chai garam hai” ka chance “garam aaj hai chai” se zyada hona chahiye.</p>
+            <div class="formula"><code>P(y₁, y₂, y₃) = P(y₁) · P(y₂ | y₁) · P(y₃ | y₁, y₂)</code><ul>
+              <li><b>y₁</b> = pehla token.</li>
+              <li><b>P(y₂ | y₁)</b> = pehla token dekh ke second ka chance.</li>
+              <li><b>Product</b> = poore sentence ka chance, step-by-step.</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Step</th><th>Token</th><th>Probability</th><th>Running product</th></tr>
+              <tr><td>1</td><td>aaj</td><td>0.30</td><td>0.30</td></tr>
+              <tr><td>2</td><td>chai | aaj</td><td>0.50</td><td>0.30 × 0.50 = 0.150</td></tr>
+              <tr><td>3</td><td>piyo | aaj chai</td><td>0.10</td><td class="good">0.015</td></tr>
+            </table></div>
+            <p>Final P(sentence) = 0.015. Training mein log loss use karte hain: −log(0.30) − log(0.50) − log(0.10) = 4.200 ke aas-paas.</p>
+            <h4>Corpus, tokenize, &lt;EOS&gt;, &lt;UNK&gt;</h4>
+            <p><strong>Corpus</strong> bas text ka collection hai: reviews, news, chat logs, recipes — jo bhi domain chahiye. Hum corpus ko tokens mein todte hain. Sentence ke end pe &lt;EOS&gt; lagate hain, unknown word ko &lt;UNK&gt;.</p>
+            <div class="visual-flow"><span>Raw text<br><small>“chai piyo”</small></span><b>→</b><span>Tokens<br><small>chai, piyo, &lt;EOS&gt;</small></span><b>→</b><span class="flow-highlight">RNN training<br><small>next token predict</small></span></div>
+            <pre class="code">tokens = ["aaj", "chai", "piyo", "&lt;EOS&gt;"]
+for t in range(len(tokens) - 1):
+    x_t = tokens[t]
+    target = tokens[t + 1]
+    print(x_t, "predicts", target)  <span class="cm"># aaj predicts chai</span></pre>
+            <h4>RNN har step agla shabd softmax se predict karta hai</h4>
+            <p>Input x⟨t⟩ dene ke baad RNN hidden state update karta hai, phir softmax vocabulary ke har token pe chance deta hai. Agar vocab 10,000 hai, output 10,000 probabilities ka vector.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 540 210" role="img" aria-label="RNN next word predict kar raha hai">
+                <rect x="50" y="100" width="80" height="42" rx="10" fill="#edf3ff" stroke="#3567e8"/><text x="73" y="126" font-size="11">aaj</text>
+                <rect x="190" y="80" width="90" height="62" rx="12" fill="#e9f7f3" stroke="#159477"/><text x="211" y="115" font-size="11">RNN</text>
+                <rect x="345" y="40" width="110" height="120" rx="12" fill="#fff3ec" stroke="#e0703a"/>
+                <text x="365" y="68" font-size="11">chai 0.50</text><text x="365" y="93" font-size="11">late 0.08</text><text x="365" y="118" font-size="11">piyo 0.05</text><text x="365" y="143" font-size="11">...</text>
+                <path d="M130 121 H190 M280 111 H345" stroke="#8a96aa" stroke-width="2"/>
+              </svg>
+              <div class="cap">Har step pe target next token hota hai. “aaj” dekar “chai” predict karna.</div>
+            </figure>
+            <h4>Loss: har step ka cross-entropy</h4>
+            <p>Agar sahi next token “chai” hai aur model ne usko 0.50 probability di, loss = −log(0.50). Agar sirf 0.01 diya hota, loss bahut bada. Cross-entropy model ko sahi token ka probability badhane pe push karta hai.</p>
+            <div class="formula"><code>L⟨t⟩ = −log P(sahi next token at time t)</code><ul>
+              <li>Probability high: loss low.</li>
+              <li>Probability low: loss high.</li>
+              <li>Total loss = saare time steps ka sum.</li>
+            </ul></div>
+            <h4>Sampling: naye sentences banana</h4>
+            <p>Training ke baad model se sentence nikalna ho toh start token do, softmax probabilities se ek token sample karo, phir usko next input banao. Jab &lt;EOS&gt; aaye, ruk jao.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Context</th><th>Top probabilities</th><th>Sampled token</th></tr>
+              <tr><td>Start</td><td>aaj 0.30, kal 0.22, meri 0.10</td><td>aaj</td></tr>
+              <tr><td>aaj</td><td>chai 0.50, match 0.20</td><td>chai</td></tr>
+              <tr><td>aaj chai</td><td>piyo 0.10, garam 0.08</td><td>garam</td></tr>
+            </table></div>
+            <p>Sample karne se variety aati hai. Har baar max choose karoge toh model safe aur boring ho sakta hai — jaise har party mein sirf plain dosa.</p>
+            <h4>Character-level vs word-level</h4>
+            <div class="compare-grid">
+              <div><b>Character-level</b><br>Vocabulary chhoti: a, b, c, space. Unknown word problem kam. Par sequence lambi, meaning seekhna mushkil.</div>
+              <div><b>Word-level</b><br>Sequence chhoti, word meaning clearer. Par vocabulary badi, &lt;UNK&gt; issue aata hai.</div>
+            </div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Sampling mein probability ko normal count mat samjho. 0.50 ka matlab guarantee nahi; bas long run mein lagbhag aadhi baar.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Language model poore sentence ka chance next-token probabilities ke product se banata hai, aur naye text ke liye un probabilities se sample karta hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>&lt;EOS&gt; na lagayein toh?</summary><p>Model ko sentence khatam karna properly nahi seekhega. Generation mein woh lamba bolta hi reh sakta hai.</p></details>
+            <details class="qa"><summary>Lowest loss ka matlab best creative text?</summary><p>Zaroori nahi. Loss next-token prediction measure karta hai. Creative quality ke liye sampling temperature, data quality, aur evaluation bhi matter karte hain.</p></details>
+            <details class="qa"><summary>Softmax 10,000 words pe slow hai?</summary><p>Haan, large vocab pe expensive hota hai. Word2Vec page mein negative sampling jaise shortcuts dekhenge.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>P(w₁)=0.2, P(w₂|w₁)=0.4, P(w₃|w₁,w₂)=0.5. Sentence probability?</summary><p>0.2 × 0.4 × 0.5 = <b>0.04</b>.</p></details>
+              <details class="qa"><summary>“namaste duniya” ko training pair mein kaise todoge, &lt;EOS&gt; ke saath?</summary><p>Tokens: namaste, duniya, &lt;EOS&gt;. Pairs: namaste predicts duniya; duniya predicts <b>&lt;EOS&gt;</b>.</p></details>
+              <details class="qa"><summary>Word-level model mein unseen word aaye toh?</summary><p>Use <b>&lt;UNK&gt;</b> token se replace karenge.</p></details>
+            </div>

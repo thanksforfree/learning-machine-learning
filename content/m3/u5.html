@@ -1,0 +1,44 @@
+            <div class="chat">
+              <p class="msg me">Ek feature (temperature) samajh aaya. Par real machine mein to vibration, pressure, speed sab honge?</p>
+              <p class="msg dost">Haan, to har feature ke liye alag bell curve banao — temperature ka apna μ, σ; vibration ka apna. Naye motor ke liye har feature ka chance nikaalo, aur sabko <strong>multiply</strong> kar do. Ek bhi feature bahut ajeeb hua to poora product chhota ho jaata hai.</p>
+            </div>
+            <h4>Algorithm — 3 steps</h4>
+            <div class="visual-flow"><span>1. Features chuno jo gadbad dikha sakein</span><b>→</b><span>2. Har feature ka μⱼ aur σⱼ normal data se</span><b>→</b><span class="flow-highlight">3. p(x) = p(x₁) × p(x₂) × … ; agar p(x) &lt; ε → anomaly</span></div>
+            <p>Example: temperature pe chance 0.3 (normal), vibration pe 0.001 (bahut ajeeb) → 0.3 × 0.001 = 0.0003. Agar ε = 0.01 to 0.0003 &lt; 0.01 → <strong>anomaly!</strong></p>
+            <h4>ε kaise chunein? Thode labelled examples se</h4>
+            <div class="chat">
+              <p class="msg dost">Maan lo 10,000 achhe motors aur sirf 20 kharab motors ka record hai. Training mein sirf achhe (6000). CV set: 2000 achhe + 10 kharab. Test: 2000 achhe + 10 kharab. Alag-alag ε try karo aur CV pe dekho kaunsa sabse zyada kharab pakadta hai bina bahut saare false alarm ke.</p>
+            </div>
+            <p>Kharab cases rare hain, isliye accuracy se phir dhokha milega. Yahan <strong>precision, recall, F1</strong> dekho (Module 2 wale). Fraud aur machine failure mein “miss” aur “false alarm” dono ki cost alag hoti hai.</p>
+            <h4>Anomaly detection vs supervised learning — kab kya?</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Anomaly detection</th><th>Supervised classification</th></tr>
+              <tr><td>Kharab examples bahut kam (0–20)</td><td>Dono type ke kaafi examples</td></tr>
+              <tr><td>Har baar <strong>naye-naye</strong> type ki gadbad aa sakti (naye fraud tricks, naye engine faults)</td><td>Future ke positive cases purane jaise hi honge (jaise spam, jana-pehchana defect)</td></tr>
+              <tr><td>Example: naye type ke hack, naya factory fault</td><td>Example: spam, mausam prediction, jaani-maani bimaari</td></tr>
+            </table></div>
+            <h4>Achhe features chunna — sabse important kaam</h4>
+            <div class="compare-grid">
+              <div><b>Bell shape banao</b>Feature ka histogram tedha ho to log(x), √x, x^(1/3) try karo taaki bell jaisa bane. Jo transform training pe lagaya, wahi CV/test pe.</div>
+              <div><b>Error analysis</b>Jo kharab case pakda nahi gaya (p(x) zyada aaya), use dekho: kya alag tha? Uske liye naya feature banao.</div>
+              <div><b>Ratio features</b>Server: CPU load zyada normal hai, network traffic zyada bhi normal. Par CPU bahut zyada aur traffic bahut kam — ajeeb (atka process). Naya feature: CPU ÷ traffic.</div>
+              <div><b>Pehle socho</b>“Kharab hone pe kya cheez unusual hogi?” — us cheez ko naapo.</div>
+            </div>
+
+            <h4>ε choose karne ka mini CV example</h4>
+            <div class="chat"><p class="msg me">ε chhota-bada karne se precision-recall jaisa trade-off hota hai?</p><p class="msg dost">Exactly. ε bada rakho to zyada cases anomaly bol doge: recall up, false alarms bhi up. ε chhota rakho to sirf bahut extreme cases pakdenge.</p></div>
+            <p>CV set: 200 normal + 10 anomaly. Teen ε values try ki:</p>
+            <div class="table-wrap"><table class="calc"><tr><th>ε</th><th>TP</th><th>FP</th><th>FN</th><th>Precision</th><th>Recall</th><th>F1</th></tr><tr><td>0.001</td><td>4</td><td>1</td><td>6</td><td>4/5 = 80%</td><td>4/10 = 40%</td><td>0.53</td></tr><tr><td>0.01</td><td>8</td><td>4</td><td>2</td><td>8/12 = 67%</td><td>8/10 = 80%</td><td class="good">0.73</td></tr><tr><td>0.05</td><td>10</td><td>20</td><td>0</td><td>10/30 = 33%</td><td>100%</td><td>0.50</td></tr></table></div>
+            <p>Yahan ε = 0.01 best F1 de raha hai. Lekin agar false alarm bahut mehenga ho, tum 0.001 choose kar sakte ho. Metric business cost se juda hai.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> ε training set pe mat choose karo. Normal data pe p(x) fit karo, CV pe ε tune karo, test pe final check.</div>
+            <h4>Feature transform ka tiny example</h4>
+            <p>Server request count kabhi 10, kabhi 10000 — bahut skewed. Log transform spread ko manageable bana sakta hai.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>x requests</th><th>log₁₀(x)</th><th>Effect</th></tr><tr><td>10</td><td>1</td><td>Small</td></tr><tr><td>100</td><td>2</td><td>Medium</td></tr><tr><td>10000</td><td>4</td><td>Huge raw value compressed</td></tr></table></div>
+            <p>Transform training, CV, test sab pe same lagao. Sirf training pe μ/σ fit karo, baaki sets pe wahi use karo.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Har feature ka chance multiply karo, ε se compare karo; phir ε aur features ko labelled examples + error analysis se sudharo. Pehla version perfect nahi hota, aur ye bilkul normal hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Chance multiply karna — kya features independent hone chahiye?</summary><p>Theory mein ye maan ke chalte hain. Practice mein thode dependent bhi ho to aksar achha chal jaata hai. Ratio jaise features dependency ko pakadne mein madad karte hain.</p></details>
+            <details class="qa"><summary>Kharab ke labels bilkul na hon to?</summary><p>Tab bhi p(x) nikaal ke sabse kam probability wale cases ko insaan se check karwa sakte ho. Par ε chunna andaaze pe hoga — thode labels mil jaayein to kaafi confidence aa jaata hai.</p></details>
+
+            <details class="qa"><summary>p(x) bahut chhota number kyu hota hai?</summary><p>Kai feature probabilities multiply hoti hain, to product quickly tiny ho jaata hai. Code mein log probabilities use karna numerically safer hota hai.</p></details>
+            <details class="qa"><summary>Feature engineering yahan model se zyada important ho sakti hai?</summary><p>Bilkul. Agar feature anomaly ko dikhata hi nahi, p(x) kaise chhota hoga? Good features anomaly detection ka aadha game hain.</p></details>

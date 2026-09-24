@@ -1,0 +1,48 @@
+
+            <div class="chat">
+              <p class="msg me">Model training pe achha hai, phir bhi real life mein fail kyu ho sakta hai?</p>
+              <p class="msg dost">Teen students socho. <strong>Rohan</strong> ne kuch khaas nahi padha, bas “har MCQ ka answer C” wala funda — practice mein bhi fail, exam mein bhi. Ye <strong>underfitting</strong>.</p>
+              <p class="msg dost"><strong>Priya</strong> ne concepts samjhe — practice mein achhe marks, exam mein bhi. Ye <strong>just right</strong>.</p>
+              <p class="msg dost"><strong>Aman</strong> ne pichle saal ka paper word-by-word ratt liya. Usi paper pe 100/100, par naya sawaal aaya to zero. Ye <strong>overfitting</strong>.</p>
+              <p class="msg me">Aman wala case model mein kaisa dikhta hai?</p>
+              <p class="msg dost">Curve har training dot ko chhoone ke chakkar mein pagal jaisa tedha-medha ho jaata hai. Training cost ≈ 0, par naye ghar pe guess bekaar.</p>
+              <p class="msg me">To training marks hi sab kuch nahi?</p>
+              <p class="msg dost">Bilkul nahi. Asli izzat naye question paper pe banti hai — isi ko generalization bolte hain.</p>
+            </div>
+            <figure class="figure">
+              <svg viewBox="0 0 420 140" role="img" aria-label="Teen graph: underfit seedhi line, just right smooth curve, overfit hilti hui curve">
+                <g transform="translate(5,10)"><rect width="130" height="110" rx="8" fill="#fff" stroke="#e6eaf1"/><line x1="5" y1="75" x2="125" y2="20" stroke="#c2410c" stroke-width="2.5"/><g fill="#7b93e0"><circle cx="15" cy="92" r="4"/><circle cx="30" cy="60" r="4"/><circle cx="50" cy="40" r="4"/><circle cx="70" cy="30" r="4"/><circle cx="90" cy="26" r="4"/><circle cx="115" cy="24" r="4"/></g></g>
+                <g transform="translate(145,10)"><rect width="130" height="110" rx="8" fill="#fff" stroke="#e6eaf1"/><path d="M8,102 C25,40 60,26 125,22" fill="none" stroke="#159477" stroke-width="2.5"/><g fill="#7b93e0"><circle cx="15" cy="92" r="4"/><circle cx="30" cy="60" r="4"/><circle cx="50" cy="40" r="4"/><circle cx="70" cy="30" r="4"/><circle cx="90" cy="26" r="4"/><circle cx="115" cy="24" r="4"/></g></g>
+                <g transform="translate(285,10)"><rect width="130" height="110" rx="8" fill="#fff" stroke="#e6eaf1"/><path d="M15,92 C20,40 25,90 30,60 S45,10 50,40 S65,55 70,30 S85,5 90,26 S105,60 115,24" fill="none" stroke="#c2410c" stroke-width="2.5"/><g fill="#7b93e0"><circle cx="15" cy="92" r="4"/><circle cx="30" cy="60" r="4"/><circle cx="50" cy="40" r="4"/><circle cx="70" cy="30" r="4"/><circle cx="90" cy="26" r="4"/><circle cx="115" cy="24" r="4"/></g></g>
+                <text x="70" y="136" font-size="11" text-anchor="middle" fill="#c2410c">Underfit (Rohan)</text><text x="210" y="136" font-size="11" text-anchor="middle" fill="#159477">Just right (Priya)</text><text x="350" y="136" font-size="11" text-anchor="middle" fill="#c2410c">Overfit (Aman)</text>
+              </svg>
+            </figure>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Naam</th><th>Technical term</th><th>Pehchaan</th></tr>
+              <tr><td>Underfit</td><td>High bias</td><td>Training data pe bhi galti zyada — model ki soch bahut simple</td></tr>
+              <tr><td>Just right</td><td>Generalizes well</td><td>Training aur naye data dono pe achha</td></tr>
+              <tr><td>Overfit</td><td>High variance</td><td>Training pe almost perfect, naye data pe kharab. Data thoda badlo to model bahut badal jaaye</td></tr>
+            </table></div>
+            <h4>Overfitting ka ilaaj</h4>
+            <p>Quick check: agar train error bhi high hai, pehle model ko zyada capable banao. Agar train low par dev/test high hai, overfitting wali dawai socho.</p>            <h4>Numbers se diagnosis</h4>
+            <p>Train error = jis data pe model ne seekha. Dev/test error = naye jaise data pe check. Gap kahani batata hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Train error</th><th>Dev error</th><th>Diagnosis</th><th>Pehla action</th></tr>
+              <tr><td>28%</td><td>30%</td><td class="bad">Underfit</td><td>Bada model / better features</td></tr>
+              <tr><td>2%</td><td>24%</td><td class="bad">Overfit</td><td>Zyada data / regularization</td></tr>
+              <tr><td>5%</td><td>6%</td><td class="good">Kaafi healthy</td><td>Ab errors inspect karo</td></tr>
+            </table></div>
+            <p>Bas ek number mat dekho. Train aur dev ko saath mein dekhna — jaise practice marks aur mock test dono.</p>
+
+            <div class="compare-grid">
+              <div><b>1. Zyada data laao</b>Jitne zyada examples, utna mushkil ratna. Model ko asli pattern seekhna hi padta hai.</div>
+              <div><b>2. Kam / better features</b>Bekaar features hatao (feature selection). Kam cheezein = kam ratne ka mauka.</div>
+              <div><b>3. Regularization</b>Saare features rakho, par weights ko bahut bada mat hone do — next topic.</div>
+              <div><b>Classification mein bhi</b>Overfit boundary har ek point ko alag karne ke liye bahut zig-zag ho jaati hai.</div>
+            </div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Goal hai Priya banna — pattern samjho, noise mat ratto.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Kaise pata chalega mera model overfit hai?</summary><p>Kuch data alag rakho jo training mein use nahi hua. Training pe galti kam + us alag data pe galti zyada = overfit. Module 2 mein iska poora system seekhoge.</p></details>
+            <details class="qa"><summary>“Bias” ka matlab yahan prejudice hai?</summary><p>Nahi. Yahan technical matlab: model ki ek strong pehle-se-maani hui soch (jaise “sab kuch seedhi line hai”), jiski wajah se woh asli pattern pakad hi nahi paata.</p></details>
+            <details class="qa"><summary>Zyada data se underfitting bhi theek ho jayegi?</summary><p>Nahi! Rohan ko 100 aur practice papers do, “sab C” wala funda wahi rahega. Underfitting ke liye model ko zyada powerful banao — zyada features, polynomial, ya neural network.</p></details>            <details class="qa"><summary>Overfitting hamesha bad thing hai?</summary><p>Training pe fit hona zaroori hai, par sirf training pe fit hona problem hai. Goal hai useful pattern pakadna, random noise nahi.</p></details>
+            <details class="qa"><summary>Dev error kab trustworthy nahi hota?</summary><p>Jab dev set bahut chhota ho ya real world se alag ho. Jaise sirf Delhi ke gharon pe dev set, par model Mumbai pe use karna hai — diagnosis mislead kar sakta hai.</p></details>

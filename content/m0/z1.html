@@ -1,0 +1,52 @@
+            <div class="chat">
+              <p class="msg me">Main maths mein bilkul zero hoon. Formula dekhte hi dimaag band ho jaata hai.</p>
+              <p class="msg dost">Ek raaz batata hoon: formula sirf ek <strong>chhoti bhasha</strong> hai — jaise SMS mein “kal milte hain” ko “kl mlte h” likhte ho. Lamba sentence chhota likhne ka tareeka. Ek baar shabd samajh gaye to formula padhna kahani padhne jaisa lagega.</p>
+              <p class="msg me">Achha? Example do.</p>
+              <p class="msg dost">Sentence: “Bill = har item ka daam × quantity, sab jodo, phir delivery charge add karo.” Formula mein: <strong>bill = daam₁ × qty₁ + daam₂ × qty₂ + delivery</strong>. Bas! Same baat, kam jagah.</p>
+              <p class="msg me">To formula dekh ke panic karna allowed hai?</p>
+              <p class="msg dost">Bilkul allowed. Panic ko bas 10 second do, phir har symbol ko naam se bulao. Jaise naye WhatsApp group mein sab unknown numbers lagte hain — naam save hote hi scene normal.</p>
+            </div>
+            <h4>Variable = ek dabba jisme number rakha hai</h4>
+            <p>Jab hum likhte hain <strong>x = 5</strong>, matlab “x naam ke dabbe mein 5 rakha hai”. Kal usme 8 bhi rakh sakte ho — isliye “variable” (badalne wala). Letter sirf label hai: x, y, w, b koi bhi ho sakta hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Symbol</th><th>Kaise padho</th><th>Matlab</th><th>Example</th></tr>
+              <tr><td>a × b &nbsp;ya&nbsp; a · b &nbsp;ya&nbsp; ab</td><td>a into b</td><td>Multiply</td><td>3 · 4 = 12</td></tr>
+              <tr><td>a / b</td><td>a divided by b</td><td>Divide</td><td>12 / 4 = 3</td></tr>
+              <tr><td>x²</td><td>x square</td><td>x × x</td><td>5² = 25</td></tr>
+              <tr><td>√x</td><td>root x</td><td>Kaunsa number khud se multiply ho ke x bane</td><td>√25 = 5</td></tr>
+              <tr><td>|x|</td><td>mod x</td><td>Minus hata do (sirf size)</td><td>|−7| = 7</td></tr>
+              <tr><td>≈</td><td>lagbhag barabar</td><td>Almost equal</td><td>π ≈ 3.14</td></tr>
+              <tr><td>≥, ≤</td><td>se bada ya barabar, se chhota ya barabar</td><td>Comparison</td><td>0.7 ≥ 0.5</td></tr>
+            </table></div>
+            <h4>Chhote numbers neeche aur upar — address hain, power nahi</h4>
+            <div class="compare-grid">
+              <div><b>Neeche wala: x₁, x₂, x₃</b>“Kaunsa feature?” Jaise x₁ = size, x₂ = bedrooms. Excel ka <em>column</em>.</div>
+              <div><b>Upar bracket wala: x⁽¹⁾, x⁽²⁾</b>“Kaunsa example?” Jaise x⁽¹⁾ = pehla ghar. Excel ki <em>row</em>. Bracket hai to power mat samajhna!</div>
+            </div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Ghar</th><th>x₁ (size)</th><th>x₂ (bedrooms)</th></tr>
+              <tr><td>1st ghar</td><td>x₁⁽¹⁾ = 1200</td><td>x₂⁽¹⁾ = 3</td></tr>
+              <tr><td>2nd ghar</td><td>x₁⁽²⁾ = 800</td><td>x₂⁽²⁾ = 2</td></tr>
+            </table></div>
+            <h4>Σ (sigma) = “sab jodo”</h4>
+            <p>Sabse daraane wala symbol, sabse aasan matlab. <strong>Σ</strong> bolta hai: “list ke har item ke liye ye karo, aur sab jod do”.</p>
+            <div class="formula"><code>Σ xᵢ  (i = 1 se 4)   →   x₁ + x₂ + x₃ + x₄</code><ul><li>Agar x = [2, 5, 1, 4] to Σ xᵢ = 2 + 5 + 1 + 4 = 12</li><li>Σ xᵢ² = 4 + 25 + 1 + 16 = 46 (pehle har ek ka square, phir jodo)</li><li>Programmer ke liye: Σ = ek <code>for</code> loop jo total mein jodta jaata hai.</li></ul></div>
+            <h4>Greek letters — sirf naam hain</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Letter</th><th>Naam</th><th>Is course mein kya</th></tr>
+              <tr><td>α</td><td>alpha</td><td>Learning rate (kadam ka size)</td></tr>
+              <tr><td>λ</td><td>lambda</td><td>Regularization kitni strict</td></tr>
+              <tr><td>μ</td><td>mu</td><td>Average (mean)</td></tr>
+              <tr><td>σ</td><td>sigma (chhota)</td><td>Data kitna phaila hai (std deviation)</td></tr>
+              <tr><td>ε</td><td>epsilon</td><td>Chhota sa number / thodi randomness</td></tr>
+              <tr><td>γ</td><td>gamma</td><td>Reinforcement learning mein discount</td></tr>
+            </table></div>
+            <h4>Formula padhne ka 3-step tareeka</h4>
+            <div class="visual-flow"><span>1. Har symbol ka naam bolo</span><b>→</b><span>2. Andar se bahar padho (brackets pehle)</span><b>→</b><span class="flow-highlight">3. Chhote numbers daal ke try karo</span></div>
+            <p>Example: <strong>f = w · x + b</strong>, w = 2, x = 3, b = 1 → f = 2 · 3 + 1 = 7. Numbers daalte hi formula “dost” ban jaata hai.</p>
+            <p>Yahan ruk ke ek baar khud bolo: “w times x, plus b”. Awaaz mein bolne se formula ka darr aadha ho jaata hai, sach mein.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Formula = chhota sentence. Symbol ka naam jaano, chhote numbers daalo, matlab khud dikh jayega.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Multiply ke kai symbols kyu hain (×, ·, bina kuch)?</summary><p>Sab same hain. Letters ke saath × likhne se x jaisa confuse hota hai, isliye · ya bas saath likh dete hain: 2w = 2 × w.</p></details>
+            <details class="qa"><summary>BODMAS yaad rakhna padega?</summary><p>Basic rule: pehle brackets, phir power (²), phir × aur ÷, phir + aur −. Doubt ho to brackets laga do — computer bhi yahi rule follow karta hai.</p></details>
+            <details class="qa"><summary>ML mein ye sab kahan aayega?</summary><p>Har jagah! Cost function mein Σ aur ², learning rate α, regularization λ, scaling mein μ aur σ, data table mein x₁⁽ⁱ⁾. Ye page tumhari dictionary hai — atko to wapas aao.</p></details>

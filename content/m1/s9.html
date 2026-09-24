@@ -1,0 +1,45 @@
+
+            <div class="chat">
+              <p class="msg me">Model “0” aur “1” ke beech border kahan banata hai?</p>
+              <p class="msg dost">Sigmoid table dekho: chance 0.5 se upar tab hai jab z 0 se upar hai. To jahan z bilkul 0 hai, wahi border hai. Ek taraf “haan”, doosri taraf “na”. Isko <strong>decision boundary</strong> kehte hain — jaise do states ke beech border line.</p>              <p class="msg me">Border line ke paas wale points pe model itna confused kyu?</p>
+              <p class="msg dost">Kyuki wahan z zero ke aas-paas hota hai, sigmoid ~50% bolta hai. Jaise cricket review mein ball umpire's call pe ho — clear out bhi nahi, clear not-out bhi nahi.</p>
+            </div>
+            <p><strong>Example:</strong> x₁ = padhai ke ghante (roz), x₂ = practice tests diye. Output: pass (1) ya fail (0). Model ne seekha w₁ = 1, w₂ = 1, b = −3. To border: <strong>x₁ + x₂ = 3</strong>.</p>
+            <p>Seedha matlab: total “padhai score” 3 se upar gaya to model pass side mein rakhega. 3 se neeche to fail side. Border pe model shoulder shrug karta hai: 50-50.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 300 230" role="img" aria-label="Seedhi decision boundary: neeche fail wale neele dots, upar pass wale naranga dots">
+                <line x1="40" y1="200" x2="290" y2="200" stroke="#b8c2d3"/><line x1="40" y1="10" x2="40" y2="200" stroke="#b8c2d3"/>
+                <polygon points="40,65 220,200 290,200 290,10 40,10" fill="#fff3ec"/><polygon points="40,65 220,200 40,200" fill="#edf3ff"/>
+                <line x1="40" y1="65" x2="220" y2="200" stroke="#17223b" stroke-width="2.5"/>
+                <g fill="#3567e8"><circle cx="70" cy="177" r="6"/><circle cx="100" cy="155" r="6"/><circle cx="70" cy="132" r="6"/><circle cx="130" cy="177" r="6"/><circle cx="160" cy="182" r="6"/></g>
+                <g fill="#e0703a"><circle cx="160" cy="110" r="6"/><circle cx="220" cy="132" r="6"/><circle cx="190" cy="65" r="6"/><circle cx="130" cy="56" r="6"/><circle cx="250" cy="65" r="6"/></g>
+                <text x="60" y="193" font-size="11" fill="#3567e8">fail</text><text x="240" y="30" font-size="11" fill="#c2410c">pass</text>
+                <text x="285" y="215" font-size="10" text-anchor="end" fill="#7a879b">padhai ke ghante →</text><text x="44" y="22" font-size="10" fill="#7a879b">practice tests</text>
+              </svg>
+              <div class="cap">Kaali line = x₁ + x₂ = 3. Neeche wale fail, upar wale pass.</div>
+            </figure>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Student</th><th>z = x₁ + x₂ − 3</th><th>Faisla</th></tr>
+              <tr><td>1 ghanta, 1 test</td><td>−1</td><td>Fail (27%)</td></tr>
+              <tr><td>2 ghante, 2 test</td><td>+1</td><td>Pass (73%)</td></tr>
+              <tr><td>3 ghante, 0 test</td><td>0</td><td>Bilkul border pe (50%)</td></tr>
+            </table></div>
+            <h4>Boundary ko test karo</h4>
+            <p>Ek point uthao, z nikaalo, sign dekho. Positive = pass side, negative = fail side.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Point</th><th>z</th><th>Sigmoid chance</th><th>Side</th></tr>
+              <tr><td>(1, 2.5)</td><td>0.5</td><td>62%</td><td>Pass side</td></tr>
+              <tr><td>(0.5, 1)</td><td>−1.5</td><td>18%</td><td>Fail side</td></tr>
+              <tr><td>(4, 0)</td><td>1</td><td>73%</td><td>Pass side</td></tr>
+            </table></div>
+            <h4>Border seedhi hi hogi kya?</h4>
+            <p>Nahi! Polynomial features daalo: x₁² aur x₂². Agar w = 1, 1 aur b = −1 ho, to border ban jaata hai <strong>x₁² + x₂² = 1 — ek gol circle</strong>. Circle ke andar “0”, bahar “1”. Aur zyada features → kisi bhi tedhi-medhi shape ki border.</p>
+            <p>Bas yaad rakho: boundary ka shape features se aata hai. Features simple, boundary simple. Features clever, boundary bhi clever.</p>
+            <div class="lesson-callout"><b>Real life feel:</b> Decision boundary ek lakir hai, par duniya blurry hoti hai. Boundary ke paas wale examples ko “pakka pass/fail” mat samjho; unpe model ki uncertainty sabse zyada hoti hai.</div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Sirf accuracy dekh ke boundary ko judge mat karo. Agar data imbalanced hai (90% fail, 10% pass), model sabko fail bolke bhi high accuracy dikha sakta hai. Boundary ki galtiyan dekhna zaroori hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Decision boundary woh line/shape hai jahan model ka chance exactly 50% hai; features jitne flexible, border utni flexible.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Boundary maine banayi ya model ne?</summary><p>Model ne, data dekh ke weights seekhe aur usse border ban gayi. Tum bas decide karte ho ki features kaise honge (seedhe ya polynomial).</p></details>
+            <details class="qa"><summary>Seedhi line se kaam na chale to?</summary><p>Polynomial features daalo, ya neural network use karo (Module 2) jo khud complex borders seekh leta hai.</p></details>
+            <details class="qa"><summary>Border ke bilkul paas wale points ka kya?</summary><p>Wahan model sabse zyada confused hai (≈50%). Zyadatar galtiyaan yahin hoti hain — error analysis mein inko dekhna useful hai.</p></details>            <details class="qa"><summary>Threshold 0.5 na ho to boundary badlegi?</summary><p>Haan. 0.5 pe boundary z = 0 hoti hai. Threshold 0.7 karoge to model ko “haan” bolne ke liye z aur bada chahiye, to border shift ho jayega.</p></details>
+            <details class="qa"><summary>Boundary ko visualize karna zaroori hai?</summary><p>2 features tak bahut useful hai. 10 features mein drawing mushkil ho jaati hai, par idea wahi rehta hai: model feature-space ko regions mein baant raha hota hai.</p></details>            <details class="qa"><summary>Agar classes overlap kar rahi hain to boundary kya karegi?</summary><p>Phir perfect boundary possible nahi. Model best compromise karta hai: kuch points galat honge hi. Aise cases mein probability aur error analysis zyada important ho jaate hain.</p></details>

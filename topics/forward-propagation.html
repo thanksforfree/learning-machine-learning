@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Forward propagation: Left se right chalte hue prediction. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Forward propagation (ML · 2) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../advanced.html">ML · 2: Advanced Learning Algorithms</a> › Topic 2 / 12</nav>
+        <p class="eyebrow">ML · 2 · TOPIC 02 · NEURAL NETWORKS</p>
+        <h1>Forward propagation</h1>
+        <p>Left se right chalte hue prediction</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 2 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="a1" href="neural-network-idea.html"><span>01</span>Neural network ka idea</a>
+            <a data-topic-link="a2" class="current" aria-current="page" href="forward-propagation.html"><span>02</span>Forward propagation</a>
+            <a data-topic-link="a3" href="tensorflow.html"><span>03</span>TensorFlow mein network banana</a>
+            <a data-topic-link="a4" href="activation-functions.html"><span>04</span>Activation functions</a>
+            <a data-topic-link="a5" href="softmax-multiclass.html"><span>05</span>Multiclass aur softmax</a>
+            <a data-topic-link="a6" href="backprop-adam.html"><span>06</span>Backpropagation aur Adam</a>
+            <a data-topic-link="a7" href="train-cv-test.html"><span>07</span>Training, CV aur test set</a>
+            <a data-topic-link="a8" href="bias-variance.html"><span>08</span>Bias aur variance</a>
+            <a data-topic-link="a9" href="ml-development-cycle.html"><span>09</span>ML development cycle</a>
+            <a data-topic-link="a10" href="precision-recall.html"><span>10</span>Precision, recall aur F1</a>
+            <a data-topic-link="a11" href="decision-trees.html"><span>11</span>Decision tree, entropy aur information gain</a>
+            <a data-topic-link="a12" href="random-forest-xgboost.html"><span>12</span>Random forest aur XGBoost</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12"><span>ML · 2 progress</span><strong data-progress-label>0 / 12 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Network prediction kaise banata hai — ye samjhe bina debugging namumkin hai. Shapes ki galti yahin pakdi jaati hai.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z6" href="maths-vectors-matrices.html"><small>Maths</small>Vectors, matrices aur dot product</a></div></div>
+        
+        <article class="lesson-card single" id="a2">
+          <div class="lesson-body">
+
+            <div class="chat">
+              <p class="msg me">Ek neuron andar actually karta kya hai? Bas naam hi fancy hai?</p>
+              <p class="msg dost">Bilkul, fancy naam ke neeche simple hisaab hai. Har input × uska weight, sab jodo, + b, phir activation (jaise sigmoid). Jo number bahar nikla, usko <strong>a</strong> ya activation bolte hain.</p>
+              <p class="msg me">Aur poori layer?</p>
+              <p class="msg dost">Layer = aise kai neurons, har ek ke apne weights. Sab <em>same</em> inputs dekhte hain. Unke outputs ki list agli layer ka input ban jaati hai. Aise aage-aage chalte jao — isko <strong>forward propagation</strong> kehte hain. Jaise relay race mein baton aage pass hota hai.</p>
+            </div>
+            <div class="formula"><code>a = g(w · x + b)</code><ul><li>g = activation function (abhi ke liye sigmoid)</li></ul></div>
+            <h4>Ek neuron, numbers ke saath</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Step</th><th>Hisaab</th></tr>
+              <tr><td>Inputs</td><td>x = [2, 3]</td></tr>
+              <tr><td>Weights, bias</td><td>w = [0.5, −1], b = 1</td></tr>
+              <tr><td>z = w·x + b</td><td>0.5×2 + (−1)×3 + 1 = 1 − 3 + 1 = <b>−1</b></td></tr>
+              <tr><td>a = sigmoid(z)</td><td>sigmoid(−1) = <b>0.27</b></td></tr>
+            </table></div>
+            <div class="visual-flow"><span>x (pixels)</span><b>→</b><span class="flow-highlight">Layer 1<br><small>25 neurons → a⁽¹⁾</small></span><b>→</b><span class="flow-highlight">Layer 2<br><small>15 neurons → a⁽²⁾</small></span><b>→</b><span>Layer 3<br><small>1 neuron → “ye digit 1 hai?”</small></span></div>
+            <p><strong>Notation:</strong> a<sup>[2]</sup><sub>3</sub> = “layer 2 ke neuron number 3 ka output”. Square bracket = kaunsi layer, neeche chhota number = kaunsa neuron. Bas address samjho, jaise “Building 2, Flat 3”. Pehli baar mein ajeeb lagta hai, par do examples ke baad haath set ho jaata hai.</p>
+            <h4>Code mein ek layer</h4>
+<pre class="code">def dense(a_in, W, b):
+    z = np.matmul(a_in, W) + b     <span class="cm"># saare neurons ka hisaab ek saath</span>
+    return 1 / (1 + np.exp(-z))    <span class="cm"># sigmoid</span>
+
+a1 = dense(x,  W1, b1)   <span class="cm"># layer 1</span>
+a2 = dense(a1, W2, b2)   <span class="cm"># layer 2 ka input = layer 1 ka output</span></pre>
+            <p><strong>W ek table (matrix) hai:</strong> har column = ek neuron ke weights. Matrix multiply ka matlab: saare neurons ka dot product ek hi jhatke mein. Jaise poori class ka attendance ek register mein — ek-ek bachche ko alag paper nahi.</p>
+
+            <h4>Shapes aur numbers ka dry-run</h4>
+            <div class="chat">
+              <p class="msg me">Yaar W ka shape dekh ke hi brain hang ho jaata hai. Row kaun, column kaun?</p>
+              <p class="msg dost">Haan, ye pehli baar sabko ulta lagta hai. Simple rule: pichli layer ke outputs jitne, utni W ki rows. Is layer ke neurons jitne, utne W ke columns. Har column ek neuron ki shopping list.</p>
+            </div>
+            <p>Maan lo input mein 3 features hain: x = [1, 2, 4]. Agli layer mein 2 neurons. To W ka shape (3, 2) hoga aur b ka shape (2,).</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Neuron</th><th>Weights</th><th>Bias</th><th>z = w·x + b</th><th>a = sigmoid(z)</th></tr>
+              <tr><td>1</td><td>[0.5, 1, −0.5]</td><td>0</td><td>0.5×1 + 1×2 − 0.5×4 = <b>0.5</b></td><td>0.62</td></tr>
+              <tr><td>2</td><td>[1, 0.2, 0.1]</td><td>−1</td><td>1×1 + 0.2×2 + 0.1×4 − 1 = <b>0.8</b></td><td>0.69</td></tr>
+            </table></div>
+            <p>Layer ka output a = [0.62, 0.69]. Ab ye do numbers next layer ka input ban gaye. Bas relay race wali baton pass ho gayi.</p>
+            <div class="compare-grid"><div><b>Single example</b>x shape (3,), W shape (3,2), output shape (2,).</div><div><b>Batch examples</b>X shape (m,3), W shape (3,2), output shape (m,2). TensorFlow mostly batch mein sochta hai.</div></div>
+            <h4>Shape bug ka quick checklist</h4>
+            <p>Forward propagation mein 80% bugs shape se aate hain. Error message scary hota hai, par usually problem yehi hoti hai:</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Symptom</th><th>Likely issue</th><th>Fix</th></tr><tr><td>(m,3) @ (2,4) fail</td><td>Inner numbers 3 aur 2 match nahi</td><td>W ko (3,4) banao</td></tr><tr><td>Output expected (m,2), mila (2,m)</td><td>Transpose ulta</td><td>Batch convention check karo</td></tr><tr><td>Bias add weird</td><td>b ka shape unclear</td><td>b ko (2,) ya (1,2) rakho</td></tr></table></div>
+            <p>Simple mantra: matrix multiply mein beech ke numbers same hone chahiye, aur bahar ke numbers output shape banate hain.</p>
+            <div class="lesson-callout"><b>Beginner checkpoint:</b> Agar output neurons 2 hain, layer ka output bhi 2 numbers ka hoga. Itna match ho raha hai to tum sahi track pe ho.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Forward propagation = har layer mein “multiply, jodo, activation”, aur output agli layer ko pass.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Matrix multiplication nahi aata</summary><p>Idea itna hai: bahut saare dot products ek saath. np.matmul khud kar deta hai. Tumhe bas dhyan rakhna hai ki shapes match karein (pichli layer ke outputs ki ginti = W ki rows).</p></details>
+            <details class="qa"><summary>Forward propagation mein model seekhta hai?</summary><p>Nahi. Forward prop sirf “answer nikaalna” hai. Seekhna backprop + gradient descent mein hota hai (topic 06).</p></details>
+            <details class="qa"><summary>Sab neurons same input dekhte hain, to sab same kyu nahi seekh lete?</summary><p>Kyunki unke weights shuru mein random rakhe jaate hain. Alag shuruaat → alag raaste → alag cheezein seekhte hain.</p></details>
+
+            <details class="qa"><summary>a<sup>[0]</sup> kya hota hai?</summary><p>Input layer ka output. Fancy notation mein a<sup>[0]</sup> = x. Matlab network ka first “activation” bas original input hi hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>x = [1, 2], w = [2, −1], b = 0.5 → z?</summary><p>2 − 2 + 0.5 = <b>0.5</b>.</p></details>
+              <details class="qa"><summary>400 input features, layer 1 mein 25 neurons. W ka shape?</summary><p><b>(400, 25)</b>.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="a2"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="neural-network-idea.html"><small>← Pichhla</small>Neural network ka idea</a>
+          <a class="pager-next" href="tensorflow.html"><small>Agla →</small>TensorFlow mein network banana</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

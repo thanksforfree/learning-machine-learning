@@ -1,0 +1,48 @@
+            <div class="chat">
+              <p class="msg me">Average to pata hai. Par ye variance, standard deviation, probability — ye kya hai?</p>
+              <p class="msg dost">Teen dost ki kahani sunao. Class ke do groups ne test diya. Dono ka average 50 marks. Kya dono same hain?</p>
+              <p class="msg me">Average same hai to same hi honge?</p>
+              <p class="msg dost">Nahi! Group A: 48, 50, 52 — sab average ke paas. Group B: 10, 50, 90 — bahut phaile hue. Average sirf “beech” batata hai. <strong>Kitna phaila hai</strong> — woh variance aur standard deviation batate hain.</p>
+              <p class="msg me">To average kabhi-kabhi aadhi kahani batata hai?</p>
+              <p class="msg dost">Exactly. Average news headline hai; variance andar ki report. Dono dekho, tab picture clear hoti hai.</p>
+            </div>
+            <h4>Mean (average) = μ</h4>
+            <div class="formula"><code>μ = (sab numbers ka total) ÷ (kitne numbers)</code><ul><li>[48, 50, 52] → 150 ÷ 3 = 50</li><li>[10, 50, 90] → 150 ÷ 3 = 50</li></ul></div>
+            <h4>Variance aur standard deviation (σ) — step by step</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Step</th><th>Group A: 48, 50, 52</th><th>Group B: 10, 50, 90</th></tr>
+              <tr><td>1. Har number − average</td><td>−2, 0, 2</td><td>−40, 0, 40</td></tr>
+              <tr><td>2. Square karo</td><td>4, 0, 4</td><td>1600, 0, 1600</td></tr>
+              <tr><td>3. Average = <b>variance (σ²)</b></td><td>8 ÷ 3 ≈ 2.7</td><td>3200 ÷ 3 ≈ 1067</td></tr>
+              <tr><td>4. Root = <b>std deviation (σ)</b></td><td class="good">≈ 1.6</td><td class="bad">≈ 32.7</td></tr>
+            </table></div>
+            <p><strong>σ ka matlab:</strong> “aam taur pe ek number average se kitna door hota hai”. Group A mein ~1.6 marks, Group B mein ~33 marks. Square isliye kiya taaki −40 aur +40 cancel na hon — Module 1 ke cost function jaisa hi trick!</p>
+            <h4>Bell curve (normal / Gaussian distribution)</h4>
+            <p>Bahut saari cheezein — logon ki height, machine ka temperature — ek <strong>ghante (bell) jaisi</strong> shape banati hain: zyadatar values average ke paas, door wali kam.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 400 190" role="img" aria-label="Bell curve: beech mein average, dono taraf 1 sigma aur 2 sigma">
+                <line x1="20" y1="165" x2="380" y2="165" stroke="#b8c2d3"/>
+                <path d="M20,164 C110,164 140,20 200,20 C260,20 290,164 380,164" fill="#edf3ff" stroke="#3567e8" stroke-width="3"/>
+                <line x1="200" y1="20" x2="200" y2="165" stroke="#3567e8" stroke-dasharray="4 3"/>
+                <line x1="155" y1="70" x2="155" y2="165" stroke="#8a96aa" stroke-dasharray="3 3"/><line x1="245" y1="70" x2="245" y2="165" stroke="#8a96aa" stroke-dasharray="3 3"/>
+                <line x1="110" y1="140" x2="110" y2="165" stroke="#c2410c" stroke-dasharray="3 3"/><line x1="290" y1="140" x2="290" y2="165" stroke="#c2410c" stroke-dasharray="3 3"/>
+                <g font-size="11" text-anchor="middle"><text x="200" y="180" fill="#3567e8">μ (average)</text><text x="155" y="180" fill="#7a879b">−1σ</text><text x="245" y="180" fill="#7a879b">+1σ</text><text x="110" y="180" fill="#c2410c">−2σ</text><text x="290" y="180" fill="#c2410c">+2σ</text></g>
+              </svg>
+              <div class="cap">Lagbhag 68% values ±1σ ke andar, ~95% values ±2σ ke andar. Isse bahut bahar = “ajeeb” (anomaly).</div>
+            </figure>
+            <h4>Probability = chance, 0 se 1 ke beech</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Probability</th><th>Matlab</th><th>Example</th></tr>
+              <tr><td>0</td><td>Kabhi nahi</td><td>Normal dice pe 7 aana</td></tr>
+              <tr><td>0.5</td><td>50-50</td><td>Sikka uchhalne pe heads</td></tr>
+              <tr><td>1/6 ≈ 0.17</td><td>6 mein 1</td><td>Dice pe 4</td></tr>
+              <tr><td>1</td><td>Pakka</td><td>Dice pe 1 se 6 ke beech kuch</td></tr>
+            </table></div>
+            <p><strong>Do independent cheezein ek saath:</strong> chances multiply karo. Do sikke dono heads: 0.5 × 0.5 = 0.25. (Anomaly detection mein har feature ka chance aise hi multiply hota hai.)</p>
+            <p>“Independent” ka matlab: ek ka result doosre ko influence nahi kar raha. Jaise do alag coins. Par India match jeeta aur WhatsApp pe memes badhe — woh independent nahi 😄.</p>
+            <p><strong>Ek hi cheez ke saare options ka total = 1.</strong> Dice ke 6 options × 1/6 = 1. (Softmax yahi guarantee karta hai.)</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> μ = beech kahan, σ = kitna phaila, probability = kitna chance (0 se 1).</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Variance aur σ dono kyu? Ek kaafi nahi?</summary><p>Variance ki unit square ho jaati hai (marks²), jo ajeeb hai. σ = root(variance) wapas original unit (marks) mein aata hai — samajhna aasan. Kaam dono ka same: phailaav naapna.</p></details>
+            <details class="qa"><summary>Model 0.8 probability bole to kya 10 mein 8 baar sahi?</summary><p>Achhe se calibrated model ho to haan, aise 10 cases mein lagbhag 8 sach mein positive hone chahiye. Par har model calibrated nahi hota — isliye check karna padta hai.</p></details>
+            <details class="qa"><summary>ML mein ye kahan aayega?</summary><p>Feature scaling (μ, σ), anomaly detection (bell curve), logistic regression (probability), softmax (total = 1), reinforcement learning (random outcomes ka average).</p></details>

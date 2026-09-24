@@ -1,0 +1,94 @@
+            <div class="chat">
+              <p class="msg me">Beam search samajh aa gaya. Par long sentence ki probability naturally chhoti hoti hai. Phir model short answer ko unfair advantage dega?</p>
+              <p class="msg dost">Bilkul pakda. Har extra word ek number 1 se chhota multiply karta hai. Isliye practical beam search logs aur length normalization use karta hai.</p>
+              <p class="msg me">Aur output achha hai ya nahi, woh kaise judge karun?</p>
+              <p class="msg dost">Human judgement best hai, par automatic metric bhi chahiye. Translation mein famous metric hai <strong>BLEU</strong>. Thoda jugaadu, par useful.</p>
+            </div>
+
+            <h4>Products chhote hote hain, logs friendly hote hain</h4>
+            <p>Probability multiply karte karte 0.0000002 jaise numbers aa jaate hain. Computer underflow kar sakta hai, aur compare karna awkward hota hai. Log trick: product ka log = logs ka sum.</p>
+            <div class="formula"><code>log score(y) = Σ⟨t⟩ log P(y⟨t⟩ | y&lt;⟨t⟩, x)</code><ul>
+              <li><b>Product</b> maximize karna aur <b>log product</b> maximize karna same ordering deta hai.</li>
+              <li>Log probabilities negative hoti hain, par add karna stable hota hai.</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Candidate</th><th>Probability</th><th>log(probability)</th></tr>
+              <tr><td>I feel hungry</td><td>0.172</td><td>−1.760</td></tr>
+              <tr><td>I am hungry</td><td>0.065</td><td>−2.733</td></tr>
+            </table></div>
+            <p>Log score −1.760 better hai kyunki zero ke zyada paas hai.</p>
+
+            <h4>Length normalization: short answer ko free medal mat do</h4>
+            <p>“haan” ek word ka answer high probability le sakta hai, par translation incomplete ho sakti hai. Isliye score ko length se normalize karte hain. Common form mein α ≈ 0.7 use hota hai.</p>
+            <div class="formula"><code>normalized score = (1 / T<sub>y</sub><sup>α</sup>) × Σ⟨t⟩ log P(y⟨t⟩ | ...)</code><ul>
+              <li><b>T<sub>y</sub></b> = output length</li>
+              <li><b>α</b> = length penalty ka knob; 0 ho to no normalization</li>
+              <li>Score ab bhi log space mein hai; bada matlab better.</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Sentence</th><th>Raw prob</th><th>T<sub>y</sub></th><th>α = 0.7 normalized log</th></tr>
+              <tr><td>A: “I ate rice”</td><td>0.072</td><td>3</td><td>log(0.072) / 3<sup>0.7</sup> = −1.219</td></tr>
+              <tr><td>B: “I ate rice today”</td><td>0.0504</td><td>4</td><td class="good">log(0.0504) / 4<sup>0.7</sup> = −1.132</td></tr>
+            </table></div>
+            <p>Raw probability A ki zyada thi, par length-normalized score B ko prefer kar raha hai. Matlab longer but complete sentence ko fair chance mila.</p>
+
+            <h4>B kaise choose karein?</h4>
+            <p>B = 1 fast hai, par greedy. B = 3 ya 10 toy/project mein common. B = 100 zyada careful search. B = 1000 bahut mehenga, aur improvement usually slow ho jaata hai. Real choice latency, memory, vocabulary size, aur quality trade-off pe depend karti hai.</p>
+            <div class="compare-grid">
+              <div><b>Small B</b>Fast, mobile app jaisa setup, par good candidate miss ho sakta hai.</div>
+              <div><b>Large B</b>Better search coverage, par decoding slow. Model galat ho to large B bhi galat ko polish karega.</div>
+            </div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Beam search best output ki guarantee nahi deta. Ye approximate search hai. Top path early prune ho gaya to wapas nahi aata.</div>
+
+            <h4>Error analysis: beam ki galti ya model ki?</h4>
+            <p>Ek input x ke liye human/reference answer y* hai. Beam ne ŷ diya. Ab model se dono probabilities nikaalo.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Case</th><th>Model comparison</th><th>Dosh kiska?</th></tr>
+              <tr><td>1</td><td>P(y* | x) &gt; P(ŷ | x), par beam ne ŷ chuna</td><td class="bad">Beam search ne good path miss kiya</td></tr>
+              <tr><td>2</td><td>P(y* | x) &lt; P(ŷ | x)</td><td class="bad">Model khud wrong output ko zyada pasand kar raha hai</td></tr>
+            </table></div>
+            <p>Ye doctor wali diagnosis hai. Fever hai to pehle pata karo viral hai ya food poisoning. Har problem ka ilaaj same nahi hota.</p>
+
+            <h4>BLEU: ek answer nahi, kai sahi translations</h4>
+            <p>Translation mein ek hi correct answer nahi hota. “Main ghar ja raha hoon” ko “I am going home” ya “I’m heading home” dono bol sakte. BLEU candidate ko multiple reference translations se compare karta hai.</p>
+            <p>BLEU ka core idea: candidate ke n-grams references mein mil rahe hain kya? Par cheating rokne ke liye <strong>modified precision</strong> clipping use hoti hai. Agar candidate “very very very” bolta rahe, references mein “very” ek baar hai to count ek hi milega.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Text</th><th>Sentence</th></tr>
+              <tr><td>Candidate</td><td>I feel hungry after school today</td></tr>
+              <tr><td>Reference 1</td><td>I am hungry after class today now</td></tr>
+              <tr><td>Reference 2</td><td>I am hungry after school right now</td></tr>
+              <tr><td>Reference 3</td><td>I became very hungry after school today</td></tr>
+            </table></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>n-gram</th><th>Clipped matches</th><th>Total candidate n-grams</th><th>Precision</th></tr>
+              <tr><td>1-gram</td><td>5</td><td>6</td><td>0.833</td></tr>
+              <tr><td>2-gram</td><td>3</td><td>5</td><td>0.600</td></tr>
+              <tr><td>3-gram</td><td>2</td><td>4</td><td>0.500</td></tr>
+              <tr><td>4-gram</td><td>1</td><td>3</td><td>0.333</td></tr>
+            </table></div>
+            <p>Geometric mean = exp((log 0.833 + log 0.600 + log 0.500 + log 0.333)/4) = 0.537. Candidate length c = 6, closest reference length r = 7, to brevity penalty lagta hai.</p>
+            <div class="formula"><code>BP = exp(1 − r/c) agar c ≤ r; warna BP = 1
+BLEU = BP × exp((1/4) × Σ log pₙ)</code><ul>
+              <li><b>BP</b> = brevity penalty; bahut chhota candidate punish hota hai</li>
+              <li><b>pₙ</b> = modified precision for n-grams, usually n = 1 se 4</li>
+              <li>Yahan BP = exp(1 − 7/6) = 0.846, BLEU = 0.846 × 0.537 = <b>0.455</b>.</li>
+            </ul></div>
+
+            <pre class="code">import math
+p = [5/6, 3/5, 2/4, 1/3]
+geo = math.exp(sum(math.log(x) for x in p) / 4)
+bp = math.exp(1 - 7/6)   <span class="cm"># candidate chhota hai</span>
+print(bp * geo)           <span class="cm"># 0.455 ke aas-paas</span></pre>
+            <div class="oneliner"><b>Yaad rakhna:</b> Logs stability dete hain, length normalization fairness deta hai, aur BLEU rough automatic score deta hai — human judgement ka replacement nahi.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>BLEU high hai to translation perfect?</summary><p>Nahi. BLEU n-gram overlap dekhta hai, meaning nuance nahi samajhta. Par dataset-level comparison ke liye useful signal hai.</p></details>
+            <details class="qa"><summary>Length normalization mein α 0.7 hi kyu?</summary><p>Ye common practical value hai. Tune kar sakte ho. α low hoga to short sentences ko advantage, high hoga to length ka effect zyada compensate hoga.</p></details>
+            <details class="qa"><summary>Error analysis mein y* ki probability kaise nikaalun?</summary><p>Teacher forcing jaisa: reference y* ke words model ko step by step feed karo aur un words ki probabilities multiply, ya log-sum, kar lo.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Candidate probability 0.02 aur length 5 hai. α = 0.7. Normalized log score approx kya? (5<sup>0.7</sup> ≈ 3.08)</summary><p>log(0.02) ≈ −3.912. Divide by 3.08: <b>−1.27</b> approx.</p></details>
+              <details class="qa"><summary>Agar P(y* | x) = 0.30 aur P(ŷ | x) = 0.45, galti beam ki ya model ki?</summary><p><b>Model ki</b>. Model wrong ŷ ko reference se zyada probability de raha hai.</p></details>
+              <details class="qa"><summary>Candidate “very very tasty” aur reference “very tasty” hai. Word “very” ka clipped count kitna?</summary><p>Reference mein “very” max 1 baar hai, to clipped count <b>1</b>, candidate mein 2 baar hone ke baad bhi.</p></details>
+            </div>

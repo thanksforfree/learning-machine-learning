@@ -1,0 +1,79 @@
+            <div class="chat">
+              <p class="msg me">Binary classification mein sigmoid tha. Par agar classes 10 hain, jaise digit 0 se 9?</p>
+              <p class="msg dost">Tab ek hi haan/na ka button kaafi nahi. Har class ko ek score do, phir scores ko probabilities mein badlo.</p>
+              <p class="msg me">Scores matlab marks? Jiske zyada marks, woh answer?</p>
+              <p class="msg dost">Haan, par marks ko probability banana hai taaki total 1 ho. Ye kaam <strong>softmax</strong> karta hai.</p>
+              <p class="msg me">Hardmax kyu nahi — bas highest ko 1, baaki 0?</p>
+              <p class="msg dost">Training ko smooth feedback chahiye. Softmax bolta hai: “ye class likely hai, par doosri thodi possible hai.”</p>
+            </div>
+            <h4>C classes, output layer mein C units</h4>
+            <p>Agar classes 5 hain, output layer mein 5 units. Har unit ek raw score z_c deta hai. Score probability nahi hota; negative bhi ho sakta hai. Softmax scores ko positive probabilities mein convert karta hai jinka sum 1 hota hai.</p>
+            <div class="formula"><code>t_c = e^{z_c}
+ŷ_c = t_c / Σ_j t_j</code><ul>
+              <li><b>z_c</b> = class c ka raw score</li>
+              <li><b>e^{z_c}</b> = score ko positive number banana</li>
+              <li><b>Σ_j t_j</b> = sab exponentials ka total</li>
+              <li><b>ŷ_c</b> = class c ki predicted probability</li>
+            </ul></div>
+            <h4>Worked softmax</h4>
+            <p>Teen classes socho: samosa, dosa, poha. Model ke raw scores z = [2, 1, 0.1].</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Class</th><th>z</th><th>eᶻ</th><th>Probability</th></tr>
+              <tr><td>Samosa</td><td>2</td><td>7.389</td><td class="good">0.659</td></tr>
+              <tr><td>Dosa</td><td>1</td><td>2.718</td><td>0.242</td></tr>
+              <tr><td>Poha</td><td>0.1</td><td>1.105</td><td>0.099</td></tr>
+              <tr><td>Total</td><td></td><td>11.213</td><td>1.000</td></tr>
+            </table></div>
+            <p>Highest score samosa ka tha, probability bhi highest. Par model thoda chance dosa ko bhi de raha hai. Ye softness training mein useful hai.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 420 210" role="img" aria-label="Softmax three class probabilities as bars">
+                <rect x="70" y="55" width="70" height="115" fill="#3567e8"/><rect x="175" y="128" width="70" height="42" fill="#7653d6"/><rect x="280" y="153" width="70" height="17" fill="#159477"/>
+                <line x1="45" y1="170" x2="380" y2="170" stroke="#8a96aa"/>
+                <text x="105" y="48" font-size="11" text-anchor="middle" fill="#3567e8">0.659</text><text x="210" y="121" font-size="11" text-anchor="middle" fill="#7653d6">0.242</text><text x="315" y="146" font-size="11" text-anchor="middle" fill="#159477">0.099</text>
+                <text x="105" y="190" font-size="11" text-anchor="middle" fill="#7a879b">samosa</text><text x="210" y="190" font-size="11" text-anchor="middle" fill="#7a879b">dosa</text><text x="315" y="190" font-size="11" text-anchor="middle" fill="#7a879b">poha</text>
+              </svg>
+              <div class="cap">Softmax probabilities total 1. Biggest score wins, par baaki classes zero nahi hoti.</div>
+            </figure>
+            <h4>Bina hidden layer ke linear boundaries</h4>
+            <p>Softmax regression agar direct input se output tak hai, to har class ka score linear hota hai. Isliye boundaries straight lines/planes hoti hain. Hidden layers add karo to network complex shapes bana sakta hai, par last layer softmax hi probabilities banati hai.</p>
+            <h4>Hardmax vs softmax</h4>
+            <div class="compare-grid">
+              <div><b>Hardmax</b>Highest class ko 1, baaki 0. Final prediction ke liye theek, training ke liye rough.</div>
+              <div><b>Softmax</b>Har class ko probability. Loss bata sakta hai ki galti kitni confident thi.</div>
+            </div>
+            <h4>Loss: one example pe cross-entropy</h4>
+            <p>Label one-hot hota hai. Agar true class samosa hai, y = [1, 0, 0]. Loss sirf true class ki probability pe focus karega.</p>
+            <div class="formula"><code>L = −Σ_c y_c log(ŷ_c)</code><ul>
+              <li><b>y_c</b> one-hot label, true class pe 1</li>
+              <li><b>ŷ_c</b> softmax probability</li>
+              <li>Agar true class probability high, loss low</li>
+            </ul></div>
+            <p>Upar samosa probability 0.659 thi. Loss = −log(0.659) = <strong>0.417</strong>. Agar model true class ko 0.05 chance deta, loss 2.996 hota. Confident galti ki saza badi.</p>
+            <p>Cost J = saare examples ke losses ka average. Mini-batch mein bhi same idea: batch ke examples ka average.</p>
+            <h4>Gradient: dZ = Ŷ − Y</h4>
+            <p>Softmax + cross-entropy ka gradient surprisingly clean hai. Prediction minus label.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Class</th><th>ŷ</th><th>y</th><th>dZ = ŷ − y</th></tr>
+              <tr><td>Samosa</td><td>0.659</td><td>1</td><td>−0.341</td></tr>
+              <tr><td>Dosa</td><td>0.242</td><td>0</td><td>0.242</td></tr>
+              <tr><td>Poha</td><td>0.099</td><td>0</td><td>0.099</td></tr>
+            </table></div>
+            <pre class="code">z = np.array([2.0, 1.0, 0.1])
+t = np.exp(z)
+y_hat = t / np.sum(t)
+y = np.array([1, 0, 0])
+dz = y_hat - y   <span class="cm"># softmax + cross-entropy gradient</span></pre>
+            <h4>C = 2 pe logistic regression hi</h4>
+            <p>Agar classes sirf 2 hain, softmax output do probabilities dega. Ek class ki probability p hai, doosri 1 − p. Ye sigmoid/logistic regression ke barabar idea hai. Isliye binary mein sigmoid convenient, multiclass mein softmax convenient.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Softmax tab use karo jab classes mutually exclusive hon — ek image sirf ek digit hai. Agar ek photo mein dog aur car dono ho sakte hain, har label ke liye alag sigmoid chahiye, softmax nahi.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Softmax scores ko probabilities banata hai, cross-entropy true class ko reward/punish karti hai, aur gradient simply Ŷ − Y hota hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Softmax mein e kyu use hota hai?</summary><p>eᶻ positive hota hai aur score differences ko nicely probability differences mein badalta hai. Plus calculus clean ho jaata hai.</p></details>
+            <details class="qa"><summary>Scores mein constant add karun to probabilities badlengi?</summary><p>Nahi. [2, 1, 0.1] aur [12, 11, 10.1] ka softmax same hoga, kyunki relative differences same hain. Code mein stability ke liye max subtract karte hain.</p></details>
+            <details class="qa"><summary>One-hot label kya hota hai?</summary><p>C classes ki list jisme true class pe 1, baaki 0. Jaise 3 classes mein class 2 true ho to [0, 1, 0].</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Scores [0, 0, 0] ka softmax?</summary><p>Sab e⁰ = 1. Total 3. Probabilities = <b>[1/3, 1/3, 1/3]</b>.</p></details>
+              <details class="qa"><summary>True class probability 0.8 ho to loss −log(0.8) approx?</summary><p>−log(0.8) ≈ <b>0.223</b>.</p></details>
+              <details class="qa"><summary>Ek photo mein multiple labels possible hain. Softmax ya sigmoids?</summary><p><b>Alag-alag sigmoids</b>, kyunki classes mutually exclusive nahi.</p></details>
+            </div>

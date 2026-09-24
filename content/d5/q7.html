@@ -1,0 +1,80 @@
+            <div class="chat">
+              <p class="msg me">One-hot mein “aam” aur “santra” bhi strangers lagte hain. Computer ko kaise batayein ki dono fruits hain?</p>
+              <p class="msg dost">One-hot shelf number hai, meaning nahi. Embedding word ko numbers ka chhota address deta hai jahan similar words paas-paas aa sakte hain.</p>
+              <p class="msg me">Matlab word ka personality vector?</p>
+              <p class="msg dost">Bilkul. Thoda khana, thoda royal, thoda gender, thoda city vibe — dimensions model khud seekhta hai.</p>
+            </div>
+            <h4>One-hot ki kamzori: koi similarity nahi</h4>
+            <p>Vocabulary 10,000 ki hai. “aam” ka vector ek shelf pe 1, “santra” doosri shelf pe 1. Dot product 0. Same “aam” aur “rocket” ka bhi 0. Model ko start mein koi clue nahi ki aam-santra related hain.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Pair</th><th>One-hot dot product</th><th>Human feel</th></tr>
+              <tr><td>aam, santra</td><td>0</td><td class="good">similar fruits</td></tr>
+              <tr><td>aam, rocket</td><td>0</td><td class="bad">unrelated</td></tr>
+            </table></div>
+            <h4>Featurized representation: meaning wale numbers</h4>
+            <p>Embedding mein har word ko dense vector milta hai, jaise 50, 100, 300 dimensions. Har dimension ka exact naam zaroori nahi, par intuition ke liye features socho: food, royal, gender, age, city, sports.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Word</th><th>Food</th><th>Royal</th><th>Gender-ish</th><th>Age-ish</th></tr>
+              <tr><td>aam</td><td>0.92</td><td>0.02</td><td>0.01</td><td>0.10</td></tr>
+              <tr><td>santra</td><td>0.88</td><td>0.01</td><td>0.00</td><td>0.09</td></tr>
+              <tr><td>raja</td><td>0.03</td><td>0.95</td><td>0.80</td><td>0.55</td></tr>
+              <tr><td>rani</td><td>0.03</td><td>0.93</td><td>−0.80</td><td>0.55</td></tr>
+            </table></div>
+            <p>Real embeddings mein dimensions itne clean labelled nahi hote. Par effect useful hota hai: similar usage wale words vector space mein paas aate hain.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 520 230" role="img" aria-label="Embedding space mein fruits paas aur royal words paas">
+                <line x1="50" y1="190" x2="475" y2="190" stroke="#b8c2d3"/><line x1="70" y1="205" x2="70" y2="28" stroke="#b8c2d3"/>
+                <circle cx="135" cy="80" r="8" fill="#159477"/><text x="148" y="84" font-size="11">aam</text>
+                <circle cx="165" cy="95" r="8" fill="#159477"/><text x="178" y="99" font-size="11">santra</text>
+                <circle cx="365" cy="70" r="8" fill="#7653d6"/><text x="378" y="74" font-size="11">raja</text>
+                <circle cx="395" cy="92" r="8" fill="#7653d6"/><text x="408" y="96" font-size="11">rani</text>
+                <circle cx="250" cy="155" r="8" fill="#e0703a"/><text x="263" y="159" font-size="11">metro</text>
+                <text x="80" y="32" font-size="11" fill="#7a879b">t-SNE style 2D view</text>
+              </svg>
+              <div class="cap">t-SNE jaise method high-dimensional embeddings ko 2D mein sirf dekhne layak banate hain.</div>
+            </figure>
+            <h4>t-SNE se 2D mein dekhna</h4>
+            <p>Embedding 300 dimensions mein hota hai; hum screen pe 300D nahi dekh sakte. t-SNE nearby points ko roughly nearby rakhte hue 2D map banata hai. Ye microscope jaisa hai: pattern dekhne ke liye, exact distance measurement ke liye nahi.</p>
+            <h4>Embeddings ka use: bade text se seekho, chhote task pe transfer</h4>
+            <p>Large text corpus se embeddings seekho — news, wiki, reviews. Phir chhote task pe use karo, jaise 2,000 restaurant reviews ka sentiment. Model ko pehle se pata ho sakta hai ki “tasty”, “swadisht”, “delicious” related feel dete hain.</p>
+            <div class="visual-flow"><span>Bada text<br><small>crores words</small></span><b>→</b><span>Embedding learn</span><b>→</b><span class="flow-highlight">Chhota task<br><small>sentiment, NER</small></span><b>↻</b><span>Fine-tune<br><small>optional</small></span></div>
+            <p>Kabhi embeddings freeze karte hain, kabhi fine-tune. Agar task data chhota hai, freeze safe. Agar enough data hai, fine-tune domain ke hisaab se polish kar sakta hai.</p>
+            <h4>Face encoding se rishta</h4>
+            <p>Face recognition mein photo ko 128-number encoding mein convert karte ho. Same person ki photos paas, different person door. Word embeddings mein word ko vector banate ho. Similar meaning/usage wale words paas. Dono idea: raw object ko meaning-space ke point mein badalna.</p>
+            <h4>Analogies: vector arithmetic ka magic-ish part</h4>
+            <p>Classic style: e_man − e_woman ≈ e_king − e_queen. Matlab “gender direction” roughly consistent ho sakti hai. Practical analogy solve karte waqt: king − man + woman ≈ queen.</p>
+            <div class="formula"><code>target ≈ e_king − e_man + e_woman</code><ul>
+              <li><b>e_word</b> = word ka embedding vector.</li>
+              <li>Nearest vector to target choose karte hain.</li>
+              <li>Ye perfect logic engine nahi; corpus bias aur noise affect karte hain.</li>
+            </ul></div>
+            <h4>Cosine similarity: direction compare karo</h4>
+            <p>Embedding ka size kabhi word frequency se affect ho sakta hai. Cosine similarity direction compare karti hai: same direction close to 1, right angle 0, opposite −1.</p>
+            <div class="formula"><code>cos(u, v) = (u · v) / (||u|| ||v||)</code><ul>
+              <li><b>u · v</b> = dot product.</li>
+              <li><b>||u||</b> = vector length.</li>
+              <li>Cosine high = vectors same direction mein.</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Pair</th><th>Vectors</th><th>Cosine</th></tr>
+              <tr><td>aam, santra</td><td>[0.8, 0.6] vs [0.7, 0.7]</td><td class="good">0.990</td></tr>
+              <tr><td>aam, metro</td><td>[0.8, 0.6] vs [−0.6, 0.8]</td><td>0.000</td></tr>
+            </table></div>
+            <pre class="code">import numpy as np
+
+def cosine(u, v):
+    return np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v))
+
+print(cosine(np.array([0.8, 0.6]), np.array([0.7, 0.7])))  <span class="cm"># 0.99</span></pre>
+            <div class="mistake"><b>Dhyan rakhna:</b> Embedding dimensions ko human labels dekar over-interpret mat karo. “Dimension 17 = royalty” zaroori nahi. Useful geometry matters.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Embeddings words ko dense meaning-space mein points banate hain; cosine se direction similarity naapte hain.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Embeddings manually banate hain?</summary><p>Nahi, usually training se learn hote hain. Hum dimension size choose karte hain, values model data se seekhta hai.</p></details>
+            <details class="qa"><summary>t-SNE plot mein distance exact hota hai?</summary><p>Nahi. t-SNE visualization hai. Clusters dekhne ke liye useful, exact math ke liye original embeddings aur cosine use karo.</p></details>
+            <details class="qa"><summary>Analogies hamesha sahi hoti hain?</summary><p>Nahi. Ye impressive pattern hai, guarantee nahi. Data bias, rare words, aur domain mismatch se answer weird ho sakta hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Vectors [1, 0] aur [0, 1] ka cosine kya hai?</summary><p>Dot product 0, lengths 1 aur 1. Cosine = 0/(1×1) = <b>0</b>.</p></details>
+              <details class="qa"><summary>Small sentiment dataset hai. Pretrained embeddings freeze karna kab sensible hai?</summary><p>Jab data kam ho aur overfitting ka darr ho. Freeze karne se pretrained meaning safe rehta hai.</p></details>
+              <details class="qa"><summary>One-hot “chai” aur “coffee” ko similar dikhata hai?</summary><p>Nahi. One-hot mein dono different indices hain; built-in similarity nahi hoti.</p></details>
+            </div>

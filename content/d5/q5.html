@@ -1,0 +1,72 @@
+            <div class="chat">
+              <p class="msg me">RNN memory rakhta hai, phir bhi long sentence mein bhool kyu jaata hai?</p>
+              <p class="msg dost">Socho dost ne 2 minute pehle bola “ladki”, phir beech mein 20 words aa gaye, aur end mein verb choose karna hai: “gayi” ya “gaya”. Normal RNN ka signal raste mein halka pad sakta hai.</p>
+              <p class="msg me">Matlab grammar ki lambi dor toot jaati hai?</p>
+              <p class="msg dost">Exactly. GRU ek gate lagata hai: “ye baat important hai, ise memory mein sambhal ke rakho.”</p>
+            </div>
+            <h4>Lambi dependency: “ladka gaya” vs “ladki gayi”</h4>
+            <p>Sentence dekho: “Woh ladki jo kal station pe apni chhoti behen ke saath khadi thi, ghar <strong>gayi</strong>.” Verb “gayi” ko start ke “ladki” se agreement chahiye. Beech ka pura masala distract kar sakta hai.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 560 185" role="img" aria-label="Ladki aur gayi ke beech long dependency">
+                <rect x="35" y="68" width="70" height="38" rx="9" fill="#edf3ff" stroke="#3567e8"/><text x="55" y="92" font-size="11">ladki</text>
+                <rect x="132" y="68" width="235" height="38" rx="9" fill="#f2edff" stroke="#7653d6"/><text x="151" y="92" font-size="11">... station pe behen ke saath ...</text>
+                <rect x="395" y="68" width="70" height="38" rx="9" fill="#e9f7f3" stroke="#159477"/><text x="416" y="92" font-size="11">gayi</text>
+                <path d="M70 62 C150 20 340 20 430 62" fill="none" stroke="#e0703a" stroke-width="2" stroke-dasharray="5 4"/>
+                <text x="205" y="33" font-size="11" fill="#c2410c">gender info ko lamba safar karna hai</text>
+              </svg>
+              <div class="cap">Early word ki information end tak bachi rehni chahiye.</div>
+            </figure>
+            <h4>RNN mein vanishing gradients</h4>
+            <p>BPTT mein gradient time mein peeche travel karta hai. Agar har step pe woh 0.8 se multiply hota raha, toh 10 steps baad 0.8¹⁰ ≈ 0.107. Signal bahut chhota. Model ko pata hi nahi chalega ki start wale word ko kaise adjust karna tha.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Steps peeche</th><th>Gradient factor</th><th>Signal</th></tr>
+              <tr><td>1</td><td>0.8</td><td>0.800</td></tr>
+              <tr><td>5</td><td>0.8⁵</td><td>0.328</td></tr>
+              <tr><td>10</td><td>0.8¹⁰</td><td class="bad">0.107</td></tr>
+            </table></div>
+            <p>Isko <strong>vanishing gradient</strong> bolte hain. Lambi dependency seekhna slow ya impossible jaisa lagne lagta hai.</p>
+            <h4>Exploding gradients aur clipping</h4>
+            <p>Kabhi ulta hota hai: har step pe 1.5 se multiply, toh signal rocket ban jaata hai. Weights wild jump maarte hain, loss NaN tak pahunch sakta hai. Simple safety: gradient ko max size ke andar clip kar do.</p>
+            <div class="formula"><code>agar ||g|| &gt; threshold, toh g = threshold × g / ||g||</code><ul>
+              <li><b>g</b> = gradient vector.</li>
+              <li><b>threshold</b> = allowed max norm, jaise 5.</li>
+              <li>Direction same rehti hai, bas size control mein.</li>
+            </ul></div>
+            <pre class="code">loss.backward()
+torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=5.0)
+optimizer.step()  <span class="cm"># exploding gradient ko leash laga di</span></pre>
+            <h4>GRU: memory cell aur candidate</h4>
+            <p><strong>GRU</strong> ka full naam Gated Recurrent Unit. Isme memory cell c⟨t⟩ hota hai. Har step pe model ek candidate c̃⟨t⟩ banata hai: “agar nayi info accept karni ho, toh memory aisi ho sakti hai.”</p>
+            <div class="formula"><code>c̃⟨t⟩ = tanh(W_c [Γᵣ * c⟨t−1⟩, x⟨t⟩] + b_c)</code><ul>
+              <li><b>c̃⟨t⟩</b> = proposed new memory.</li>
+              <li><b>c⟨t−1⟩</b> = purani memory.</li>
+              <li><b>Γᵣ</b> = relevance gate; purani memory ka kitna hissa candidate banate waqt relevant hai.</li>
+            </ul></div>
+            <h4>Update gate Γᵤ: naya likhna ya purana sambhalna?</h4>
+            <p>GRU ka star gate update gate hai. Γᵤ 0 aur 1 ke beech number hai. 1 ke paas: nayi candidate memory likho. 0 ke paas: purani memory bachao.</p>
+            <div class="formula"><code>Γᵤ = sigmoid(W_u [c⟨t−1⟩, x⟨t⟩] + b_u)
+c⟨t⟩ = Γᵤ * c̃⟨t⟩ + (1 − Γᵤ) * c⟨t−1⟩</code><ul>
+              <li><b>Γᵤ ≈ 0</b> = yaad rakho, overwrite mat karo.</li>
+              <li><b>Γᵤ ≈ 1</b> = nayi info strong hai, update karo.</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Case</th><th>Γᵤ</th><th>c̃</th><th>c old</th><th>c new</th></tr>
+              <tr><td>Gate mostly closed</td><td>0.2</td><td>0.7</td><td>0.6</td><td>0.2×0.7 + 0.8×0.6 = <b>0.62</b></td></tr>
+              <tr><td>Gate mostly open</td><td>0.9</td><td>0.1</td><td>0.6</td><td>0.9×0.1 + 0.1×0.6 = <b>0.15</b></td></tr>
+            </table></div>
+            <p>Gate closed mein memory lagbhag 0.6 hi rahi. Gate open mein nayi candidate 0.1 ne memory ko kheench liya. Ye hi long memory ka control knob hai.</p>
+            <h4>Full GRU: relevance gate Γᵣ</h4>
+            <p>Update gate decide karta hai final memory kitni badlegi. Relevance gate decide karta hai candidate banate waqt old memory ka kaunsa hissa dekhna hai. Jaise recipe revise karte waqt chef bolta hai: “kal ka masala ignore karo, aaj fresh tadka chahiye.”</p>
+            <div class="visual-flow"><span>Old memory<br><small>c⟨t−1⟩</small></span><b>→</b><span>Γᵣ filters<br><small>candidate ke liye</small></span><b>→</b><span>c̃⟨t⟩</span><b>→</b><span class="flow-highlight">Γᵤ mixes<br><small>final c⟨t⟩</small></span></div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Γᵤ ≈ 0 ka matlab “zero memory” nahi. Matlab update zero: purani memory ko pass-through karo.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> GRU memory pe gate lagata hai. Gate band ho toh important baat lambe time tak safe reh sakti hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Vanishing gradient sirf RNN mein hota hai?</summary><p>Nahi, deep networks mein bhi ho sakta hai. RNN mein same transition bahut baar repeat hota hai, isliye long sequence pe problem zyada dikhti hai.</p></details>
+            <details class="qa"><summary>Gradient clipping vanishing ko bhi solve karta hai?</summary><p>Nahi. Clipping exploding gradient ka seat belt hai. Vanishing ke liye GRU/LSTM jaisi memory path help karti hai.</p></details>
+            <details class="qa"><summary>GRU mein a⟨t⟩ aur c⟨t⟩ alag hain?</summary><p>Simplified GRU mein aksar hidden state aur memory ko same treat karte hain. LSTM mein cell state aur hidden output clearly alag hote hain.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Γᵤ = 0.1, c̃ = 0.9, c old = 0.4. c new?</summary><p>0.1×0.9 + 0.9×0.4 = 0.09 + 0.36 = <b>0.45</b>.</p></details>
+              <details class="qa"><summary>Gate Γᵤ ≈ 0 ho toh GRU kya kar raha hai?</summary><p>Mostly <b>purani memory yaad rakh raha hai</b>, nayi candidate se overwrite nahi kar raha.</p></details>
+              <details class="qa"><summary>Exploding gradient ka quick practical fix?</summary><p><b>Gradient clipping</b>: gradient norm ko threshold ke andar rakhna.</p></details>
+            </div>

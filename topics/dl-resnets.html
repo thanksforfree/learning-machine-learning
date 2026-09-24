@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ResNets: Shortcut wala raasta. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>ResNets (DL · 4) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-convolutional-networks.html">DL · 4: Convolutional Neural Networks</a> › Topic 6 / 15</nav>
+        <p class="eyebrow">DL · 4 · TOPIC 06 · FAMOUS ARCHITECTURES</p>
+        <h1>ResNets</h1>
+        <p>Shortcut wala raasta</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 4 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="c1" href="dl-cv-edge-detection.html"><span>01</span>Computer vision aur edge detection</a>
+            <a data-topic-link="c2" href="dl-padding-stride.html"><span>02</span>Padding aur strided convolution</a>
+            <a data-topic-link="c3" href="dl-conv-volumes-layer.html"><span>03</span>Volumes pe convolution aur ek conv layer</a>
+            <a data-topic-link="c4" href="dl-pooling-cnn-example.html"><span>04</span>Pooling, poora CNN example aur convolution kyu</a>
+            <a data-topic-link="c5" href="dl-classic-networks.html"><span>05</span>Classic networks: LeNet-5, AlexNet, VGG-16</a>
+            <a data-topic-link="c6" class="current" aria-current="page" href="dl-resnets.html"><span>06</span>ResNets</a>
+            <a data-topic-link="c7" href="dl-inception.html"><span>07</span>1×1 convolution aur Inception network</a>
+            <a data-topic-link="c8" href="dl-mobilenet-efficientnet.html"><span>08</span>MobileNet aur EfficientNet</a>
+            <a data-topic-link="c9" href="dl-cnn-practical-advice.html"><span>09</span>CNN practical advice</a>
+            <a data-topic-link="c10" href="dl-localization-landmarks.html"><span>10</span>Object localization aur landmark detection</a>
+            <a data-topic-link="c11" href="dl-sliding-windows.html"><span>11</span>Sliding windows aur uska convolutional version</a>
+            <a data-topic-link="c12" href="dl-yolo.html"><span>12</span>YOLO: IoU, non-max suppression, anchor boxes</a>
+            <a data-topic-link="c13" href="dl-region-proposals-unet.html"><span>13</span>Region proposals aur semantic segmentation (U-Net)</a>
+            <a data-topic-link="c14" href="dl-face-recognition.html"><span>14</span>Face recognition: one-shot, Siamese, triplet loss</a>
+            <a data-topic-link="c15" href="dl-neural-style-transfer.html"><span>15</span>Neural style transfer aur ConvNet andar kya seekhta hai</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15"><span>DL · 4 progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>ResNet ne 100+ layer ke networks ko trainable banaya. Skip connection ka idea aaj har jagah hai, transformers mein bhi.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Residual block: a[l+2] = g(z[l+2] + a[l])</li><li>Plain network: gehra karne pe training error badhne lagta hai</li><li>ResNet kyu kaam karta hai: identity seekhna aasan</li><li>Dimensions match: same conv, ya W_s</li><li>Photos pe ResNet ka dhaancha</li></ul></details>
+        <article class="lesson-card single" id="c6">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Deep network better hona chahiye na? Phir 100 layers laga do, kaam khatam.</p>
+              <p class="msg dost">Kaash! Plain network mein layers badhane se kabhi-kabhi training error hi badhne lagta hai. Matlab model training data bhi achha fit nahi kar pa raha.</p>
+              <p class="msg me">Par zyada layers ke paas option to hai ki extra layers kuch na karein?</p>
+              <p class="msg dost">Theory mein haan. Practice mein “kuch na karna” learn karna bhi mushkil pad sakta hai. ResNet ne shortcut diya: agar layer kuch useful na seekhe, input ko seedha aage bhej do.</p>
+              <p class="msg me">Shortcut jaise exam mein rough work skip?</p>
+              <p class="msg dost">Thoda. Agar beech ka block help nahi kar raha, identity raasta available hai. Isi se very deep networks trainable bane.</p>
+            </div>
+
+            <h4>Residual block ka core idea</h4>
+            <p>Normal block input <code>a[l]</code> leta hai, kuch conv/ReLU karta hai, aur output deta hai. Residual block us output mein original input ko add kar deta hai.</p>
+            <div class="formula"><code>a[l+2] = g( z[l+2] + a[l] )</code><ul>
+              <li><b>a[l]</b> = block ka input activation</li>
+              <li><b>z[l+2]</b> = do layers ke baad ka linear output</li>
+              <li><b>+</b> = skip connection; input seedha add</li>
+              <li><b>g</b> = activation, jaise ReLU</li>
+            </ul></div>
+
+            <figure class="figure">
+              <svg viewBox="0 0 430 210" role="img" aria-label="Residual block input ko do layers ke output mein add karta hai">
+                <rect x="45" y="82" width="70" height="38" rx="8" fill="#edf3ff" stroke="#3567e8"/>
+                <text x="80" y="105" font-size="11" text-anchor="middle" fill="#3567e8">a[l]</text>
+                <rect x="160" y="58" width="70" height="34" rx="8" fill="#f2edff" stroke="#7653d6"/>
+                <text x="195" y="79" font-size="11" text-anchor="middle" fill="#7653d6">Conv</text>
+                <rect x="160" y="118" width="70" height="34" rx="8" fill="#f2edff" stroke="#7653d6"/>
+                <text x="195" y="139" font-size="11" text-anchor="middle" fill="#7653d6">Conv</text>
+                <circle cx="290" cy="104" r="15" fill="#fff3ec" stroke="#e0703a" stroke-width="2"/>
+                <text x="290" y="108" font-size="11" text-anchor="middle" fill="#c2410c">+</text>
+                <rect x="340" y="82" width="70" height="38" rx="8" fill="#e9f7f3" stroke="#159477"/>
+                <text x="375" y="105" font-size="11" text-anchor="middle" fill="#159477">ReLU</text>
+                <path d="M115,101 L155,75" stroke="#7653d6" stroke-width="2"/>
+                <path d="M230,75 L275,104" stroke="#7653d6" stroke-width="2"/>
+                <path d="M115,101 C160,25 250,25 290,89" fill="none" stroke="#159477" stroke-width="2"/>
+                <path d="M305,104 L338,104" stroke="#159477" stroke-width="2"/>
+                <text x="200" y="32" font-size="11" text-anchor="middle" fill="#159477">shortcut / skip</text>
+              </svg>
+              <div class="cap">Block ke andar ka raasta aur shortcut raasta dono milkar output banate hain.</div>
+            </figure>
+
+            <h4>Plain network mein training error badh kyu sakta hai?</h4>
+            <p>Agar 20-layer plain network train ho raha hai, to 56-layer plain network at least utna achha hona chahiye — extra layers identity ban sakti hain, right? Problem ye hai ki optimizer ko exact identity mapping dhundhna easy nahi hota.</p>
+            <p>Deep plain network mein gradients ko bahut layers se guzarna padta hai. Kabhi signal weak hota hai, kabhi optimization awkward. Result: training data pe bhi error badh sakta hai. Ye overfitting nahi; ye optimization problem hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Model</th><th>Training error feeling</th><th>Meaning</th></tr>
+              <tr><td>20-layer plain</td><td>kam</td><td>train ho gaya</td></tr>
+              <tr><td>56-layer plain</td><td class="bad">zyada</td><td>depth add karne se optimize mushkil</td></tr>
+              <tr><td>56-layer ResNet</td><td class="good">kam</td><td>shortcut ne training easy banayi</td></tr>
+            </table></div>
+
+            <h4>ResNet kyu kaam karta hai: identity easy bana do</h4>
+            <p>Residual block ko aise socho:</p>
+            <div class="formula"><code>output = ReLU( F(a[l]) + a[l] )</code><ul>
+              <li><b>F(a[l])</b> = block ke conv layers jo extra change seekhte hain</li>
+              <li>Agar useful change nahi chahiye, F(a[l]) ≈ 0 seekhna relatively easy</li>
+              <li>Tab output ≈ ReLU(a[l]) — input ka signal aage nikal gaya</li>
+            </ul></div>
+            <p>Matlab block ko poori mapping learn nahi karni. Sirf “input mein kya correction add karna hai” learn karna hai. Jaise mummy ki dal already achhi hai; tumhe bas thoda namak adjust karna hai, poori dal dobara banani nahi.</p>
+
+            <h4>Dimensions match: same conv ya W_s</h4>
+            <p>Addition tabhi possible hai jab shapes same hon. Agar <code>z[l+2]</code> aur <code>a[l]</code> dono 28×28×64 hain, seedha add. Par agar block channels 64 se 128 kar raha hai ya stride se size half kar raha hai, shortcut ko bhi transform karna padega.</p>
+            <div class="formula"><code>a[l+2] = g( z[l+2] + W_s a[l] )</code><ul>
+              <li><b>W_s</b> = shortcut projection, often 1×1 convolution</li>
+              <li>Example: 1×1 conv, 64 input channels, 128 output channels</li>
+              <li>Parameters without bias = 1 × 1 × 64 × 128 = 8,192</li>
+            </ul></div>
+            <p>Same conv padding spatial size preserve kar sakta hai. Projection shortcut shape ko match karata hai. Add operation ko shape drama bilkul pasand nahi.</p>
+
+            <h4>Photos pe ResNet ka dhaancha</h4>
+            <p>Typical ResNet pehle ek conv layer se basic features nikalta hai, phir residual blocks ke groups. Har group mein spatial size kabhi half hota hai, channels double. End mein global average pooling aur softmax.</p>
+            <div class="visual-flow"><span>Image</span><b>→</b><span>Conv</span><b>→</b><span class="flow-highlight">Residual blocks</span><b>→</b><span>Global avg pool</span><b>→</b><span>Softmax</span></div>
+            <pre class="code">def residual_block(x):
+    shortcut = x
+    z = conv_relu(x)
+    z = conv(z)
+    return relu(z + shortcut)  <span class="cm"># shapes same honi chahiye</span></pre>
+
+            <div class="mistake"><b>Dhyan rakhna:</b> Skip connection concatenate nahi karta; ResNet mein usually add karta hai. Add ke liye shapes exactly match honi chahiye.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> ResNet block poori nayi mapping nahi, input par correction seekhta hai. Shortcut deep network ko “kuch na karne” ka easy option deta hai.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Shortcut se model cheating kar raha hai?</summary><p>Nahi. Shortcut bhi architecture ka part hai. Agar block useful feature seekhta hai to F(a) add hota hai; agar nahi, signal safe aage jaata hai.</p></details>
+            <details class="qa"><summary>ResNet mein ReLU addition se pehle ya baad mein?</summary><p>Original blocks mein addition ke baad ReLU common tha. Baad mein pre-activation variants aaye. Beginner level pe main idea: skip path add hota hai.</p></details>
+            <details class="qa"><summary>Transformers mein bhi skip connection hota hai?</summary><p>Haan. Residual/skip connection ka idea CNN se bahar bhi bahut useful nikla. Deep Transformer blocks mein bhi residual paths hote hain.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>z = [−2, 3, 1], shortcut a = [5, −1, 2]. ReLU(z+a) kya?</summary><p>z+a = [3, 2, 3]. ReLU same rakhega. <b>[3, 2, 3]</b>.</p></details>
+              <details class="qa"><summary>1×1 shortcut projection: 256 input channels se 512 output channels. Bias ignore karo. Params?</summary><p>1 × 1 × 256 × 512 = <b>131,072</b>.</p></details>
+              <details class="qa"><summary>Plain deep network ka training error depth badhne pe badh raha hai. Ye high variance hai?</summary><p>Nahi zaroori. Training error hi badh raha hai, to ye mostly <b>optimization problem</b> hai; ResNet shortcut help kar sakta hai.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="c6"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-classic-networks.html"><small>← Pichhla</small>Classic networks: LeNet-5, AlexNet, VGG-16</a>
+          <a class="pager-next" href="dl-inception.html"><small>Agla →</small>1×1 convolution aur Inception network</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Jahan order matter karta hai: sentences, awaaz, music. RNN, GRU, LSTM, word embeddings (Word2Vec, GloVe), seq2seq aur beam search, attention, speech, aur aakhir mein Transformers — aaj ke language models ki neev.">
+  <title>DL · 5: Sequence Models — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="index.html">Learning map</a><a href="maths.html">Maths</a><a href="ml.html">ML</a><a class="active" href="dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="module-hero">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Learning map</a> › <a href="dl.html">Deep Learning Specialization</a></nav>
+      <p class="eyebrow">DL COURSE 5 • AWAAZ, TEXT, TRANSLATION, TRANSFORMERS</p>
+      <h1>Sequence Models</h1>
+      <p>Jahan order matter karta hai: sentences, awaaz, music. RNN, GRU, LSTM, word embeddings (Word2Vec, GloVe), seq2seq aur beam search, attention, speech, aur aakhir mein Transformers — aaj ke language models ki neev.</p>
+      <div class="module-path"><span>RNN</span> → <span>GRU/LSTM</span> → <span>Word embeddings</span> → <span>Seq2seq + attention</span> → <span>Transformers</span></div>
+      <div class="hero-actions"><a class="button button-primary" href="topics/dl-why-sequence-models.html">Topic 01 se shuru karo →</a>
+      <div class="progress-box inline" data-module-topics="q1,q2,q3,q4,q5,q6,q7,q8,q9,q10,q11,q12,q13,q14,q15"><span>Progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div></div>
+    </section>
+    <div class="module-overview">
+      <section class="lesson-group"><p class="eyebrow">RNN</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="q1" href="topics/dl-why-sequence-models.html">
+          <span class="topic-index">01</span>
+          <span class="topic-card-text"><b>Sequence models kyu, aur notation</b><small>Jab order matter karta hai</small><em>Pehle ye samajhna ki sequence wale data mein kya alag hai, aur shabdon ko computer ko kaise dikhayein.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="q2" href="topics/dl-rnn-model.html">
+          <span class="topic-index">02</span>
+          <span class="topic-card-text"><b>Recurrent Neural Network (RNN)</b><small>Yaaddasht wala network</small><em>RNN pehla network hai jo pichhli baat yaad rakh ke aage chalta hai. Baaki sab sequence models iske upgrade hain.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="q3" href="topics/dl-bptt-rnn-types.html">
+          <span class="topic-index">03</span>
+          <span class="topic-card-text"><b>Backprop through time aur RNN ke types</b><small>Many-to-many, many-to-one, one-to-many</small><em>Har sequence problem ka apna shape hai. Sahi shape chuno to aadha design ho gaya.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="q4" href="topics/dl-language-model-sampling.html">
+          <span class="topic-index">04</span>
+          <span class="topic-card-text"><b>Language model aur naye sentences banana</b><small>Agla shabd kya hoga?</small><em>Aaj ke chatbots isi idea ka bahut bada roop hain. Yahan uska sabse chhota version khud banana samjhoge.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">LAMBI YAADDASHT</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="q5" href="topics/dl-vanishing-gradients-gru.html">
+          <span class="topic-index">05</span>
+          <span class="topic-card-text"><b>Vanishing gradients aur GRU</b><small>Lambi baat yaad rakhna</small><em>Normal RNN lambe sentences mein shuru ki baat bhool jaata hai. GRU usko yaad rakhne ka gate deta hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="q6" href="topics/dl-lstm-brnn-deep-rnn.html">
+          <span class="topic-index">06</span>
+          <span class="topic-card-text"><b>LSTM, bidirectional RNN aur deep RNN</b><small>Teen gates, do dishaayein, kai layers</small><em>LSTM saalon tak sequence models ka raja raha. BRNN aur deep RNN uske saath aane wale do bade upgrade hain.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">WORD EMBEDDINGS</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="q7" href="topics/dl-word-embeddings.html">
+          <span class="topic-index">07</span>
+          <span class="topic-card-text"><b>Word embeddings: shabdon ko matlab wale numbers</b><small>Aam aur santra paas-paas</small><em>Computer ko shabdon ke beech ka rishta samjhaane ka tareeka. Aaj ka poora NLP isi pe khada hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="q8" href="topics/dl-word2vec-negative-sampling.html">
+          <span class="topic-index">08</span>
+          <span class="topic-card-text"><b>Embedding matrix, Word2Vec aur negative sampling</b><small>Embeddings seekhte kaise hain</small><em>Embeddings kahin se aasmaan se nahi girte. Yahan dekhoge ki ek simple sa prediction task unhe kaise sikha deta hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="q9" href="topics/dl-glove-sentiment-debiasing.html">
+          <span class="topic-index">09</span>
+          <span class="topic-card-text"><b>GloVe, sentiment classification aur bias hatana</b><small>Embeddings ka use, aur unki zimmedari</small><em>Embeddings seekhne ka ek aur tareeka, unka ek asli use, aur ek zaroori sawaal: kya ye samaj ke bias bhi seekh lete hain?</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">SEQ2SEQ AUR ATTENTION</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="q10" href="topics/dl-seq2seq-beam-search.html">
+          <span class="topic-index">10</span>
+          <span class="topic-card-text"><b>Sequence-to-sequence aur beam search</b><small>Translation ka pehla tareeka</small><em>Translation, captions, summaries — sab seq2seq hain. Aur beam search batata hai ki ek achha output kaise chunein.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="q11" href="topics/dl-beam-refinements-bleu.html">
+          <span class="topic-index">11</span>
+          <span class="topic-card-text"><b>Beam search refinements, error analysis aur BLEU</b><small>Output kitna achha, kaise naapein</small><em>Beam search ko practical banana, galti beam ki hai ya model ki — ye pehchanna, aur translation ko ek number mein judge karna.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="q12" href="topics/dl-attention-model.html">
+          <span class="topic-index">12</span>
+          <span class="topic-card-text"><b>Attention model</b><small>Poora sentence ek saath yaad nahi, dhyan jahan zaroori</small><em>Attention ne translation ko badal diya — aur yahi idea aage Transformers ka dil bana.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="q13" href="topics/dl-speech-trigger-word.html">
+          <span class="topic-index">13</span>
+          <span class="topic-card-text"><b>Speech recognition aur trigger word detection</b><small>“Hey phone” sunna</small><em>Sequence models ka ek bahut asli use — awaaz. Aur CTC ka chalaak idea jo lambi awaaz ko chhote text se jodta hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">TRANSFORMERS</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="q14" href="topics/dl-transformer-self-attention.html">
+          <span class="topic-index">14</span>
+          <span class="topic-card-text"><b>Transformer intuition aur self-attention</b><small>Har shabd baaki sab shabdon ko dekhe</small><em>Aaj ke saare bade language models Transformers hain. Self-attention unka engine hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="q15" href="topics/dl-multihead-transformer.html">
+          <span class="topic-index">15</span>
+          <span class="topic-card-text"><b>Multi-head attention aur Transformer network</b><small>Poora dhaancha ek saath</small><em>Specialization ka aakhri tukda — aur woh architecture jo BERT, GPT jaise models ke peeche hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <div class="next-module end-card"><div><p class="eyebrow">DEEP LEARNING SPECIALIZATION POORA</p><h2>Ab aage kya?</h2><p>Learning map pe jao — doosra track shuru karo, ya kisi bhi topic ke “Ab tumhari baari” sawaal dobara solve karo.</p></div><a class="button button-primary" href="index.html">Learning map →</a></div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Training aur testing alag distributions pe: Web photos se train, mobile photos pe test. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Training aur testing alag distributions pe (DL · 3) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-structuring-projects.html">DL · 3: Structuring Machine Learning Projects</a> › Topic 6 / 9</nav>
+        <p class="eyebrow">DL · 3 · TOPIC 06 · ALAG DISTRIBUTION KA DATA</p>
+        <h1>Training aur testing alag distributions pe</h1>
+        <p>Web photos se train, mobile photos pe test</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 3 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="p1" href="dl-ml-strategy-orthogonalization.html"><span>01</span>ML strategy aur orthogonalization</a>
+            <a data-topic-link="p2" href="dl-single-number-metric.html"><span>02</span>Ek number wala metric, satisficing aur optimizing</a>
+            <a data-topic-link="p3" href="dl-dev-test-setup.html"><span>03</span>Dev/test set lagana, aur kab badalna</a>
+            <a data-topic-link="p4" href="dl-human-level-performance.html"><span>04</span>Human-level performance aur avoidable bias</a>
+            <a data-topic-link="p5" href="dl-error-analysis.html"><span>05</span>Error analysis aur galat labels</a>
+            <a data-topic-link="p6" class="current" aria-current="page" href="dl-mismatched-distributions.html"><span>06</span>Training aur testing alag distributions pe</a>
+            <a data-topic-link="p7" href="dl-fix-data-mismatch.html"><span>07</span>Data mismatch kaise theek karein</a>
+            <a data-topic-link="p8" href="dl-transfer-multitask.html"><span>08</span>Transfer learning aur multi-task learning</a>
+            <a data-topic-link="p9" href="dl-end-to-end.html"><span>09</span>End-to-end deep learning</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="p1,p2,p3,p4,p5,p6,p7,p8,p9"><span>DL · 3 progress</span><strong data-progress-label>0 / 9 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Aksar achha training data aur asli use ka data alag hota hai. Galat split kiya to galat nateeje nikaaloge.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Bahut saara internet data + thoda asli product data — kaise baantein (apne numbers)</li><li>Ek aur apna example (jaise voice product)</li><li>Train-dev set kya hai</li><li>Human / train / train-dev / dev / test errors se diagnosis</li><li>Avoidable bias, variance, data mismatch, dev pe overfit</li></ul></details>
+        <article class="lesson-card single" id="p6">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Mere paas 75 hazaar catalog photos hain aur 6 hazaar kiosk photos. Train kaise karun?</p>
+              <p class="msg dost">Pehle bata, final users kaunse photos bhejenge?</p>
+              <p class="msg me">Kiosk wale. Catalog photos bas vendor se ready mil gaye.</p>
+              <p class="msg dost">To dev/test kiosk photos se banao. Catalog photos helpful hain, par target nahi.</p>
+              <p class="msg me">Matlab train aur test alag distributions pe ho sakte hain?</p>
+              <p class="msg dost">Haan, real projects mein aksar hota hai. Bas diagnosis ke liye split smart chahiye.</p>
+            </div>
+
+            <h4>75 hazaar catalog + 6 hazaar kiosk photos ka split</h4>
+            <p>Maan lo sneaker-authentication model ke liye 75,000 clean catalog photos mile. Mall kiosk users se 6,000 messy counter photos mile: glass reflection, tilted shoe, mixed lighting. Final product kiosk users ke liye hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Set</th><th>Data</th><th>Purpose</th></tr>
+              <tr><td>Train</td><td>75,000 catalog + 3,000 kiosk</td><td>Model ko zyada examples do</td></tr>
+              <tr><td>Train-dev</td><td>3,000 training-distribution examples, train mein use nahi</td><td>Variance vs mismatch diagnose</td></tr>
+              <tr><td>Dev</td><td>1,500 kiosk</td><td class="good">Model choices target users pe</td></tr>
+              <tr><td>Test</td><td>1,500 kiosk</td><td class="good">Final honest target number</td></tr>
+            </table></div>
+            <p>Important: dev/test kiosk distribution se. Catalog photos ko dev/test mein daalne se metric pretty lagega, product nahi.</p>
+
+            <h4>Loading-dock scanner ka example</h4>
+            <p>Barcode model office desk photos pe 4% error de raha hai. Dusty loading dock pe 21%. Agar final use loading dock mein hai, desk-photo dev set tumhe jhoothi tasalli dega. Training mein desk data ka use karo, par dev/test loading-dock scans se rakho.</p>
+            <div class="visual-flow">
+              <span>Desk photos<br><small>easy, plenty</small></span><b>+</b>
+              <span>Loading dock<br><small>small, target</small></span><b>→</b>
+              <span class="flow-highlight">Dev/test dock se</span>
+            </div>
+
+            <h4>Train-dev set kya hai?</h4>
+            <p>Train-dev set woh examples hain jo training distribution se aate hain, par training mein use nahi hote. Iska kaam hai ye batana: model training distribution ke unseen examples pe kaisa karta hai?</p>
+            <p>Ye chhota sa extra set confusion todta hai. Agar train se train-dev pe error jump kare, variance problem. Agar train-dev se dev pe jump kare, data mismatch problem.</p>
+            <div class="formula"><code>variance gap = train-dev error − train error
+data mismatch gap = dev error − train-dev error
+dev overfit gap = test error − dev error</code><ul>
+              <li><b>train-dev</b> training jaisi distribution, par model ne train nahi kiya</li>
+              <li><b>dev</b> target user distribution</li>
+              <li><b>test</b> final target distribution, dev jaisa</li>
+            </ul></div>
+
+            <h4>Human / train / train-dev / dev / test se diagnosis</h4>
+            <p>Ab numbers se disease pakdo. Sneaker kiosk app ka example:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Error source</th><th>Error</th><th>Gap</th><th>Signal</th></tr>
+              <tr><td>Human</td><td>3%</td><td>—</td><td>Baseline</td></tr>
+              <tr><td>Train</td><td>6%</td><td>6 − 3 = 3%</td><td>Some avoidable bias</td></tr>
+              <tr><td>Train-dev</td><td>10%</td><td>10 − 6 = 4%</td><td class="bad">Variance</td></tr>
+              <tr><td>Dev</td><td>19%</td><td>19 − 10 = 9%</td><td class="bad">Data mismatch</td></tr>
+              <tr><td>Test</td><td>20%</td><td>20 − 19 = 1%</td><td>Dev/test aligned</td></tr>
+            </table></div>
+            <p>Yahan sabse bada gap train-dev se dev ka hai: 9 points. Matlab target kiosk photos training distribution se kaafi alag hain. Sirf regularization se poora fix nahi hoga; target-style data chahiye.</p>
+
+            <h4>Chaar common patterns</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Pattern</th><th>Numbers</th><th>Diagnosis</th><th>Action</th></tr>
+              <tr><td>Bias</td><td>Human 2, train 12</td><td class="bad">Training pe weak</td><td>Bigger model/features</td></tr>
+              <tr><td>Variance</td><td>Train 3, train-dev 11</td><td class="bad">Same distribution unseen pe weak</td><td>More data/regularize</td></tr>
+              <tr><td>Mismatch</td><td>Train-dev 6, dev 17</td><td class="bad">Target distribution alag</td><td>Target-like data/synthesis</td></tr>
+              <tr><td>Dev overfit</td><td>Dev 8, test 15</td><td class="bad">Dev pe tune-tune kar diya</td><td>Bigger dev, reset process</td></tr>
+            </table></div>
+            <p>Numbers ko percentages samjho. Exact values project ke hisaab se badlenge, par gap reading same rahegi.</p>
+
+            <h4>Dev pe overfit ka signal</h4>
+            <p>Agar dev error 6% aur test error 14% hai, aur dev/test same distribution se hone chahiye the, to model choices dev set ke quirks pe overfit ho gaye. Bahut zyada hyperparameter tuning, repeated manual choices, ya dev set chhota ho sakta hai.</p>
+            <p>Fix: dev set enlarge karo, fresh dev/test split banao, ya model selection process discipline se chalao. Test ko daily leaderboard mat banao.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Catalog photos ko train, dev, test mein random mix kar doge to metric easy distribution pe shine karega. Kiosk photos pe shock milega.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Train-dev set ek chhota mirror hai. Ye batata hai problem overfitting hai ya target data sach mein alag hai.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Train-dev set kitna bada?</summary><p>Itna ki error estimate stable ho. Usually dev jaisa order. Agar data huge hai to kuch hazaar examples kaafi. Agar data chhota hai to careful trade-off.</p></details>
+            <details class="qa"><summary>Kiosk photos kam hain. Kya train mein sab daal doon?</summary><p>Nahi, kuch kiosk photos dev/test ke liye bachao. Target metric ke bina tumhe pata hi nahi chalega product improve hua ya nahi.</p></details>
+            <details class="qa"><summary>Train distribution mixed hai. Train-dev ka sample kaise?</summary><p>Train mein jo mix use kiya, usi mix ka held-out sample lo. Purpose hai training distribution pe unseen performance measure karna.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Human 5%, train 8%, train-dev 9%, dev 21%, test 22%. Sabse bada issue?</summary><p>Train-dev to dev gap = 12 points. Variance gap sirf 1. <b>Final answer: data mismatch</b>.</p></details>
+              <details class="qa"><summary>Train 4%, train-dev 15%, dev 16%. Issue?</summary><p>Train-dev − train = 11 points, dev − train-dev = 1 point. <b>Final answer: high variance, mismatch nahi main issue</b>.</p></details>
+              <details class="qa"><summary>Dev 9%, test 18%, dono same distribution hone chahiye the. Kya shak?</summary><p>Dev pe overfit, dev set chhota/overused, ya dev-test split actually different. <b>Final answer: dev/test process check</b>.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="p6"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-error-analysis.html"><small>← Pichhla</small>Error analysis aur galat labels</a>
+          <a class="pager-next" href="dl-fix-data-mismatch.html"><small>Agla →</small>Data mismatch kaise theek karein</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

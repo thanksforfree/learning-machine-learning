@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Ek neuron (logistic regression) se shuru karke poora deep network haath se banana — notation, computation graph, vectorization, activation functions, backprop, aur L layers tak ki dimensions.">
+  <title>DL · 1: Neural Networks and Deep Learning — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="index.html">Learning map</a><a href="maths.html">Maths</a><a href="ml.html">ML</a><a class="active" href="dl.html">DL</a></nav></header>
+  <main id="main" class="module-blue">
+    <section class="module-hero">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Learning map</a> › <a href="dl.html">Deep Learning Specialization</a></nav>
+      <p class="eyebrow">DL COURSE 1 • NEURAL NETWORK KHUD BANAO</p>
+      <h1>Neural Networks and Deep Learning</h1>
+      <p>Ek neuron (logistic regression) se shuru karke poora deep network haath se banana — notation, computation graph, vectorization, activation functions, backprop, aur L layers tak ki dimensions.</p>
+      <div class="module-path"><span>Ek neuron</span> → <span>Computation graph</span> → <span>Vectorize karo</span> → <span>Ek hidden layer</span> → <span>L layers</span></div>
+      <div class="hero-actions"><a class="button button-primary" href="topics/dl-what-is-deep-learning.html">Topic 01 se shuru karo →</a>
+      <div class="progress-box inline" data-module-topics="n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11"><span>Progress</span><strong data-progress-label>0 / 11 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div></div>
+    </section>
+    <div class="module-overview">
+      <section class="lesson-group"><p class="eyebrow">SHURUAAT</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="n1" href="topics/dl-what-is-deep-learning.html">
+          <span class="topic-index">01</span>
+          <span class="topic-card-text"><b>Deep learning kya hai, aur ab hi kyu chal pada?</b><small>Neural network ka pehla idea aur scale ki kahani</small><em>Poore specialization ka context: neural network kis kaam aata hai, kaunse data pe kaunsa network, aur pichhle kuch saalon mein ye achanak itna powerful kyu ho gaya.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">EK NEURON</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="n2" href="topics/dl-binary-classification.html">
+          <span class="topic-index">02</span>
+          <span class="topic-card-text"><b>Binary classification aur notation</b><small>Photo ko numbers ki lambi list banana</small><em>Poore course ki notation yahin set hoti hai. X ka shape, m, nₓ — ye clear ho gaya to aage ke formulas padhna aasan ho jaayega.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="n3" href="topics/dl-logistic-regression-neuron.html">
+          <span class="topic-index">03</span>
+          <span class="topic-card-text"><b>Logistic regression — ek neuron wala network</b><small>ŷ = σ(wᵀx + b), loss aur cost</small><em>Ye sabse chhota neural network hai. Iski training samajh li to deep network bas isi ko baar-baar jodna hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="n4" href="topics/dl-computation-graph.html">
+          <span class="topic-index">04</span>
+          <span class="topic-card-text"><b>Gradient descent aur computation graph</b><small>Forward mein hisaab, backward mein slopes</small><em>Backpropagation ka poora idea yahan ek chhote graph pe dikh jaata hai. Deep network mein bhi bilkul yahi hota hai, bas graph bada hota hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="n5" href="topics/dl-logistic-gradients.html">
+          <span class="topic-index">05</span>
+          <span class="topic-card-text"><b>Logistic regression ke gradients</b><small>dz = a − y ka jaadu</small><em>Yahi formulas neural network ki aakhri layer mein har jagah aayenge. Aur yahin pata chalta hai ki for-loops kyu dushman hain.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="n6" href="topics/dl-vectorization.html">
+          <span class="topic-index">06</span>
+          <span class="topic-card-text"><b>Vectorization aur broadcasting</b><small>For-loop hatao, speed badhao</small><em>Deep learning bade data pe chalta hai. Vectorization ke bina ek training run ghanton ki jagah dinon mein chalegi.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">EK HIDDEN LAYER</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="n7" href="topics/dl-shallow-network.html">
+          <span class="topic-index">07</span>
+          <span class="topic-card-text"><b>Shallow neural network: ek hidden layer</b><small>Neurons ko stack karke matrix banana</small><em>Pehli baar asli “network” banega. Aur yahin se W[1], a[1] jaisi layer notation shuru hoti hai jo aage har jagah chalegi.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="n8" href="topics/dl-activation-functions.html">
+          <span class="topic-index">08</span>
+          <span class="topic-card-text"><b>Activation functions aur unke derivatives</b><small>Sigmoid, tanh, ReLU, Leaky ReLU</small><em>Activation galat chuna to network ya to seekhega hi nahi ya bahut dheere seekhega. Aur backprop ke liye inke slopes chahiye.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="n9" href="topics/dl-shallow-backprop.html">
+          <span class="topic-index">09</span>
+          <span class="topic-card-text"><b>Shallow network ka backprop aur random initialization</b><small>Weights zero se shuru kyu nahi</small><em>Pehla poora backprop khud likhoge. Aur ek bahut common galti — sab weights zero rakhna — kyu network ko bekaar kar deti hai, woh yahan samjhoge.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">DEEP NETWORK</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="n10" href="topics/dl-deep-network.html">
+          <span class="topic-index">10</span>
+          <span class="topic-card-text"><b>Deep L-layer network aur dimensions</b><small>Kitni bhi layers, ek hi formula</small><em>Ab network ko kitna bhi gehra kar sakte ho. Dimensions ka hisaab sahi rakha to bugs ka sabse bada source khatam.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="n11" href="topics/dl-why-deep-building-blocks.html">
+          <span class="topic-index">11</span>
+          <span class="topic-card-text"><b>Deep kyu? Building blocks, parameters aur hyperparameters</b><small>Poora network ek saath jodna</small><em>Course 1 ka final picture: deep network har layer ke forward-backward blocks se kaise banta hai, aur kaunsi cheezein tumhe khud chunni padti hain.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <div class="next-module"><div><p class="eyebrow">IS COURSE KE BAAD</p><h2>Improving Deep Neural Networks</h2><p>Network ban gaya — ab usko achha banana. Bias/variance, L2 aur dropout, initialization, gradient checking, mini-batches, momentum-RMSprop-Adam, hyperparameter search, batch norm, softmax aur TensorFlow.</p></div><a class="button button-primary" href="dl-improving-networks.html">DL · 2 dekho →</a></div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

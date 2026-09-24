@@ -1,0 +1,76 @@
+            <div class="chat">
+              <p class="msg me">Probability Level 1 mein chance tha. Level 2 mein kya naya hai?</p>
+              <p class="msg dost">Ab chance akela nahi, context ke saath aayega. “Baarish ka chance” alag, “cloudy hai to baarish ka chance” alag.</p>
+              <p class="msg me">Language model bhi aise hi sochta hai?</p>
+              <p class="msg dost">Haan. “chai” ke baad “peena” ka chance, “train” ke baad “late” ka chance — pichhle shabdon ke condition pe.</p>
+            </div>
+            <h4>Conditional probability: P(A | B)</h4>
+            <p><code>P(A | B)</code> padho: “B ho chuka hai, ab A ka chance kya?” Example: 100 din observe kiye. 30 din cloudy the. Un 30 cloudy dinon mein 18 din baarish hui.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Sawaal</th><th>Hisaab</th><th>Answer</th></tr>
+              <tr><td>Cloudy ka chance</td><td>30 ÷ 100</td><td>0.30</td></tr>
+              <tr><td>Baarish | Cloudy</td><td>18 ÷ 30</td><td><b>0.60</b></td></tr>
+              <tr><td>Cloudy aur baarish dono</td><td>0.30 × 0.60</td><td><b>0.18</b></td></tr>
+            </table></div>
+            <div class="formula"><code>P(A and B) = P(B) × P(A | B)</code><ul>
+              <li><b>P(B)</b> = pehle context ka chance.</li>
+              <li><b>P(A | B)</b> = context milne ke baad A ka chance.</li>
+            </ul></div>
+            <h4>Sentence probability = chain rule</h4>
+            <p>Sentence ko left se right banao. Har shabd ka chance pichhle shabdon pe depend karega.</p>
+            <div class="formula"><code>P(y₁, y₂, y₃) = P(y₁) × P(y₂ | y₁) × P(y₃ | y₁,y₂)</code><ul>
+              <li>“main” ka chance maan lo 0.8.</li>
+              <li>“main” ke baad “chai” ka chance 0.5.</li>
+              <li>“main chai” ke baad “peeta” ka chance 0.25.</li>
+              <li>Sentence chance = 0.8 × 0.5 × 0.25 = <b>0.1</b>.</li>
+            </ul></div>
+            <h4>Likelihood — data dekh ke model ko score dena</h4>
+            <p>Likelihood ka mood: “Agar model ye bol raha hai, to hamara observed data kitna believable hai?” Coin example: 10 toss mein 8 heads, 2 tails aaye.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Model</th><th>Likelihood for 8H, 2T</th><th>Value</th></tr>
+              <tr><td>Coin heads chance 0.7</td><td>0.7⁸ × 0.3²</td><td><b>0.00519</b></td></tr>
+              <tr><td>Coin heads chance 0.5</td><td>0.5¹⁰</td><td><b>0.00098</b></td></tr>
+            </table></div>
+            <p>0.7 wala model is data ko zyada believable banata hai. Maximum likelihood training ka idea: parameters aise choose karo jo training labels ko high probability dein.</p>
+            <h4>Negative log-likelihood = cross-entropy loss</h4>
+            <p>Products chhote hote jaate hain, isliye log use karte hain. High probability ko chhoti saza, low probability ko badi saza.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Correct class ko probability</th><th>Loss = −log(p)</th><th>Feel</th></tr>
+              <tr><td>0.7</td><td>0.357</td><td>Achha, chhoti saza</td></tr>
+              <tr><td>0.2</td><td>1.609</td><td>Kaafi galat</td></tr>
+              <tr><td>0.1</td><td>2.303</td><td>Confident galti, badi saza</td></tr>
+            </table></div>
+            <p>Upar sentence example ka log loss: <code>−(log 0.8 + log 0.5 + log 0.25) = 2.303</code>, kyunki total probability 0.1 thi aur <code>−log(0.1) = 2.303</code>.</p>
+            <h4>argmax vs sampling</h4>
+            <p>Softmax model har option ka probability distribution deta hai. Example scores <code>[2, 1, 0.1]</code> ka softmax ≈ <code>[0.659, 0.242, 0.099]</code>.</p>
+            <div class="compare-grid">
+              <div><b>argmax</b>Sabse bada probability choose karo. Predictable, safe. Yahan class 1 (0.659) choose hogi.</div>
+              <div><b>sampling</b>Probability ke hisaab se random choose karo. Kabhi class 2 bhi aa sakti hai. Text generation mein variety aati hai.</div>
+            </div>
+<pre class="code">import numpy as np
+
+probs = np.array([0.659, 0.242, 0.099])
+print(np.argmax(probs))                 <span class="cm"># 0, sabse likely</span>
+choice = np.random.choice([0, 1, 2], p=probs)
+print(choice)                           <span class="cm"># probabilities ke hisaab se random</span></pre>
+            <h4>Chhoti probabilities: product se log sum tak</h4>
+            <p>100 shabdon ki sentence mein probabilities multiply karoge to number bahut chhota ho jayega. Computer ke floating-point mein underflow aa sakta hai. Logs product ko sum bana dete hain:</p>
+            <div class="formula"><code>log(p₁ × p₂ × p₃) = log p₁ + log p₂ + log p₃</code><ul>
+              <li>Product: 0.8 × 0.5 × 0.25 = 0.1</li>
+              <li>Log sum: log 0.8 + log 0.5 + log 0.25 = log 0.1</li>
+              <li>Beam search aur language models logs mein score rakhte hain.</li>
+            </ul></div>
+            <h4>Deep learning mein ye kahan milega?</h4>
+            <p>DL Course 2 ke softmax regression page mein, DL Course 5 ke language model, beam search, Word2Vec negative sampling, aur Transformer output softmax mein.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Probability multiply karte waqt independence assume mat karna jab relation ho. Sentence mein words independent nahi hote, isliye conditional probabilities use karte hain.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Conditional probability context wala chance hai. Training mein correct answer ko high probability dena = likelihood badhana = cross-entropy ghatana.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Cross-entropy aur negative log-likelihood same hain?</summary><p>One-hot labels ke common classification setup mein practically same number milta hai: correct class ki probability ka <code>−log</code>.</p></details>
+            <details class="qa"><summary>Sampling galti kyu kare jab argmax best hai?</summary><p>Creative tasks mein hamesha top word lene se text boring/repetitive ho sakta hai. Sampling controlled randomness deti hai.</p></details>
+            <details class="qa"><summary>Loss 2.303 ka matlab bad hai?</summary><p>Depend karta hai classes pe. 10 classes mein random guess ka loss ≈ −log(0.1) = 2.303. Usse neeche jaana learning ka sign hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>50 students mein 20 ne umbrella laya. Un 20 mein 15 ko rain warning mili thi. P(warning | umbrella)?</summary><p>Umbrella wale 20 mein warning wale 15. Probability = 15 ÷ 20 = <b>0.75</b>.</p></details>
+              <details class="qa"><summary>Correct class probability 0.25 hai. Loss?</summary><p><code>−log(0.25) ≈ <b>1.386</b></code>.</p></details>
+              <details class="qa"><summary><code>[0.1, 0.7, 0.2]</code> pe argmax ka index?</summary><p>Sabse bada 0.7 index 1 pe hai (zero-based). Final answer <b>1</b>.</p></details>
+            </div>

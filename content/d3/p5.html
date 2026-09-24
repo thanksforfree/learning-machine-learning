@@ -1,0 +1,81 @@
+            <div class="chat">
+              <p class="msg me">Dev error 12% hai. Main kya improve karun?</p>
+              <p class="msg dost">Pehle 100 galat examples khol.</p>
+              <p class="msg me">Bas dekhna hai? Ye to boring QA ka kaam lag raha hai.</p>
+              <p class="msg dost">Boring? Dost, yahi gold mine hai. Model ki galtiyan tumhe next sprint ka roadmap deti hain.</p>
+              <p class="msg me">Aur agar 100 mein pattern na dikhe?</p>
+              <p class="msg dost">Tab bhi seekha: problem scattered hai, ek silver bullet nahi. Wo bhi valuable info hai.</p>
+            </div>
+
+            <h4>100 galat dev examples dekho</h4>
+            <p>Error analysis ka simplest version: dev set ke galat predictions ka random sample lo, manually category mark karo, counts likho. Fancy dashboard baad mein. Pehle aankh se data dekho.</p>
+            <p>Maan lo warehouse package-damage classifier ka dev set 4,000 photos ka hai. Model 480 galtiyan kar raha hai, yani 12% error. Tum 100 galtiyan sample karke categories mark karte ho.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Category</th><th>100 galtiyon mein count</th><th>Ceiling improvement</th><th>Faisla</th></tr>
+              <tr><td>Plastic wrap glare</td><td>28</td><td>28% of 12% = 3.36 points</td><td class="good">High ROI</td></tr>
+              <tr><td>Side-view package</td><td>22</td><td>2.64 points</td><td class="good">Worth trying</td></tr>
+              <tr><td>Torn tape hidden</td><td>11</td><td>1.32 points</td><td>Maybe later</td></tr>
+              <tr><td>Random confusing cases</td><td>39</td><td>Mixed</td><td>Needs deeper look</td></tr>
+            </table></div>
+            <div class="formula"><code>ceiling gain ≈ current error × fraction of errors in that category</code><ul>
+              <li><b>current error</b> = 12% in this example</li>
+              <li><b>fraction</b> = 28/100 for glare</li>
+              <li><b>ceiling</b> = maximum possible gain if category magically fixed perfectly</li>
+            </ul></div>
+            <p>Glare pe kaam karne ka max gain 3.36 points hai. Torn tape hidden ka max 1.32. Agar team chhoti hai, pehle glare.</p>
+
+            <h4>Kai ideas ek spreadsheet mein parallel check</h4>
+            <p>Ek galti sirf ek category mein nahi aati. Glare wali package photo side-view bhi ho sakti hai, wrong label bhi. Spreadsheet mein columns banao, checkboxes lagao.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Example</th><th>Glare</th><th>Side-view</th><th>Wrong label</th><th>Rare packaging</th></tr>
+              <tr><td>#17</td><td>✓</td><td>✓</td><td></td><td></td></tr>
+              <tr><td>#22</td><td></td><td>✓</td><td>✓</td><td></td></tr>
+              <tr><td>#48</td><td></td><td></td><td></td><td>✓</td></tr>
+              <tr><td>Total in 100 errors</td><td>28</td><td>22</td><td>17</td><td>8</td></tr>
+            </table></div>
+            <p>Iska fayda: ek hi pass mein multiple ideas score ho jaate hain. Warna pehle blur audit, phir label audit, phir rare disease audit — teen baar same data dekhoge.</p>
+
+            <h4>Galat labels: random vs systematic</h4>
+            <p>Deep learning random label noise se surprisingly tolerate kar leta hai. Agar 1–2% labels randomly wrong hain, bada model average pattern phir bhi seekh sakta hai. Par systematic label errors dangerous hain.</p>
+            <div class="compare-grid">
+              <div><b>Random label error</b>Kabhi-kabhi annotator ne safe package ko damaged bol diya. Direction random hai.</div>
+              <div><b>Systematic label error</b>Ek specific disease ko hamesha “fungus” label kar rahe ho, jab woh nutrient deficiency hai. Model galat rule seekhega.</div>
+            </div>
+            <p>Systematic error woh hai jo model ke liye fake pattern banata hai. Jaise traffic dataset mein rainy-night images ko mostly “no vehicle” label kar diya kyunki annotator ko vehicle dikha nahi. Model raat+baarish ko “empty road” samajh sakta hai.</p>
+
+            <h4>Labels theek karne layak kab?</h4>
+            <p>Label cleaning mehenga hai. Numbers se decide karo. Maan lo dev set mein 480 errors hain. Tum 100 error sample dekhte ho, 17 actual label mistakes hain. Current error 12% hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Observation</th><th>Number</th><th>Meaning</th></tr>
+              <tr><td>Label mistakes among errors</td><td>17/100 = 17%</td><td>Noticeable chunk</td></tr>
+              <tr><td>Ceiling gain</td><td>12% × 17% = 2.04 points</td><td class="good">Cleaning likely worth it</td></tr>
+              <tr><td>If only 2/100 labels wrong</td><td>12% × 2% = 0.24 points</td><td>Probably not first priority</td></tr>
+            </table></div>
+            <p>Yahan 2.04 points ka possible gain hai. Agar product ke liye 2 points huge hain, label cleaning sprint banao. Agar nahi, glare category shayad better ROI de.</p>
+
+            <h4>Dev aur test dono pe same process</h4>
+            <p>Agar dev labels clean kiye aur test labels dirty chhode, dev/test comparison unfair ho jaayega. Jo label-cleaning rule dev pe lagao, wahi test pe bhi lagao. Aur sirf wrong predictions nahi, kuch correct examples bhi dekho.</p>
+            <p>Kyu? Agar “correct” examples mein bhi labels wrong hain, model ko galat tarah reward mil raha ho sakta hai. 100 wrong + 100 correct sample check karna boring lagta hai, par trust banata hai.</p>
+
+            <h4>Pehla system jaldi banao</h4>
+            <p>Error analysis tabhi possible hai jab model mistakes kare. Isliye months tak perfect data pipeline ka wait mat karo. Ek simple baseline banao, dev set pe run karo, galtiyan dekho, phir iterate.</p>
+            <div class="visual-flow">
+              <span>Quick baseline</span><b>→</b>
+              <span class="flow-highlight">Error analysis</span><b>→</b>
+              <span>Targeted fix</span><b>↻</b>
+              <span>Better model</span>
+            </div>
+            <div class="mistake"><b>Dhyan rakhna:</b> “Mujhe already pata hai problem kya hai” bolke error analysis skip mat karo. Data aksar tumhari ego se better bolta hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> 100 galtiyan manually dekhna chhota kaam lagta hai, par wahi tumhe 1000 random experiments se bachata hai.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>100 examples enough hain?</summary><p>Direction ke liye haan. Agar category close call ho ya business decision bada ho, 200–500 sample lo. Start 100 se karo; paralysis se better hai.</p></details>
+            <details class="qa"><summary>Categories kaun banata hai?</summary><p>Pehle rough categories tum banao. Domain expert ke saath 20 examples dekho, categories refine karo. Perfect taxonomy se pehle useful taxonomy chahiye.</p></details>
+            <details class="qa"><summary>Correct examples dekhna kyu?</summary><p>Label noise correct predictions mein bhi ho sakta hai. Agar label hi wrong tha aur model ne us wrong label ko match kiya, metric model ko galat tareef de raha hai.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Dev error 9%. 100 errors mein 24 "glare packages" hain. Ceiling gain?</summary><p>Gain ≈ 9% × 24% = 2.16 percentage points. <b>Final answer: max around 2.16 points</b>.</p></details>
+              <details class="qa"><summary>100 errors mein wrong labels 5 hain. Current error 11%. Label cleaning first priority?</summary><p>Ceiling = 11% × 5% = 0.55 points. Shayad first priority nahi, unless safety/legal reason ho. <b>Final answer: generally no</b>.</p></details>
+              <details class="qa"><summary>Dev labels clean kiye, test labels nahi. Problem?</summary><p>Dev/test comparison unfair ho gaya. Same cleaning rules test pe bhi lagao. <b>Final answer: dono pe same process</b>.</p></details>
+            </div>

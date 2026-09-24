@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Training, CV aur test set: Practice, mock test, board exam. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Training, CV aur test set (ML · 2) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../advanced.html">ML · 2: Advanced Learning Algorithms</a> › Topic 7 / 12</nav>
+        <p class="eyebrow">ML · 2 · TOPIC 07 · MODEL KO CHECK KARO</p>
+        <h1>Training, CV aur test set</h1>
+        <p>Practice, mock test, board exam</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 2 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="a1" href="neural-network-idea.html"><span>01</span>Neural network ka idea</a>
+            <a data-topic-link="a2" href="forward-propagation.html"><span>02</span>Forward propagation</a>
+            <a data-topic-link="a3" href="tensorflow.html"><span>03</span>TensorFlow mein network banana</a>
+            <a data-topic-link="a4" href="activation-functions.html"><span>04</span>Activation functions</a>
+            <a data-topic-link="a5" href="softmax-multiclass.html"><span>05</span>Multiclass aur softmax</a>
+            <a data-topic-link="a6" href="backprop-adam.html"><span>06</span>Backpropagation aur Adam</a>
+            <a data-topic-link="a7" class="current" aria-current="page" href="train-cv-test.html"><span>07</span>Training, CV aur test set</a>
+            <a data-topic-link="a8" href="bias-variance.html"><span>08</span>Bias aur variance</a>
+            <a data-topic-link="a9" href="ml-development-cycle.html"><span>09</span>ML development cycle</a>
+            <a data-topic-link="a10" href="precision-recall.html"><span>10</span>Precision, recall aur F1</a>
+            <a data-topic-link="a11" href="decision-trees.html"><span>11</span>Decision tree, entropy aur information gain</a>
+            <a data-topic-link="a12" href="random-forest-xgboost.html"><span>12</span>Random forest aur XGBoost</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12"><span>ML · 2 progress</span><strong data-progress-label>0 / 12 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Bina honest evaluation ke tumhe pata hi nahi chalega ki model achha hai. Har ML project ka pehla engineering kadam.</div>
+        
+        
+        <article class="lesson-card single" id="a7">
+          <div class="lesson-body">
+
+            <div class="chat">
+              <p class="msg me">Model train ho gaya. Ab main khush ho jaun ya pehle check karun?</p>
+              <p class="msg dost">Pehle check, phir mithai. Agar teacher wahi sawaal exam mein de jo class mein karaye the, marks dhokha ho sakte hain — shayad ratta laga ho. Asli test naye sawaalon se hota hai. Isliye data ko pehle hi <strong>teen hisson</strong> mein baant do.</p>
+            </div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Set</th><th>Kitna (approx)</th><th>Kaam</th><th>Jaise</th></tr>
+              <tr><td><b>Training</b></td><td>60%</td><td>Model isi se seekhta hai (w, b)</td><td>Class practice</td></tr>
+              <tr><td><b>Cross-validation (dev)</b></td><td>20%</td><td>Options compare karna: kaunsa model, kitni layers, kaunsa λ</td><td>Mock test</td></tr>
+              <tr><td><b>Test</b></td><td>20%</td><td>Aakhir mein ek baar, fair report card</td><td>Board exam</td></tr>
+            </table></div>
+            <h4>Example: polynomial degree kaise chunein</h4>
+            <p>Degree 1, 2, 3 … 10 wale models train karo (sirf training set pe). Har ek ka error <strong>CV set</strong> pe dekho. Maan lo degree 4 ka CV error sabse kam aaya — degree 4 chuno. Ab <strong>test set</strong> pe ek hi baar chalao aur wahi number report karo. Test set ko baar-baar dekhna matlab board paper pe pencil se hints likhna.</p>
+            <div class="mistake"><b>Sabse common galti:</b> Test set dekh-dekh ke choices karna. Tab test set bhi “mock test” ban jaata hai aur tumhara reported score asal se zyada achha dikhta hai. Real duniya mein surprise milega.</div>
+            <p><strong>Classification mein error</strong> = kitne percent examples galat classify hue.</p>
+
+            <h4>Numbers ke saath split samjho</h4>
+            <div class="chat"><p class="msg me">Data kam ho to teen hisson mein baantna waste nahi?</p><p class="msg dost">Dil karta hai sab training mein daal dein, samajh sakta hoon. Par phir honest report card nahi bachega. Thoda data side mein rakhna insurance jaisa hai.</p></div>
+            <p>Maan lo tumhare paas 1000 examples hain. Common split 60/20/20 aise dikhega:</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Set</th><th>Percent</th><th>Examples</th><th>Kaam</th></tr><tr><td>Training</td><td>60%</td><td>600</td><td>Weights seekhna</td></tr><tr><td>CV/dev</td><td>20%</td><td>200</td><td>Degree, λ, architecture choose karna</td></tr><tr><td>Test</td><td>20%</td><td>200</td><td>Final honest number</td></tr></table></div>
+            <h4>Model choice ka mini example</h4>
+            <p>Teen models train kiye. Training error dekh ke degree 6 tempting lag sakta hai, par CV sach bol raha hai.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Model</th><th>Training error</th><th>CV error</th><th>Decision</th></tr><tr><td>Degree 1</td><td>18%</td><td>19%</td><td class="bad">Underfit</td></tr><tr><td>Degree 3</td><td>7%</td><td class="good">8%</td><td class="good">Ye chuno</td></tr><tr><td>Degree 6</td><td>2%</td><td>15%</td><td class="bad">Overfit</td></tr></table></div>
+            <p>Ab degree 3 final ho gaya. Test set pe bas ek baar jao. Agar test error 9% aaya, report karo. Test dekh ke phir degree change kiya to fairness gayi.</p>
+            <h4>Data leakage — chhupa hua cheating</h4>
+            <p>Leakage matlab model ko aisi information mil gayi jo real future mein available nahi hogi. Score mast dikhega, deployment pe dhad se girega.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Situation</th><th>Leakage?</th><th>Kyu</th></tr><tr><td>Same patient ki reports train aur test dono mein</td><td class="bad">Haan</td><td>Model patient ko pehchaan sakta hai</td></tr><tr><td>Future sales column feature mein</td><td class="bad">Haan</td><td>Prediction time pe future nahi pata</td></tr><tr><td>Random customers, no duplicates</td><td class="good">Mostly ok</td><td>Train/test independent</td></tr></table></div>
+            <p>Split karte waqt socho: “real world mein model ko ye info milegi kya?” Agar nahi, feature hatao ya split badlo.</p>
+            <div class="lesson-callout"><b>Beginner checkpoint:</b> Agar tumne CV set pe 20 models compare kiye, CV score thoda optimistic ho sakta hai. Test set isi final optimism check ke liye bacha ke rakha jaata hai.</div>
+            <p>Small datasets mein kabhi-kabhi k-fold cross-validation bhi use hota hai: data ko 5 folds mein baanto, 4 se train aur 1 se validate, phir fold rotate. Isse data ka better use hota hai, par training time badhta hai.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Training se seekho, CV se choices karo, test se final honest report do — test ko baar-baar mat chhedo.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>60/20/20 fixed rule hai?</summary><p>Nahi. Data bahut zyada ho (jaise 10 lakh examples) to 98/1/1 bhi theek — 10,000 examples ka test set kaafi hai.</p></details>
+            <details class="qa"><summary>CV set, dev set, validation set — alag hain?</summary><p>Nahi, aam taur pe teeno same cheez ke naam hain. Team ya library ke hisaab se naam badal jaata hai, kaam wahi: choices compare karna.</p></details>
+
+            <details class="qa"><summary>Random split karna hai ya time ke hisaab se?</summary><p>Agar data time-based hai (jaise sales, traffic), future predict karna hai to purane data se train aur naye data se CV/test rakho. Random split kabhi-kabhi future leak kar deta hai.</p></details>
+            <details class="qa"><summary>Test set chhota ho to number hilta kyu hai?</summary><p>200 examples ke test mein 2-3 extra galtiyan percent ko noticeably badal sakti hain. Isliye possible ho to test set representative aur kaafi bada rakho.</p></details>
+            <details class="qa"><summary>CV error best aur test error thoda worse aaye to?</summary><p>Normal hai. CV pe choices tune hui hain, test bilkul naya hai. Agar gap bahut bada hai to split mismatch ya data leakage check karo.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>λ ya polynomial degree chunne ke liye kaunsa set?</summary><p><b>Cross-validation (dev)</b>.</p></details>
+              <details class="qa"><summary>Final number kis set pe report karte hain?</summary><p><b>Test</b> set pe, sirf ek baar.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="a7"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="backprop-adam.html"><small>← Pichhla</small>Backpropagation aur Adam</a>
+          <a class="pager-next" href="bias-variance.html"><small>Agla →</small>Bias aur variance</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

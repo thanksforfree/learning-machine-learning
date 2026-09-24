@@ -1,0 +1,55 @@
+            <div class="chat">
+              <p class="msg me">Sigmoid mein e aur log loss mein log aaya. Ye dono kya bala hain?</p>
+              <p class="msg dost">Dono ek hi parivaar ke hain — <strong>power</strong> (ghaat) wale. Pehle power samjho, baaki apne aap samajh aayega.</p>
+              <p class="msg me">e dekh ke thoda alien jaisa feel aa raha hai.</p>
+              <p class="msg dost">Normal hai. e ko abhi bas “growth ka special number” treat karo. Naam ajeeb hai, kaam seedha hai.</p>
+            </div>
+            <h4>Power = baar baar multiply</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Likha</th><th>Matlab</th><th>Answer</th></tr>
+              <tr><td>2³</td><td>2 × 2 × 2</td><td>8</td></tr>
+              <tr><td>10²</td><td>10 × 10</td><td>100</td></tr>
+              <tr><td>5¹</td><td>bas 5</td><td>5</td></tr>
+              <tr><td>7⁰</td><td>kisi bhi (non-zero) number ki power 0</td><td>1</td></tr>
+              <tr><td>2⁻¹</td><td>ulta: 1 ÷ 2</td><td>0.5</td></tr>
+              <tr><td>10⁻³</td><td>1 ÷ 1000</td><td>0.001</td></tr>
+            </table></div>
+            <p><strong>Negative power = divide</strong>. Ye yaad rakho, sigmoid mein e<sup>−z</sup> aata hai. Code mein <strong>1e-3</strong> dikhe to ghabrana nahi: matlab 1 × 10⁻³ = 0.001 (jaise learning_rate=1e-3). Programmer log shortcut pasand karte hain, bas.</p>
+            <h4>Power kitni tezi se badhti hai — ye mehsoos karo</h4>
+            <div class="chat">
+              <p class="msg dost">Ek kahani: tumhe roz paisa double milega, pehle din ₹1. Din 10 pe ₹512. Din 20 pe ₹5 lakh+. Din 30 pe ₹53 crore+! Isko <strong>exponential growth</strong> kehte hain — shuru mein dheere, phir rocket.</p>
+            </div>
+            <h4>e — ek khaas number</h4>
+            <p><strong>e ≈ 2.718</strong>. Jaise π ≈ 3.14 ek khaas number hai (circle ke liye), waise e ek khaas number hai (growth ke liye). Tumhe iski value yaad nahi rakhni — bas iska behaviour:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>z</th><th>−4</th><th>−2</th><th>0</th><th>1</th><th>2</th><th>4</th></tr>
+              <tr><td>e<sup>z</sup></td><td>0.018</td><td>0.14</td><td>1</td><td>2.72</td><td>7.39</td><td>54.6</td></tr>
+            </table></div>
+            <div class="compare-grid">
+              <div><b>e<sup>z</sup> hamesha positive</b>Kabhi 0 ya negative nahi. Isliye softmax isse sab scores ko positive banata hai.</div>
+              <div><b>z bada → e<sup>z</sup> bahut bada</b>z negative → e<sup>z</sup> 0 ke paas. Isi se sigmoid 0 aur 1 ke beech rehta hai.</div>
+            </div>
+            <h4>Sigmoid ab samajh aayega</h4>
+            <div class="formula"><code>sigmoid(z) = 1 / (1 + e⁻ᶻ)</code><ul>
+              <li>z = 4: e⁻⁴ = 0.018 → 1 / 1.018 = <b>0.98</b></li>
+              <li>z = 0: e⁰ = 1 → 1 / 2 = <b>0.5</b></li>
+              <li>z = −4: e⁴ = 54.6 → 1 / 55.6 = <b>0.018</b></li>
+              <li>Neeche hamesha 1 + (positive number) → answer kabhi 1 se zyada nahi, kabhi 0 se kam nahi. Isliye probability ke liye perfect!</li>
+            </ul></div>
+            <h4>log — power ka ulta sawaal</h4>
+            <div class="chat">
+              <p class="msg me">Aur log?</p>
+              <p class="msg dost">Power puchhta hai: “2 ko 3 baar multiply karo to kya aayega?” → 8. Log <em>ulta</em> puchhta hai: “8 banane ke liye 2 ko kitni baar multiply karna padega?” → 3. Bas. log₂(8) = 3.</p>
+            </div>
+            <p>ML mein aam taur pe <strong>natural log</strong> (ln ya log) use hota hai jo e ke base pe hai. Tumhe shape yaad rakhni hai:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Number</th><th>1</th><th>0.5</th><th>0.1</th><th>0.01</th></tr>
+              <tr><td>log (natural)</td><td>0</td><td>−0.69</td><td>−2.30</td><td>−4.61</td></tr>
+              <tr><td>−log (ulta sign)</td><td class="good">0</td><td>0.69</td><td>2.30</td><td class="bad">4.61</td></tr>
+            </table></div>
+            <p>Dekho: number jitna <strong>0 ke paas</strong>, −log utna <strong>bada</strong>. Yahi log loss ka dil hai: sahi answer ko model ne bahut kam chance diya (0.01) → saza bahut badi (4.61).</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Power = baar-baar multiply. e<sup>z</sup> = hamesha positive growth. log = ulta sawaal; chhote chance pe −log bada ho jaata hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Calculator mein e aur log kaise?</summary><p>Python: <code>np.exp(2)</code> = 7.39, <code>np.log(0.5)</code> = −0.69. Haath se kabhi calculate nahi karna padega.</p></details>
+            <details class="qa"><summary>log(0) kya hai?</summary><p>Defined nahi — minus infinity ki taraf jaata hai. Isliye code mein kabhi-kabhi chhota sa number (1e-15) jod dete hain taaki log(0) na ho. TensorFlow ye khud sambhalta hai.</p></details>
+            <details class="qa"><summary>log se multiply wala kaam jodna ban jaata hai — ye kya hai?</summary><p>Ek property: log(a × b) = log(a) + log(b). Bahut chhote numbers ko multiply karne ki jagah unke log jodna computer ke liye zyada safe hai. Abhi bas jaan lo, zaroorat pe kaam aayega.</p></details>

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Content-based filtering aur deep learning: Profile match, retrieval aur ranking. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Content-based filtering aur deep learning (ML · 3) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../unsupervised.html">ML · 3: Unsupervised Learning, Recommenders, RL</a> › Topic 9 / 13</nav>
+        <p class="eyebrow">ML · 3 · TOPIC 09 · RECOMMENDER SYSTEMS</p>
+        <h1>Content-based filtering aur deep learning</h1>
+        <p>Profile match, retrieval aur ranking</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 3 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="u1" href="unsupervised-clustering.html"><span>01</span>Unsupervised learning aur clustering</a>
+            <a data-topic-link="u2" href="k-means.html"><span>02</span>K-means algorithm</a>
+            <a data-topic-link="u3" href="k-means-cost-choose-k.html"><span>03</span>K-means cost, initialization aur K chunna</a>
+            <a data-topic-link="u4" href="anomaly-gaussian.html"><span>04</span>Anomaly detection aur Gaussian</a>
+            <a data-topic-link="u5" href="anomaly-algorithm.html"><span>05</span>Anomaly detection algorithm aur evaluation</a>
+            <a data-topic-link="u6" href="recommender-features.html"><span>06</span>Recommender: item features ke saath</a>
+            <a data-topic-link="u7" href="collaborative-filtering.html"><span>07</span>Collaborative filtering aur binary labels</a>
+            <a data-topic-link="u8" href="mean-normalization.html"><span>08</span>Mean normalization, TensorFlow aur related items</a>
+            <a data-topic-link="u9" class="current" aria-current="page" href="content-based-filtering.html"><span>09</span>Content-based filtering aur deep learning</a>
+            <a data-topic-link="u10" href="pca.html"><span>10</span>PCA — bahut features ko kam mein samet-na</a>
+            <a data-topic-link="u11" href="reinforcement-learning-basics.html"><span>11</span>Reinforcement learning basics</a>
+            <a data-topic-link="u12" href="q-function-bellman.html"><span>12</span>Q-function aur Bellman equation</a>
+            <a data-topic-link="u13" href="deep-q-network.html"><span>13</span>Continuous states aur Deep Q-Network</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11,u12,u13"><span>ML · 3 progress</span><strong data-progress-label>0 / 13 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Modern recommenders isi tarah bante hain — do neural networks, retrieval + ranking, aur ethics ka dhyan.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z6" href="maths-vectors-matrices.html"><small>Maths</small>Vectors, matrices aur dot product</a><a class="chip" data-topic-link="z12" href="maths-norms-similarity.html"><small>Maths</small>Norms, distance aur cosine similarity</a></div></div>
+        
+        <article class="lesson-card single" id="u9">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Content-based filtering kya alag karta hai? Naam same-same sa lag raha.</p>
+              <p class="msg dost">Collaborative filtering bolta hai: “tumhare jaise <em>logon</em> ne kya pasand kiya.” Content-based bolta hai: “tumhare <em>baare mein</em> aur movie ke <em>baare mein</em> jo pata hai, usse match karo.” Shaadi.com type scene — dono profiles dekho, phir match score.</p>
+            </div>
+            <div class="compare-grid">
+              <div><b>User features (xᵘ)</b>Umar, desh, pehle kaunse genres dekhe, average kitne star deta hai, kaunsi language…</div>
+              <div><b>Movie features (xᵐ)</b>Genre, release saal, actors, critics rating, average user rating…</div>
+            </div>
+            <h4>Deep learning se match karna — do towers</h4>
+            <div class="chat">
+              <p class="msg dost">Do alag neural networks banao. <strong>User network</strong>: user features lo → ek chhota vector vᵘ (maan lo 32 numbers) — user ki “taste profile”. <strong>Movie network</strong>: movie features lo → vᵐ (32 numbers) — movie ki “personality”. Match score = vᵘ · vᵐ (dot product). Dono vectors ek jaise → score zyada.</p>
+            </div>
+            <div class="visual-flow"><span>User features</span><b>→</b><span>User NN → vᵘ</span><b>·</b><span>vᵐ ← Movie NN</span><b>←</b><span>Movie features</span></div>
+            <div class="visual-flow"><span class="flow-highlight">Score = vᵘ · vᵐ</span><b>→</b><span>(ya sigmoid(vᵘ · vᵐ) = like ka chance)</span></div>
+            <p>Dono networks ek hi cost (rating ki squared error, ya log loss) se <strong>ek saath</strong> train hote hain. Output layers ka size same hona chahiye, warna dot product bol dega: “bhai dimensions match nahi.”</p>
+            <p><strong>Similar movies:</strong> vᵐ ek doosre ke paas → movies milti-julti. Ye pehle se (raat ko) calculate karke rakh sakte ho.</p>
+            <h4>Crore items mein se kaise chunein — retrieval &amp; ranking</h4>
+            <div class="chat">
+              <p class="msg me">Lakhon movies, har ek ke liye network chalana slow nahi hoga?</p>
+              <p class="msg dost">Bahut slow. Isliye do step. <strong>Retrieval</strong>: jaldi se ~100–500 “shayad achhe” candidates nikaalo — user ki pichhli 10 movies jaisi movies, uske favourite genre ki top movies, uske desh mein trending. <strong>Ranking</strong>: in chune hue candidates pe hi poora model chalao aur score se sort karo.</p>
+            </div>
+            <div class="visual-flow"><span>1 crore items</span><b>→</b><span>Retrieval (fast, rough)</span><b>→</b><span>~300 candidates</span><b>→</b><span class="flow-highlight">Ranking (accurate model)</span><b>→</b><span>Top 10 dikhao</span></div>
+            <p>Zyada candidates retrieve karo to better result mil sakta hai, par system slow hoga. Offline experiments se balance tay karo — user ko achhi recommendation bhi chahiye aur app ko ghoomta hua spinner bhi nahi chahiye.</p>
+            <h4>Recommender ki zimmedari (ethics)</h4>
+            <div class="mistake"><b>Sochne wali baat:</b> Agar system sirf “zyada click / zyada time” maximize kare to woh clickbait, gussa bhadkane wala ya galat content bhi push kar sakta hai, kyunki log uspe zyada ruk-te hain. Ya sirf zyada paisa dene wale ads upar. Achha design: users ke fayde ko bhi goal mein rakho, harmful content filter karo, aur transparent raho ki cheezein kyu dikh rahi hain.</div>
+
+            <h4>Dot product ka numeric match score</h4>
+            <div class="chat"><p class="msg me">vᵘ · vᵐ bada matlab match. Par dot product actual mein kya compare karta hai?</p><p class="msg dost">Agar user aur movie vector same directions mein high hain, products add hoke score bada. Agar opposite taste hai, score chhota ya negative.</p></div>
+            <div class="table-wrap"><table class="calc"><tr><th>Vector</th><th>Meaning feel</th></tr><tr><td>vᵘ = [2, 0.5, −1]</td><td>User ko feature 1 pasand, feature 3 avoid</td></tr><tr><td>Movie A vᵐ = [1, 1, 0]</td><td>Feature 1 strong</td></tr><tr><td>Movie B vᵐ = [0, 1, 2]</td><td>Feature 3 strong</td></tr></table></div>
+            <div class="table-wrap"><table class="calc"><tr><th>Movie</th><th>Score</th><th>Reading</th></tr><tr><td>A</td><td>2×1 + 0.5×1 + (−1)×0 = <b>2.5</b></td><td class="good">Good match</td></tr><tr><td>B</td><td>2×0 + 0.5×1 + (−1)×2 = <b>−1.5</b></td><td class="bad">Bad match</td></tr></table></div>
+            <p>Neural networks ye vectors aise seekhte hain ki clicked/liked items ka score high aur ignored items ka score low ho.</p>
+            <div class="lesson-callout"><b>Beginner checkpoint:</b> Retrieval fast aur rough hota hai, ranking slow aur accurate. Large apps dono use karte hain; sirf ranking se crore items scan karna mehenga padega.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Content-based = user aur item features se do networks ke vectors ka dot product; bade catalogue ke liye pehle retrieval, phir ranking.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Collaborative ya content-based — kaunsa better?</summary><p>Asli systems aksar dono milate hain. Content-based naye items (cold start) ke liye achha kyunki features hain; collaborative chhupe patterns pakadta hai jo features mein nahi.</p></details>
+            <details class="qa"><summary>vᵘ ke 32 numbers ka matlab kya hai?</summary><p>Koi seedha naam nahi — network ne khud seekha. Bas itna pata hai ki similar taste wale users ke vectors paas-paas hote hain. Thoda “black box” hai, par recommendation kaam ki ho to useful.</p></details>
+            <details class="qa"><summary>TensorFlow mein ye kaise?</summary><p>Do Sequential networks banao, dono ke outputs ko normalize karke Dot layer se jodo, aur ek Model mein wrap karke compile/fit karo — basic structure Module 2 jaisa hi.</p></details>
+
+            <details class="qa"><summary>Vectors normalize kyu karte hain?</summary><p>Normalize karne se dot product zyada angle/similarity jaisa behave karta hai, sirf vector ki length se dominate nahi hota. Retrieval mein ye useful hota hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>vᵘ · vᵐ bada ho to matlab?</summary><p>User aur movie ka <b>achha match</b>.</p></details>
+              <details class="qa"><summary>Retrieval aur ranking mein farak?</summary><p>Retrieval = jaldi se kuch sau candidates. Ranking = unpe accurate model se sorting.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="u9"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="mean-normalization.html"><small>← Pichhla</small>Mean normalization, TensorFlow aur related items</a>
+          <a class="pager-next" href="pca.html"><small>Agla →</small>PCA — bahut features ko kam mein samet-na</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

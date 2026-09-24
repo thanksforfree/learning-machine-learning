@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Computer vision aur edge detection: Photo mein pehle kinare dikhte hain. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Computer vision aur edge detection (DL · 4) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-convolutional-networks.html">DL · 4: Convolutional Neural Networks</a> › Topic 1 / 15</nav>
+        <p class="eyebrow">DL · 4 · TOPIC 01 · CONVOLUTION KI BUNIYAAD</p>
+        <h1>Computer vision aur edge detection</h1>
+        <p>Photo mein pehle kinare dikhte hain</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 4 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="c1" class="current" aria-current="page" href="dl-cv-edge-detection.html"><span>01</span>Computer vision aur edge detection</a>
+            <a data-topic-link="c2" href="dl-padding-stride.html"><span>02</span>Padding aur strided convolution</a>
+            <a data-topic-link="c3" href="dl-conv-volumes-layer.html"><span>03</span>Volumes pe convolution aur ek conv layer</a>
+            <a data-topic-link="c4" href="dl-pooling-cnn-example.html"><span>04</span>Pooling, poora CNN example aur convolution kyu</a>
+            <a data-topic-link="c5" href="dl-classic-networks.html"><span>05</span>Classic networks: LeNet-5, AlexNet, VGG-16</a>
+            <a data-topic-link="c6" href="dl-resnets.html"><span>06</span>ResNets</a>
+            <a data-topic-link="c7" href="dl-inception.html"><span>07</span>1×1 convolution aur Inception network</a>
+            <a data-topic-link="c8" href="dl-mobilenet-efficientnet.html"><span>08</span>MobileNet aur EfficientNet</a>
+            <a data-topic-link="c9" href="dl-cnn-practical-advice.html"><span>09</span>CNN practical advice</a>
+            <a data-topic-link="c10" href="dl-localization-landmarks.html"><span>10</span>Object localization aur landmark detection</a>
+            <a data-topic-link="c11" href="dl-sliding-windows.html"><span>11</span>Sliding windows aur uska convolutional version</a>
+            <a data-topic-link="c12" href="dl-yolo.html"><span>12</span>YOLO: IoU, non-max suppression, anchor boxes</a>
+            <a data-topic-link="c13" href="dl-region-proposals-unet.html"><span>13</span>Region proposals aur semantic segmentation (U-Net)</a>
+            <a data-topic-link="c14" href="dl-face-recognition.html"><span>14</span>Face recognition: one-shot, Siamese, triplet loss</a>
+            <a data-topic-link="c15" href="dl-neural-style-transfer.html"><span>15</span>Neural style transfer aur ConvNet andar kya seekhta hai</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15"><span>DL · 4 progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Convolution ka pehla kaam dikhta hai yahan — aur ye bhi ki normal network photos ke liye kyu nahi chalta.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z16" href="maths-convolution.html"><small>Maths</small>Convolution: sliding dot product</a></div></div>
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Computer vision ke kaam: classification, detection, style transfer</li><li>Badi photo ki problem: 1000×1000×3 = 30 lakh inputs</li><li>Chhoti photo pe vertical edge filter ka worked example (apne numbers)</li><li>Positive vs negative edge, horizontal filter</li><li>Sobel/Scharr jaise filters, aur filter ke numbers khud seekhna</li></ul></details>
+        <article class="lesson-card single" id="c1">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Dost, computer vision ka naam sunte hi mujhe lagta hai ki photo dekhna to insaan wali cheez hai. Computer kya dekhega?</p>
+              <p class="msg dost">Computer ko photo bas numbers ki badi Excel sheet dikhti hai. Har pixel mein red, green, blue ki value. Par haan, us sheet mein pattern chhupa hota hai.</p>
+              <p class="msg me">Pattern matlab?</p>
+              <p class="msg dost">Jaise chai ke cup ka kinara, traffic signal ka gol shape, shirt ki sleeve ki line. CNN pehle aise <strong>edges</strong> pakadna seekhta hai, phir un edges se parts, phir poora object.</p>
+              <p class="msg me">Aur normal neural network se ye kaam nahi ho sakta?</p>
+              <p class="msg dost">Ho sakta hai chhoti photo pe. Par badi photo aate hi parameters ka tiffin dabba phat jaata hai. Isi liye convolution wali soch chahiye.</p>
+            </div>
+
+            <h4>Computer vision ke teen common kaam</h4>
+            <div class="compare-grid">
+              <div><b>Classification</b>Photo mein kya hai? Jaise “ye mango hai ya apple?” Sirf label.</div>
+              <div><b>Detection</b>Kya hai aur kahan hai? Jaise CCTV frame mein helmet kis box mein hai.</div>
+              <div><b>Style transfer</b>Content ek photo ka, style doosri image ka. Jaise tumhari selfie ko rangoli-jaisi texture dena.</div>
+            </div>
+            <p>In teeno mein first useful clue aksar edge hota hai. Agar object ka boundary hi nahi dikha, to aage ki pehchaan mushkil ho jaati hai.</p>
+
+            <h4>Badi photo ki asli dikkat</h4>
+            <p>Phone se li hui 1200 × 800 RGB photo socho. Har pixel ke 3 channels hote hain.</p>
+            <div class="formula"><code>inputs = height × width × channels = 1200 × 800 × 3 = 28,80,000</code><ul>
+              <li><b>height, width</b> = photo ke pixel rows aur columns</li>
+              <li><b>channels</b> = RGB mein 3: red, green, blue</li>
+              <li><b>28.8 lakh inputs</b> = sirf ek photo ka raw vector</li>
+            </ul></div>
+            <p>Agar first hidden layer mein 800 neurons rakh diye, to weights lagbhag 28.8 lakh × 800 = 230.4 crore. Arre bhai, pehli layer hi full IPL auction ban gayi. CNN ka idea hai: chhoti khidki se local pattern dekho, aur wohi khidki poori photo pe ghumao.</p>
+
+            <h4>Vertical edge: 7×7 photo pe 3×3 filter</h4>
+            <p>Yeh toy photo hai: left side thoda dark 2, right side bright 9. Beech mein seedha vertical edge hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Row</th><th colspan="7">7×7 photo</th></tr>
+              <tr><td>1</td><td>2</td><td>2</td><td>2</td><td>9</td><td>9</td><td>9</td><td>9</td></tr>
+              <tr><td>2</td><td>2</td><td>2</td><td>2</td><td>9</td><td>9</td><td>9</td><td>9</td></tr>
+              <tr><td>3</td><td>2</td><td>2</td><td>2</td><td>9</td><td>9</td><td>9</td><td>9</td></tr>
+              <tr><td>4</td><td>2</td><td>2</td><td>2</td><td>9</td><td>9</td><td>9</td><td>9</td></tr>
+              <tr><td>5</td><td>2</td><td>2</td><td>2</td><td>9</td><td>9</td><td>9</td><td>9</td></tr>
+              <tr><td>6</td><td>2</td><td>2</td><td>2</td><td>9</td><td>9</td><td>9</td><td>9</td></tr>
+              <tr><td>7</td><td>2</td><td>2</td><td>2</td><td>9</td><td>9</td><td>9</td><td>9</td></tr>
+            </table></div>
+            <p>Filter lo:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><td>1</td><td>0</td><td>−1</td></tr>
+              <tr><td>1</td><td>0</td><td>−1</td></tr>
+              <tr><td>1</td><td>0</td><td>−1</td></tr>
+            </table></div>
+            <p>Har 3×3 patch pe element-wise multiply karo, phir sum. Pehle patch mein columns [2, 2, 2] repeat ho rahe hain, isliye left aur right cancel ho jaate hain. Edge pe patch columns [2, 2, 9] repeat ho rahe hain:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Patch</th><th>Calculation</th><th>Output</th></tr>
+              <tr><td>Columns 1–3</td><td>(2 − 2), teen rows</td><td>0</td></tr>
+              <tr><td>Columns 2–4</td><td>(2 − 9) + (2 − 9) + (2 − 9)</td><td>−21</td></tr>
+              <tr><td>Columns 3–5</td><td>(2 − 9) + (2 − 9) + (2 − 9)</td><td>−21</td></tr>
+              <tr><td>Columns 4–6</td><td>9 − 9, teen rows</td><td>0</td></tr>
+              <tr><td>Columns 5–7</td><td>9 − 9, teen rows</td><td>0</td></tr>
+            </table></div>
+            <p>Poora 5×5 output:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><td>0</td><td>−21</td><td>−21</td><td>0</td><td>0</td></tr>
+              <tr><td>0</td><td>−21</td><td>−21</td><td>0</td><td>0</td></tr>
+              <tr><td>0</td><td>−21</td><td>−21</td><td>0</td><td>0</td></tr>
+              <tr><td>0</td><td>−21</td><td>−21</td><td>0</td><td>0</td></tr>
+              <tr><td>0</td><td>−21</td><td>−21</td><td>0</td><td>0</td></tr>
+            </table></div>
+            <p>Minus sign se darna nahi. Iska matlab bas edge ki direction hai: dark-left bright-right. Filter ko ulta kar do <code>[−1,0,1]</code>, to wahi jagah +21 degi.</p>
+
+            <figure class="figure">
+              <svg viewBox="0 0 420 170" role="img" aria-label="Filter photo pe slide karke edge response banata hai">
+                <rect x="25" y="25" width="120" height="120" fill="#edf3ff" stroke="#b8c2d3"/>
+                <rect x="85" y="25" width="60" height="120" fill="#3567e8" opacity="0.55"/>
+                <rect x="55" y="45" width="60" height="60" fill="none" stroke="#c2410c" stroke-width="3"/>
+                <text x="85" y="158" font-size="11" text-anchor="middle" fill="#4b5871">7×7 photo</text>
+                <text x="205" y="82" font-size="11" text-anchor="middle" fill="#7a879b">3×3 filter</text>
+                <text x="205" y="102" font-size="11" text-anchor="middle" fill="#7a879b">dot product</text>
+                <path d="M155,82 L250,82" stroke="#7653d6" stroke-width="2" marker-end="url(#a)"/>
+                <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#7653d6"/></marker></defs>
+                <rect x="270" y="45" width="90" height="90" fill="#fff3ec" stroke="#e0703a"/>
+                <rect x="292" y="45" width="45" height="90" fill="#e0703a" opacity="0.35"/>
+                <text x="315" y="158" font-size="11" text-anchor="middle" fill="#4b5871">5×5 edge map</text>
+              </svg>
+              <div class="cap">Convolution = chhota filter slide karo, har jagah ek score nikalo.</div>
+            </figure>
+
+            <h4>Horizontal edge aur sign ka meaning</h4>
+            <p>Vertical filter left-right badlaav pakadta hai. Horizontal filter top-bottom badlaav pakadta hai:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><td>1</td><td>1</td><td>1</td></tr>
+              <tr><td>0</td><td>0</td><td>0</td></tr>
+              <tr><td>−1</td><td>−1</td><td>−1</td></tr>
+            </table></div>
+            <p>Hamari toy photo mein top-bottom koi change nahi, isliye horizontal filter ka output sab 0 aayega. Agar upar dark aur neeche bright hota, to strong negative ya positive response aata.</p>
+
+            <h4>Sobel, Scharr, aur learned filters</h4>
+            <p>Purane computer vision mein humans filters design karte the. Sobel jaisa filter center ke aas-paas edge ko thoda zyada weight deta hai. Scharr bhi edge detection ke liye ek hand-made filter family hai.</p>
+            <p>CNN mein twist ye hai: hum filter ke 9 numbers manually nahi bharte. Training ke dauraan network khud decide karta hai ki kaunsa filter useful hai — koi vertical edge, koi texture, koi curve, koi shirt ka button.</p>
+            <pre class="code">import numpy as np
+patch = np.array([[2, 2, 9],
+                  [2, 2, 9],
+                  [2, 2, 9]])
+f = np.array([[1, 0, -1],
+              [1, 0, -1],
+              [1, 0, -1]])
+score = np.sum(patch * f)  <span class="cm"># -21, strong vertical edge</span></pre>
+
+            <div class="mistake"><b>Dhyan rakhna:</b> Edge detector ka output “object mil gaya” nahi hota. Ye sirf low-level clue hai. CNN mein bahut layers milke simple edges se complex shapes banati hain.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Photo numbers ki grid hai; filter chhoti torch hai; edge map batata hai ki badlaav kahan strong hai.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Output 5×5 kyu aaya, 7×7 kyu nahi?</summary><p>3×3 filter bina padding ke 7×7 photo mein sirf 5 positions vertically aur 5 positions horizontally fit hota hai. Formula next page mein detail se aayega.</p></details>
+            <details class="qa"><summary>Negative edge bhi useful hai?</summary><p>Haan. Sign direction batata hai. Bright-left dark-right aur dark-left bright-right dono edge hain, bas opposite direction.</p></details>
+            <details class="qa"><summary>Filter ke numbers random se start hote hain?</summary><p>Training ke start mein random hote hain. Backprop unhe dheere-dheere useful pattern detectors bana deta hai.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>1200×800 RGB photo mein kitne raw inputs?</summary><p>1200 × 800 × 3 = <b>28,80,000 inputs</b>.</p></details>
+              <details class="qa"><summary>7×7 image pe 3×3 filter, no padding, stride 1. Output size?</summary><p>Filter 5 positions each direction mein fit hota hai, to <b>5×5</b>.</p></details>
+              <details class="qa"><summary>Agar vertical filter ko multiply karke +21 ki jagah −21 aaye, kya model fail ho gaya?</summary><p>Nahi. Sign sirf direction batata hai. Strong magnitude ka matlab edge strong hai; <b>−21 bhi kaam ka signal</b>.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="c1"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-end-to-end.html"><small>← Pichhla · DL · 3</small>End-to-end deep learning</a>
+          <a class="pager-next" href="dl-padding-stride.html"><small>Agla →</small>Padding aur strided convolution</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

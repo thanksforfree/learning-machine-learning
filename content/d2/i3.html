@@ -1,0 +1,73 @@
+            <div class="chat">
+              <p class="msg me">Dropout naam se lagta hai college attendance wali problem hai.</p>
+              <p class="msg dost">Bilkul! Training ke dauraan kuch neurons ko bolte hain: “Aaj tum chhutti pe.” Baaki network ko kaam chalana padta hai.</p>
+              <p class="msg me">Par jaan-boojh ke neurons band karna loss badha dega na?</p>
+              <p class="msg dost">Short term mein haan, par long term mein network jugaadu aur less dependent banta hai. Cricket team ki tarah: sirf ek star batsman pe bharosa nahi.</p>
+            </div>
+            <h4>Idea: training mein random neurons band</h4>
+            <p>Dropout regularization ka simple idea hai: har training step mein layer ke activations ka random subset zero kar do. Agle mini-batch mein alag subset zero hoga. Network har baar ek thoda different, thoda chhota network ban ke train hota hai.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 420 210" role="img" aria-label="Dropout mein hidden layer ke kuch neurons off hain aur kuch active">
+                <g stroke="#8a96aa" stroke-width="1">
+                  <line x1="90" y1="65" x2="205" y2="55"/><line x1="90" y1="105" x2="205" y2="105"/><line x1="90" y1="145" x2="205" y2="155"/>
+                  <line x1="215" y1="55" x2="330" y2="85"/><line x1="215" y1="155" x2="330" y2="125"/>
+                </g>
+                <g fill="#edf3ff" stroke="#3567e8"><circle cx="85" cy="65" r="16"/><circle cx="85" cy="105" r="16"/><circle cx="85" cy="145" r="16"/></g>
+                <g><circle cx="210" cy="55" r="16" fill="#e9f7f3" stroke="#159477"/><circle cx="210" cy="105" r="16" fill="#fff3ec" stroke="#c2410c"/><circle cx="210" cy="155" r="16" fill="#e9f7f3" stroke="#159477"/></g>
+                <g fill="#f2edff" stroke="#7653d6"><circle cx="335" cy="85" r="16"/><circle cx="335" cy="125" r="16"/></g>
+                <text x="210" y="109" font-size="11" text-anchor="middle" fill="#c2410c">off</text>
+                <text x="210" y="25" font-size="11" text-anchor="middle" fill="#159477">random mask</text>
+              </svg>
+              <div class="cap">Har mini-batch mein mask badalta hai. Aaj kuch neurons off, kal kuch aur.</div>
+            </figure>
+            <h4>Inverted dropout: mask, keep_prob, scale</h4>
+            <p>Sabse common implementation inverted dropout hai. <code>keep_prob</code> ka matlab: ek neuron active rehne ka chance. Agar keep_prob = 0.85, to roughly 85% activations bachenge. Jo bachenge unko <code>1/keep_prob</code> se divide karte hain, taaki average activation same scale pe rahe.</p>
+            <div class="formula"><code>D = random mask where D &lt; keep_prob
+A = A * D
+A = A / keep_prob</code><ul>
+              <li><b>D</b> = 0/1 mask, same shape as activation A</li>
+              <li><b>keep_prob</b> = neuron ko rakhne ka chance</li>
+              <li><b>A / keep_prob</b> = test time scale match karne ki trick</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Activation A</th><th>Mask D</th><th>A × D</th><th>Divide by keep_prob = 0.60</th></tr>
+              <tr><td>1.20</td><td>1</td><td>1.20</td><td>2.00</td></tr>
+              <tr><td>0.50</td><td>0</td><td>0</td><td>0</td></tr>
+              <tr><td>2.00</td><td>1</td><td>2.00</td><td>3.33</td></tr>
+              <tr><td>0.80</td><td>1</td><td>0.80</td><td>1.33</td></tr>
+            </table></div>
+            <pre class="code">keep_prob = 0.85
+D1 = np.random.rand(A1.shape[0], A1.shape[1]) &lt; keep_prob
+A1 = A1 * D1                 <span class="cm"># kuch neurons zero</span>
+A1 = A1 / keep_prob          <span class="cm"># inverted dropout scaling</span></pre>
+            <h4>Test time pe dropout nahi</h4>
+            <p>Prediction ke time randomness nahi chahiye. Agar same photo ko 5 baar do, 5 alag answers aana ajeeb hoga. Isliye test/dev/inference time pe dropout off. Inverted dropout ki wajah se extra scaling bhi nahi karni padti.</p>
+            <div class="compare-grid">
+              <div><b>Training</b>Random mask on. Activations scale by 1/keep_prob. Network ko redundancy seekhni padti hai.</div>
+              <div><b>Testing</b>Mask off. Full network use hota hai. Output stable rahta hai.</div>
+            </div>
+            <h4>Kaam kyu karta hai?</h4>
+            <p>Dropout network ko bolta hai: “Kal tumhara favourite neuron absent ho sakta hai.” To layer kisi ek feature pe over-dependent nahi hoti. Agar face detector sirf “left eye bright” feature pe depend kar raha tha, dropout usko nose, outline, texture jaise backup clues bhi use karna sikhata hai.</p>
+            <p>Ek aur intuition: dropout many smaller networks ka average jaisa behave karta hai. Alag-alag masks se alag networks train hote hain, aur test time full network un sab ka blended version jaisa hota hai.</p>
+            <h4>Har layer ka alag keep_prob</h4>
+            <p>Jis layer mein parameters zyada aur overfitting risk zyada, wahan keep_prob thoda kam kar sakte ho. Input layer pe usually zyada aggressive dropout nahi lagate. Kuch layers pe dropout zero bhi ho sakta hai, matlab keep_prob = 1.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Layer</th><th>Possible keep_prob</th><th>Reason</th></tr>
+              <tr><td>Input</td><td>0.95 ya 1.0</td><td>Raw data ko zyada mat todo</td></tr>
+              <tr><td>Big hidden layer</td><td>0.7–0.9</td><td>Overfit risk high</td></tr>
+              <tr><td>Small hidden layer</td><td>0.9–1.0</td><td>Already limited capacity</td></tr>
+            </table></div>
+            <h4>Cost J ab clean define nahi — debug kaise karein</h4>
+            <p>Dropout ke saath har iteration mein network random change hota hai, to exact cost curve noisy aur hard-to-interpret ho sakta hai. Agar loss decrease nahi ho raha, pehle dropout off karke check karo ki basic network overfit kar pa raha hai ya nahi. Phir dropout on karo.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Dropout ko har problem pe default namak ki tarah mat daalo. Agar high bias hai, dropout aur badha sakta hai. Dropout mainly high variance ke liye hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Dropout training mein thodi pareshaani deke network ko less nakhrebaaz banata hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>keep_prob 0.8 ka matlab 80% weights rakhna?</summary><p>Nahi, usually activations/neurons ko mask karte hain. Weights delete nahi hote; bas us pass mein unka contribution zero ho jaata hai.</p></details>
+            <details class="qa"><summary>Dropout convolution layers mein bhi use hota hai?</summary><p>Hota hai, par CNNs mein data augmentation aur batch norm bhi strong tools hain. Fully connected layers mein dropout zyada common dikhta hai.</p></details>
+            <details class="qa"><summary>Randomness se result unstable nahi hoga?</summary><p>Training stochastic hoti hai, par test time dropout off hota hai. Seed set karoge to experiment repeatable bhi ban sakta hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>A = 0.6, mask = 1, keep_prob = 0.75. Inverted dropout ke baad value?</summary><p>0.6 × 1 ÷ 0.75 = 0.8. <b>final answer: 0.8</b>.</p></details>
+              <details class="qa"><summary>Dev pe predict karte waqt dropout on ya off?</summary><p><b>Off</b>. Dev/test/inference time pe full network use karo.</p></details>
+              <details class="qa"><summary>High bias model pe dropout badha diya. Kya risk?</summary><p>Model aur weak ho sakta hai, training error badh sakta hai. Pehle capacity/optimization fix karo.</p></details>
+            </div>

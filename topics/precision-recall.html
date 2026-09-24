@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Precision, recall aur F1: Jab accuracy dhokha de. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Precision, recall aur F1 (ML · 2) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../advanced.html">ML · 2: Advanced Learning Algorithms</a> › Topic 10 / 12</nav>
+        <p class="eyebrow">ML · 2 · TOPIC 10 · MODEL KO CHECK KARO</p>
+        <h1>Precision, recall aur F1</h1>
+        <p>Jab accuracy dhokha de</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 2 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="a1" href="neural-network-idea.html"><span>01</span>Neural network ka idea</a>
+            <a data-topic-link="a2" href="forward-propagation.html"><span>02</span>Forward propagation</a>
+            <a data-topic-link="a3" href="tensorflow.html"><span>03</span>TensorFlow mein network banana</a>
+            <a data-topic-link="a4" href="activation-functions.html"><span>04</span>Activation functions</a>
+            <a data-topic-link="a5" href="softmax-multiclass.html"><span>05</span>Multiclass aur softmax</a>
+            <a data-topic-link="a6" href="backprop-adam.html"><span>06</span>Backpropagation aur Adam</a>
+            <a data-topic-link="a7" href="train-cv-test.html"><span>07</span>Training, CV aur test set</a>
+            <a data-topic-link="a8" href="bias-variance.html"><span>08</span>Bias aur variance</a>
+            <a data-topic-link="a9" href="ml-development-cycle.html"><span>09</span>ML development cycle</a>
+            <a data-topic-link="a10" class="current" aria-current="page" href="precision-recall.html"><span>10</span>Precision, recall aur F1</a>
+            <a data-topic-link="a11" href="decision-trees.html"><span>11</span>Decision tree, entropy aur information gain</a>
+            <a data-topic-link="a12" href="random-forest-xgboost.html"><span>12</span>Random forest aur XGBoost</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12"><span>ML · 2 progress</span><strong data-progress-label>0 / 12 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Fraud, bimaari, defects — jahan positive cases rare hain wahan yahi metrics sach batate hain.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z5" href="maths-average-probability.html"><small>Maths</small>Average, phailaav aur probability</a></div></div>
+        
+        <article class="lesson-card single" id="a10">
+          <div class="lesson-body">
+
+            <div class="chat">
+              <p class="msg me">Mere model ki accuracy 90% hai. Party?</p>
+              <p class="msg dost">Party se pehle ek sawaal. Maan lo 100 patients mein sirf 10 bimaar hain. Ek “bewakoof model” jo <em>hamesha</em> bole “sab healthy hain” — uski accuracy bhi 90% hai! Par usne ek bhi bimaar nahi pakda. Jab positive cases rare hon (bimaari, fraud), accuracy dhokha de sakti hai.</p>
+            </div>
+            <h4>Example: 100 patients, 10 sach mein bimaar. Model ne 8 ko bimaar bola, jinme 6 sach mein bimaar the.</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th></th><th>Sach mein bimaar</th><th>Sach mein healthy</th></tr>
+              <tr><td><b>Model: bimaar</b></td><td class="good">6 (True Positive)</td><td class="bad">2 (False Positive)</td></tr>
+              <tr><td><b>Model: healthy</b></td><td class="bad">4 (False Negative)</td><td class="good">88 (True Negative)</td></tr>
+            </table></div>
+            <p>Is table ko <strong>confusion matrix</strong> kehte hain.</p>
+            <div class="compare-grid">
+              <div><b>Precision = 6 / 8 = 75%</b>“Model ne jinko bimaar bola, unme se kitne sach mein bimaar the?” — model ki baat pe kitna bharosa.</div>
+              <div><b>Recall = 6 / 10 = 60%</b>“Jitne sach mein bimaar the, unme se kitne pakde?” — kitne miss nahi hue.</div>
+            </div>
+            <p>“Hamesha healthy” wale model ka recall = 0 / 10 = <strong>0%</strong>. Bas, hero ki pol khul gayi.</p>
+            <h4>Dono mein kheenchataani (trade-off)</h4>
+            <p>Threshold badhao: sirf 90% pakka ho tab “bimaar” bolo. Precision upar, recall neeche — kam galat alarm, par kuch cases miss. Threshold ghatao: 30% pe bhi bolo. Recall upar, precision neeche. Sahi threshold problem pe depend karta hai: gambhir bimaari mein miss karna zyada bura, to recall pe dhyan.</p>
+            <div class="formula"><code>F1 = 2 × P × R / (P + R) = 2 × 0.75 × 0.6 / 1.35 = 0.67</code><ul><li>Ek number jo dono ko combine kare. Simple average se farak: agar ek bhi bahut kam ho to F1 bhi kam aata hai. (P = 1, R = 0 → average 0.5 dikhta, par F1 = 0.)</li></ul></div>
+
+            <h4>Threshold badalne ka live effect</h4>
+            <div class="chat"><p class="msg me">Precision-recall trade-off sun liya, par threshold ghumaane se numbers kaise hilte hain?</p><p class="msg dost">Chalo same 10 bimaar patients wale example mein teen thresholds try karte hain. High threshold strict teacher jaisa, low threshold cautious doctor jaisa.</p></div>
+            <p>Maan lo 100 patients mein 10 sach mein bimaar hain. Model probability deta hai; threshold se decide hota hai “bimaar” kab bolna.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Threshold</th><th>TP</th><th>FP</th><th>FN</th><th>Precision</th><th>Recall</th><th>Feel</th></tr><tr><td>0.80</td><td>5</td><td>1</td><td>5</td><td>5/6 = <b>83%</b></td><td>5/10 = <b>50%</b></td><td>Kam alarm, zyada miss</td></tr><tr><td>0.50</td><td>8</td><td>4</td><td>2</td><td>8/12 = <b>67%</b></td><td>8/10 = <b>80%</b></td><td>Balanced</td></tr><tr><td>0.30</td><td>10</td><td>10</td><td>0</td><td>10/20 = <b>50%</b></td><td>10/10 = <b>100%</b></td><td>Sab pakde, alarms zyada</td></tr></table></div>
+            <p>Medical screening mein 0.30 acceptable ho sakta hai kyunki miss nahi chahiye. Spam filter mein 0.80 better ho sakta hai kyunki genuine email spam mein jaana painful hai.</p>
+            <div class="formula"><code>F1(threshold 0.50) = 2 × 0.67 × 0.80 / (0.67 + 0.80) ≈ 0.73</code><ul><li>F1 tab useful hai jab precision aur recall dono ko balance karna ho.</li></ul></div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Threshold test set pe tune mat karo. CV set pe threshold chuno, test pe final report do.</div>
+            <h4>Accuracy rare cases mein kyu dhokha deti hai?</h4>
+            <p>Ek aur numeric check: 1000 transactions mein 10 fraud. Model A sabko non-fraud bolta hai. Model B 8 fraud pakadta hai, par 20 false alarms deta hai.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Model</th><th>Accuracy</th><th>Recall</th><th>Business feel</th></tr><tr><td>A: sab safe</td><td>990/1000 = <b>99%</b></td><td>0/10 = <b>0%</b></td><td class="bad">Fraud pakda hi nahi</td></tr><tr><td>B: alert model</td><td>972/1000 = <b>97.2%</b></td><td>8/10 = <b>80%</b></td><td class="good">Useful despite lower accuracy</td></tr></table></div>
+            <p>Isliye rare positive problems mein “highest accuracy” winner nahi hota. Kaam ka metric choose karo.</p>
+            <div class="lesson-callout"><b>Beginner checkpoint:</b> Metric choose karne se pehle positive class define karo. Fraud detection mein “fraud” positive hai; spam filter mein “spam” positive ho sakta hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Precision = “jo bola woh sahi tha?”, Recall = “jo tha woh pakda?”. Rare cases mein accuracy ki jagah ye dekho.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Precision aur recall yaad kaise rakhun?</summary><p>Precision = model ki <em>baat</em> ki quality (uske “haan” kitne sachche). Recall = <em>yaaddasht</em> — asli cases mein se kitne “yaad” (pakde).</p></details>
+            <details class="qa"><summary>Spam filter mein kya zyada important?</summary><p>Precision — kyunki boss ki urgent email galti se spam mein chali gayi to din kharab. Isliye spam filter threshold thoda upar rakhta hai, taaki false positives kam hon.</p></details>
+
+            <details class="qa"><summary>False positive aur false negative yaad kaise rakhu?</summary><p>False positive = model ne “haan” bola par sach mein na. False negative = model ne “na” bola par sach mein haan. Pehla galat alarm, doosra miss.</p></details>
+            <details class="qa"><summary>F1 kab use nahi karna chahiye?</summary><p>Jab precision aur recall ki cost equal nahi ho. Bimaari screening mein recall much more important ho sakta hai; spam mein precision. Tab business/medical cost ke hisaab se metric choose karo.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>TP = 8, FP = 2, FN = 8. Precision aur recall?</summary><p>P = 8/10 = <b>80%</b>, R = 8/16 = <b>50%</b>.</p></details>
+              <details class="qa"><summary>Threshold badhane se aam taur pe kya hota hai?</summary><p>Precision upar, recall neeche.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="a10"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="ml-development-cycle.html"><small>← Pichhla</small>ML development cycle</a>
+          <a class="pager-next" href="decision-trees.html"><small>Agla →</small>Decision tree, entropy aur information gain</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

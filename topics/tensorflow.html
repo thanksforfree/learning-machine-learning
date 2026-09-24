@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="TensorFlow mein network banana: Banao → compile → fit. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>TensorFlow mein network banana (ML · 2) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../advanced.html">ML · 2: Advanced Learning Algorithms</a> › Topic 3 / 12</nav>
+        <p class="eyebrow">ML · 2 · TOPIC 03 · NEURAL NETWORKS</p>
+        <h1>TensorFlow mein network banana</h1>
+        <p>Banao → compile → fit</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 2 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="a1" href="neural-network-idea.html"><span>01</span>Neural network ka idea</a>
+            <a data-topic-link="a2" href="forward-propagation.html"><span>02</span>Forward propagation</a>
+            <a data-topic-link="a3" class="current" aria-current="page" href="tensorflow.html"><span>03</span>TensorFlow mein network banana</a>
+            <a data-topic-link="a4" href="activation-functions.html"><span>04</span>Activation functions</a>
+            <a data-topic-link="a5" href="softmax-multiclass.html"><span>05</span>Multiclass aur softmax</a>
+            <a data-topic-link="a6" href="backprop-adam.html"><span>06</span>Backpropagation aur Adam</a>
+            <a data-topic-link="a7" href="train-cv-test.html"><span>07</span>Training, CV aur test set</a>
+            <a data-topic-link="a8" href="bias-variance.html"><span>08</span>Bias aur variance</a>
+            <a data-topic-link="a9" href="ml-development-cycle.html"><span>09</span>ML development cycle</a>
+            <a data-topic-link="a10" href="precision-recall.html"><span>10</span>Precision, recall aur F1</a>
+            <a data-topic-link="a11" href="decision-trees.html"><span>11</span>Decision tree, entropy aur information gain</a>
+            <a data-topic-link="a12" href="random-forest-xgboost.html"><span>12</span>Random forest aur XGBoost</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12"><span>ML · 2 progress</span><strong data-progress-label>0 / 12 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Idea se asli working model tak ka pul. Industry mein neural networks isi tarah ki libraries se bante hain.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z8" href="maths-python-numpy.html"><small>Maths</small>Python aur NumPy crash course</a></div></div>
+        
+        <article class="lesson-card single" id="a3">
+          <div class="lesson-body">
+
+            <div class="chat">
+              <p class="msg me">Ye sab NumPy mein khud likhna padega kya? Thoda darr lag raha hai.</p>
+              <p class="msg dost">Samajhne ke liye ek baar khud banana mast exercise hai. Par roz ke kaam mein TensorFlow jaisi library help karti hai. Tension nahi — flow wahi hai jo Module 1 mein tha, bas packaging thodi professional ho gayi.</p>
+            </div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Module 1 (logistic regression)</th><th>TensorFlow mein</th></tr>
+              <tr><td>1. Model define karo: f = sigmoid(w·x + b)</td><td>Sequential([...Dense layers...])</td></tr>
+              <tr><td>2. Loss/cost batao</td><td>model.compile(loss=...)</td></tr>
+              <tr><td>3. Gradient descent se cost ghatao</td><td>model.fit(X, y, epochs=...)</td></tr>
+            </table></div>
+<pre class="code">import tensorflow as tf
+from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Dense
+
+<span class="cm"># 1. Banao: 3 layers</span>
+model = Sequential([
+    Dense(25, activation="relu"),
+    Dense(15, activation="relu"),
+    Dense(1,  activation="sigmoid"),   <span class="cm"># haan/na ka chance</span>
+])
+
+<span class="cm"># 2. Compile: galti kaise naapni hai + kaise sudharna hai</span>
+model.compile(loss=tf.keras.losses.BinaryCrossentropy(),
+              optimizer=tf.keras.optimizers.Adam(learning_rate=0.001))
+
+<span class="cm"># 3. Fit: data do aur train karo</span>
+model.fit(X_train, y_train, epochs=100)
+
+<span class="cm"># 4. Use: naye data pe chance</span>
+chance = model.predict(X_new)</pre>
+            <ul>
+              <li><strong>Dense</strong> = har neuron pichli layer ke har output se juda hai (“ghana” connection).</li>
+              <li><strong>epochs=100</strong> = poore training data pe 100 baar ghoomna. Jaise same chapter ko 100 revision passes.</li>
+              <li><strong>X_train</strong> = ek table: har row ek example, har column ek feature.</li>
+            </ul>
+
+            <h4>Fit ke andar kya repeat hota hai?</h4>
+            <div class="chat"><p class="msg me">model.fit ek line hai, par andar kya chal raha hota hai?</p><p class="msg dost">Socho gym trainer. Har batch pe model prediction karta hai, loss dekhta hai, backprop se slopes nikaalta hai, optimizer se weights thoda update karta hai. Phir next batch. Ye loop baar-baar.</p></div>
+            <div class="visual-flow"><span>Batch lo</span><b>→</b><span>Prediction</span><b>→</b><span>Loss</span><b>→</b><span class="flow-highlight">Backprop + update</span><b>↻</b></div>
+            <p>Ek numeric feel lete hain. Maan lo 1000 training examples hain, batch size 100 hai, aur epochs = 5.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Cheez</th><th>Hisaab</th><th>Meaning</th></tr><tr><td>Batches per epoch</td><td>1000 ÷ 100 = <b>10</b></td><td>Ek epoch mein 10 updates</td></tr><tr><td>Total updates</td><td>10 × 5 = <b>50</b></td><td>Weights 50 baar sudhrenge</td></tr><tr><td>Prediction calls</td><td>Har batch pe forward pass</td><td>Model baar-baar practice karta hai</td></tr></table></div>
+            <p>Isliye epochs bahut kam hue to model under-practice. Bahut zyada hue to overfit bhi kar sakta hai. CV set isliye dost hai — woh batata hai kab rukna hai.</p>
+            <h4>compile mein kya choose hota hai?</h4>
+            <p><code>compile</code> ko restaurant order samjho: model architecture kitchen hai, compile batata hai taste kaise judge hoga aur chef kaise improve karega.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Line</th><th>Matlab</th><th>Example choice</th></tr><tr><td>loss</td><td>Galti ka bill</td><td>BinaryCrossentropy for haan/na</td></tr><tr><td>optimizer</td><td>Weights ka update rule</td><td>Adam(0.001)</td></tr><tr><td>metrics</td><td>Report card pe kya dikhana</td><td>accuracy, precision, recall</td></tr></table></div>
+            <p>Loss training ke liye main signal hai. Metric human-friendly report hai. Dono same hona zaroori nahi — fraud mein loss log loss ho sakta hai, metric recall.</p>
+            <div class="lesson-callout"><b>Beginner checkpoint:</b> TensorFlow code padhte waqt teen cheezein dhoondo: layers kitni hain, loss kya hai, optimizer kya hai. Ye teen mil gaye to model ka basic plan samajh aa jaata hai.</div>
+            <p>Ek aur practical baat: pehli baar model train karte waqt chhota run karo, jaise epochs=2. Agar code, shapes aur loss pipeline sahi chal rahe hain, tab long training chalao. Warna 100 epochs ke baad pata chalega ki label column hi galat tha — dard alag level ka.</p>
+            <p>Agar loss <em>nan</em> dikhne lage, learning rate bahut bada, data mein weird values, ya loss-activation mismatch ho sakta hai. Pehle chhota batch print karke sanity check karo.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Architecture banao, loss + optimizer batao, data pe fit karo — baaki TensorFlow sambhal leta hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Code ratna padega?</summary><p>Nahi. Structure yaad rakho: banao → compile → fit → predict. Exact syntax documentation dekh ke likh sakte ho.</p></details>
+            <details class="qa"><summary>Library to black box hai, andar ka samajhna zaroori kyu?</summary><p>Kyunki jab kuch galat hoga (aur hoga, sabke saath hota hai), to tumhe pata hona chahiye ki andar shapes, activations aur loss ka kya scene hai. Warna bas code idhar-udhar hilega, problem nahi.</p></details>
+            <details class="qa"><summary>Dense layer mein input shape kab dena hai?</summary><p>Pehli layer ko kabhi-kabhi input shape batani padti hai, ya TensorFlow pehle batch dekh ke khud samajh leta hai. Beginner ke liye bas yaad rakho: rows = examples, columns = features.</p></details>
+
+            <details class="qa"><summary>Batch size kya choose karun?</summary><p>Beginner ke liye 32, 64, 128 common choices hain. Chhota batch noisy par kabhi helpful, bada batch stable par memory zyada. Pehle default rakho, phir zaroorat pe tune karo.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>TensorFlow ke teen main steps?</summary><p>Sequential se model banao → compile(loss, optimizer) → fit(X, y).</p></details>
+              <details class="qa"><summary>epochs = 10 ka matlab?</summary><p>Poore training data pe 10 chakkar.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="a3"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="forward-propagation.html"><small>← Pichhla</small>Forward propagation</a>
+          <a class="pager-next" href="activation-functions.html"><small>Agla →</small>Activation functions</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

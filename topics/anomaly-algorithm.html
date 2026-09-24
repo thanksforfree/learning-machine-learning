@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Anomaly detection algorithm aur evaluation: ε, features aur supervised se farak. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Anomaly detection algorithm aur evaluation (ML · 3) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../unsupervised.html">ML · 3: Unsupervised Learning, Recommenders, RL</a> › Topic 5 / 13</nav>
+        <p class="eyebrow">ML · 3 · TOPIC 05 · ANOMALY DETECTION</p>
+        <h1>Anomaly detection algorithm aur evaluation</h1>
+        <p>ε, features aur supervised se farak</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 3 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="u1" href="unsupervised-clustering.html"><span>01</span>Unsupervised learning aur clustering</a>
+            <a data-topic-link="u2" href="k-means.html"><span>02</span>K-means algorithm</a>
+            <a data-topic-link="u3" href="k-means-cost-choose-k.html"><span>03</span>K-means cost, initialization aur K chunna</a>
+            <a data-topic-link="u4" href="anomaly-gaussian.html"><span>04</span>Anomaly detection aur Gaussian</a>
+            <a data-topic-link="u5" class="current" aria-current="page" href="anomaly-algorithm.html"><span>05</span>Anomaly detection algorithm aur evaluation</a>
+            <a data-topic-link="u6" href="recommender-features.html"><span>06</span>Recommender: item features ke saath</a>
+            <a data-topic-link="u7" href="collaborative-filtering.html"><span>07</span>Collaborative filtering aur binary labels</a>
+            <a data-topic-link="u8" href="mean-normalization.html"><span>08</span>Mean normalization, TensorFlow aur related items</a>
+            <a data-topic-link="u9" href="content-based-filtering.html"><span>09</span>Content-based filtering aur deep learning</a>
+            <a data-topic-link="u10" href="pca.html"><span>10</span>PCA — bahut features ko kam mein samet-na</a>
+            <a data-topic-link="u11" href="reinforcement-learning-basics.html"><span>11</span>Reinforcement learning basics</a>
+            <a data-topic-link="u12" href="q-function-bellman.html"><span>12</span>Q-function aur Bellman equation</a>
+            <a data-topic-link="u13" href="deep-q-network.html"><span>13</span>Continuous states aur Deep Q-Network</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11,u12,u13"><span>ML · 3 progress</span><strong data-progress-label>0 / 13 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Algorithm ke saath yeh jaanna ki kab anomaly detection use karna hai aur kab supervised — engineering judgement.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z5" href="maths-average-probability.html"><small>Maths</small>Average, phailaav aur probability</a></div></div>
+        
+        <article class="lesson-card single" id="u5">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Ek feature (temperature) samajh aaya. Par real machine mein to vibration, pressure, speed sab honge?</p>
+              <p class="msg dost">Haan, to har feature ke liye alag bell curve banao — temperature ka apna μ, σ; vibration ka apna. Naye motor ke liye har feature ka chance nikaalo, aur sabko <strong>multiply</strong> kar do. Ek bhi feature bahut ajeeb hua to poora product chhota ho jaata hai.</p>
+            </div>
+            <h4>Algorithm — 3 steps</h4>
+            <div class="visual-flow"><span>1. Features chuno jo gadbad dikha sakein</span><b>→</b><span>2. Har feature ka μⱼ aur σⱼ normal data se</span><b>→</b><span class="flow-highlight">3. p(x) = p(x₁) × p(x₂) × … ; agar p(x) &lt; ε → anomaly</span></div>
+            <p>Example: temperature pe chance 0.3 (normal), vibration pe 0.001 (bahut ajeeb) → 0.3 × 0.001 = 0.0003. Agar ε = 0.01 to 0.0003 &lt; 0.01 → <strong>anomaly!</strong></p>
+            <h4>ε kaise chunein? Thode labelled examples se</h4>
+            <div class="chat">
+              <p class="msg dost">Maan lo 10,000 achhe motors aur sirf 20 kharab motors ka record hai. Training mein sirf achhe (6000). CV set: 2000 achhe + 10 kharab. Test: 2000 achhe + 10 kharab. Alag-alag ε try karo aur CV pe dekho kaunsa sabse zyada kharab pakadta hai bina bahut saare false alarm ke.</p>
+            </div>
+            <p>Kharab cases rare hain, isliye accuracy se phir dhokha milega. Yahan <strong>precision, recall, F1</strong> dekho (Module 2 wale). Fraud aur machine failure mein “miss” aur “false alarm” dono ki cost alag hoti hai.</p>
+            <h4>Anomaly detection vs supervised learning — kab kya?</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Anomaly detection</th><th>Supervised classification</th></tr>
+              <tr><td>Kharab examples bahut kam (0–20)</td><td>Dono type ke kaafi examples</td></tr>
+              <tr><td>Har baar <strong>naye-naye</strong> type ki gadbad aa sakti (naye fraud tricks, naye engine faults)</td><td>Future ke positive cases purane jaise hi honge (jaise spam, jana-pehchana defect)</td></tr>
+              <tr><td>Example: naye type ke hack, naya factory fault</td><td>Example: spam, mausam prediction, jaani-maani bimaari</td></tr>
+            </table></div>
+            <h4>Achhe features chunna — sabse important kaam</h4>
+            <div class="compare-grid">
+              <div><b>Bell shape banao</b>Feature ka histogram tedha ho to log(x), √x, x^(1/3) try karo taaki bell jaisa bane. Jo transform training pe lagaya, wahi CV/test pe.</div>
+              <div><b>Error analysis</b>Jo kharab case pakda nahi gaya (p(x) zyada aaya), use dekho: kya alag tha? Uske liye naya feature banao.</div>
+              <div><b>Ratio features</b>Server: CPU load zyada normal hai, network traffic zyada bhi normal. Par CPU bahut zyada aur traffic bahut kam — ajeeb (atka process). Naya feature: CPU ÷ traffic.</div>
+              <div><b>Pehle socho</b>“Kharab hone pe kya cheez unusual hogi?” — us cheez ko naapo.</div>
+            </div>
+
+            <h4>ε choose karne ka mini CV example</h4>
+            <div class="chat"><p class="msg me">ε chhota-bada karne se precision-recall jaisa trade-off hota hai?</p><p class="msg dost">Exactly. ε bada rakho to zyada cases anomaly bol doge: recall up, false alarms bhi up. ε chhota rakho to sirf bahut extreme cases pakdenge.</p></div>
+            <p>CV set: 200 normal + 10 anomaly. Teen ε values try ki:</p>
+            <div class="table-wrap"><table class="calc"><tr><th>ε</th><th>TP</th><th>FP</th><th>FN</th><th>Precision</th><th>Recall</th><th>F1</th></tr><tr><td>0.001</td><td>4</td><td>1</td><td>6</td><td>4/5 = 80%</td><td>4/10 = 40%</td><td>0.53</td></tr><tr><td>0.01</td><td>8</td><td>4</td><td>2</td><td>8/12 = 67%</td><td>8/10 = 80%</td><td class="good">0.73</td></tr><tr><td>0.05</td><td>10</td><td>20</td><td>0</td><td>10/30 = 33%</td><td>100%</td><td>0.50</td></tr></table></div>
+            <p>Yahan ε = 0.01 best F1 de raha hai. Lekin agar false alarm bahut mehenga ho, tum 0.001 choose kar sakte ho. Metric business cost se juda hai.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> ε training set pe mat choose karo. Normal data pe p(x) fit karo, CV pe ε tune karo, test pe final check.</div>
+            <h4>Feature transform ka tiny example</h4>
+            <p>Server request count kabhi 10, kabhi 10000 — bahut skewed. Log transform spread ko manageable bana sakta hai.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>x requests</th><th>log₁₀(x)</th><th>Effect</th></tr><tr><td>10</td><td>1</td><td>Small</td></tr><tr><td>100</td><td>2</td><td>Medium</td></tr><tr><td>10000</td><td>4</td><td>Huge raw value compressed</td></tr></table></div>
+            <p>Transform training, CV, test sab pe same lagao. Sirf training pe μ/σ fit karo, baaki sets pe wahi use karo.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Har feature ka chance multiply karo, ε se compare karo; phir ε aur features ko labelled examples + error analysis se sudharo. Pehla version perfect nahi hota, aur ye bilkul normal hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Chance multiply karna — kya features independent hone chahiye?</summary><p>Theory mein ye maan ke chalte hain. Practice mein thode dependent bhi ho to aksar achha chal jaata hai. Ratio jaise features dependency ko pakadne mein madad karte hain.</p></details>
+            <details class="qa"><summary>Kharab ke labels bilkul na hon to?</summary><p>Tab bhi p(x) nikaal ke sabse kam probability wale cases ko insaan se check karwa sakte ho. Par ε chunna andaaze pe hoga — thode labels mil jaayein to kaafi confidence aa jaata hai.</p></details>
+
+            <details class="qa"><summary>p(x) bahut chhota number kyu hota hai?</summary><p>Kai feature probabilities multiply hoti hain, to product quickly tiny ho jaata hai. Code mein log probabilities use karna numerically safer hota hai.</p></details>
+            <details class="qa"><summary>Feature engineering yahan model se zyada important ho sakti hai?</summary><p>Bilkul. Agar feature anomaly ko dikhata hi nahi, p(x) kaise chhota hoga? Good features anomaly detection ka aadha game hain.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>p(x₁) = 0.2, p(x₂) = 0.05, ε = 0.02. Anomaly hai?</summary><p>0.2 × 0.05 = 0.01 &lt; 0.02 → <b>haan</b>.</p></details>
+              <details class="qa"><summary>Hazaaron labelled spam examples hain. Anomaly detection ya supervised?</summary><p><b>Supervised</b>.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="u5"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="anomaly-gaussian.html"><small>← Pichhla</small>Anomaly detection aur Gaussian</a>
+          <a class="pager-next" href="recommender-features.html"><small>Agla →</small>Recommender: item features ke saath</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

@@ -1,0 +1,86 @@
+            <div class="chat">
+              <p class="msg me">Maine loops likh diye. Code readable hai. Phir vectorization pe itna zor kyu?</p>
+              <p class="msg dost">Readable hai, par slow ho sakta hai. Socho wedding mein 800 logon ko chai deni hai aur tum ek-ek cup kitchen se la rahe ho.</p>
+              <p class="msg me">Vectorization matlab tray mein 20 cup ek saath?</p>
+              <p class="msg dost">Exactly. NumPy poora batch optimized code ko de deta hai. Same maths, bas delivery fast.</p>
+              <p class="msg me">Mujhe shapes ka darr hai. (5,), (5,1), (1,5) sab same jaise lagte hain.</p>
+              <p class="msg dost">Ye darr healthy hai. Shapes ko address samjho. Address galat, parcel galat ghar. Is page ka kaam wahi address system clear karna hai.</p>
+              <p class="msg me">To loop zero?</p>
+              <p class="msg dost">Examples/features ke loop hatao. Iterations wala outer loop rahega. Training ko baar-baar kadam lena hi padega.</p>
+            </div>
+            <h4>Loop vs np.dot</h4>
+            <p>Vectorization ka matlab hai loops ko matrix/vector operations mein badalna. Python ka loop interpreter se guzarta hai; np.dot optimized low-level code use karta hai. Same maths, bas execution ka raasta tez.</p>
+            <div class="formula"><code>Z = wᵀX + b
+A = σ(Z)</code><ul>
+              <li><b>X</b> shape (nₓ, m), har column ek example</li>
+              <li><b>wᵀ</b> shape (1, nₓ)</li>
+              <li><b>Z</b> aur <b>A</b> shape (1, m), saare examples ke scores/chances</li>
+            </ul></div>
+            <figure class="figure">
+              <svg viewBox="0 0 430 190" role="img" aria-label="Vectorization mein w transpose X se saare examples ka Z ek saath nikalta hai">
+                <rect x="25" y="65" width="55" height="65" rx="8" fill="#edf3ff" stroke="#3567e8"/>
+                <rect x="125" y="35" width="110" height="115" rx="8" fill="#f2edff" stroke="#7653d6"/>
+                <rect x="295" y="75" width="95" height="45" rx="8" fill="#e9f7f3" stroke="#159477"/>
+                <g stroke="#8a96aa" stroke-width="2" fill="none"><path d="M80,96 H125"/><path d="M235,96 H295"/></g>
+                <g font-size="11" text-anchor="middle" fill="#273142"><text x="52" y="92">wᵀ</text><text x="52" y="110">1×nₓ</text><text x="180" y="88">X</text><text x="180" y="108">nₓ×m</text><text x="342" y="92">Z</text><text x="342" y="110">1×m</text></g>
+              </svg>
+              <div class="cap">Ek multiplication, m predictions.</div>
+            </figure>
+            <h4>Forward pass numbers ke saath</h4>
+            <p>w = [1, −2], b = 0.5, aur X mein 3 examples columns mein:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Example</th><th>x</th><th>wᵀx + b</th></tr>
+              <tr><td>1</td><td>[1, 2]</td><td>1 − 4 + 0.5 = <b>−2.5</b></td></tr>
+              <tr><td>2</td><td>[3, 1]</td><td>3 − 2 + 0.5 = <b>1.5</b></td></tr>
+              <tr><td>3</td><td>[0, 4]</td><td>0 − 8 + 0.5 = <b>−7.5</b></td></tr>
+            </table></div>
+            <pre class="code">Z = np.dot(w.T, X) + b      <span class="cm"># b har column mein broadcast</span>
+A = 1 / (1 + np.exp(-Z))    <span class="cm"># shape (1, m)</span>
+dZ = A - Y
+dw = np.dot(X, dZ.T) / m
+db = np.sum(dZ) / m</pre>
+            <h4>Backward pass vectorized</h4>
+            <div class="formula"><code>dZ = A − Y
+dw = X · dZᵀ / m
+db = (1/m) × Σ dZ</code><ul>
+              <li><b>dZ</b> shape (1, m)</li>
+              <li><b>X · dZᵀ</b> shape (nₓ, 1), exactly w jaisa</li>
+              <li><b>db</b> ek number hai, kyunki b ek number hai</li>
+            </ul></div>
+            <p>Mini example: X = [[1,2,0],[0,1,3]], A = [0.2,0.7,0.1], Y = [0,1,0]. To dZ = [0.2, −0.3, 0.1].</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Gradient</th><th>Hisaab</th><th>Value</th></tr>
+              <tr><td>dw₁</td><td>(1×0.2 + 2×−0.3 + 0×0.1)/3</td><td>−0.133</td></tr>
+              <tr><td>dw₂</td><td>(0×0.2 + 1×−0.3 + 3×0.1)/3</td><td>0</td></tr>
+              <tr><td>db</td><td>(0.2 − 0.3 + 0.1)/3</td><td class="good">0</td></tr>
+            </table></div>
+            <h4>Broadcasting: b har column mein kaise joda?</h4>
+            <p>Z shape (1, m) hai, b scalar. NumPy scalar ko automatically m columns tak repeat jaisa treat karta hai. Ye convenient hai, par shapes galat hon to silent bug bhi de sakta hai. Isliye assert lagao.</p>
+            <pre class="code">assert X.shape == (n_x, m)
+assert w.shape == (n_x, 1)
+assert Y.shape == (1, m)
+assert dw.shape == w.shape</pre>
+            <h4>Rank-1 array wali galti</h4>
+            <p>NumPy mein shape (5,) na row hai na column. Ye beech ka ajeeb creature hai. Deep learning code mein column vector chahiye to (5,1), row chahiye to (1,5). reshape use karo.</p>
+            <h4>Ek full iteration bina example-loop</h4>
+            <p>Vectorized training mein ek iteration ka flow compact ho jaata hai: Z banao, A banao, dZ nikalo, dw/db nikalo, update karo. Sirf shapes check karte raho. Ye style baad mein deep network layers mein bhi repeat hoga.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Step</th><th>Formula</th><th>Shape</th></tr>
+              <tr><td>Forward score</td><td>Z = wᵀX + b</td><td>(1, m)</td></tr>
+              <tr><td>Error</td><td>dZ = A − Y</td><td>(1, m)</td></tr>
+              <tr><td>Weight grad</td><td>dw = X dZᵀ / m</td><td>(nₓ, 1)</td></tr>
+            </table></div>
+            <div class="mistake"><b>Dhyan rakhna:</b> np.random.randn(5) se rank-1 array banta hai. Prefer np.random.randn(5, 1). Shape print karo, warna dot product kabhi-kabhi surprise dega.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Examples ko columns mein rakho, phir one dot product se poore batch ka forward-backward ho jaata hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Kya iterations wala loop bhi hata denge?</summary><p>Nahi. Har gradient descent step repeat karna padega. Hum examples/features wale inner loops hata rahe hain.</p></details>
+            <details class="qa"><summary>Broadcasting hamesha achhi cheez hai?</summary><p>Powerful hai, par dangerous bhi. Galat shape silently expand ho sakti hai. Assertions dost hain.</p></details>
+            <details class="qa"><summary>dw ka shape w jaisa kyu hona chahiye?</summary><p>Update w := w − αdw tabhi possible hai jab dono same shape hon. Gradient hamesha us parameter ke shape ka hota hai.</p></details>
+            <details class="qa"><summary>np.dot aur @ same hain?</summary><p>2D arrays ke liye mostly matrix multiply jaisa behavior hai. Course mein np.dot likha mil sakta hai; modern Python mein @ bhi common hai. Shapes phir bhi same rules follow karte hain.</p></details>
+            <details class="qa"><summary>Broadcasting bug ka sign kya hota hai?</summary><p>Code run ho jaata hai par output shape unexpected hota hai, ya cost weird behave karti hai. Isliye operation ke baad assert shape lagana boring par powerful habit hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>w shape (4,1), X shape (4,10). Z shape?</summary><p>wᵀ shape (1,4), so Z = wᵀX + b shape <b>(1,10)</b>.</p></details>
+              <details class="qa"><summary>dZ = [0.1, −0.2, 0.4]. db?</summary><p>Average = (0.1 − 0.2 + 0.4)/3 = <b>0.1</b>.</p></details>
+              <details class="qa"><summary>Shape (5,) ka safer column version?</summary><p><code>a.reshape(5, 1)</code> ya directly array ko shape <b>(5,1)</b> mein banao.</p></details>
+            </div>

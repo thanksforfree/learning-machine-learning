@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Gradient descent aur computation graph: Forward mein hisaab, backward mein slopes. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Gradient descent aur computation graph (DL · 1) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-blue">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-neural-networks.html">DL · 1: Neural Networks and Deep Learning</a> › Topic 4 / 11</nav>
+        <p class="eyebrow">DL · 1 · TOPIC 04 · EK NEURON</p>
+        <h1>Gradient descent aur computation graph</h1>
+        <p>Forward mein hisaab, backward mein slopes</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 1 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="n1" href="dl-what-is-deep-learning.html"><span>01</span>Deep learning kya hai, aur ab hi kyu chal pada?</a>
+            <a data-topic-link="n2" href="dl-binary-classification.html"><span>02</span>Binary classification aur notation</a>
+            <a data-topic-link="n3" href="dl-logistic-regression-neuron.html"><span>03</span>Logistic regression — ek neuron wala network</a>
+            <a data-topic-link="n4" class="current" aria-current="page" href="dl-computation-graph.html"><span>04</span>Gradient descent aur computation graph</a>
+            <a data-topic-link="n5" href="dl-logistic-gradients.html"><span>05</span>Logistic regression ke gradients</a>
+            <a data-topic-link="n6" href="dl-vectorization.html"><span>06</span>Vectorization aur broadcasting</a>
+            <a data-topic-link="n7" href="dl-shallow-network.html"><span>07</span>Shallow neural network: ek hidden layer</a>
+            <a data-topic-link="n8" href="dl-activation-functions.html"><span>08</span>Activation functions aur unke derivatives</a>
+            <a data-topic-link="n9" href="dl-shallow-backprop.html"><span>09</span>Shallow network ka backprop aur random initialization</a>
+            <a data-topic-link="n10" href="dl-deep-network.html"><span>10</span>Deep L-layer network aur dimensions</a>
+            <a data-topic-link="n11" href="dl-why-deep-building-blocks.html"><span>11</span>Deep kyu? Building blocks, parameters aur hyperparameters</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11"><span>DL · 1 progress</span><strong data-progress-label>0 / 11 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Backpropagation ka poora idea yahan ek chhote graph pe dikh jaata hai. Deep network mein bhi bilkul yahi hota hai, bas graph bada hota hai.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z7" href="maths-slope-derivative.html"><small>Maths</small>Slope, derivative aur chain rule</a><a class="chip" data-topic-link="z10" href="maths-computation-graph.html"><small>Maths</small>Computation graph aur activation ke derivatives</a></div></div>
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Gradient descent ka recap: w := w − α·dw</li><li>Derivative = slope, chhote numbers se check karna</li><li>Computation graph ka ek apna chhota worked example (jaise ek bill ka hisaab)</li><li>Backward pass: har variable ka derivative graph pe</li><li>Code notation: dvar ka matlab “dJ/dvar”</li></ul></details>
+        <article class="lesson-card single" id="n4">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Forward pass mein numbers nikal gaye. Par backward pass sunke lagta hai jaise bill ka audit chal raha ho.</p>
+              <p class="msg dost">Audit analogy perfect hai. Restaurant bill mein total zyada aaya, to dekhna padega: price ki wajah se, quantity ki wajah se, delivery ki wajah se, ya tax factor ki wajah se?</p>
+              <p class="msg me">Matlab final galti ko peeche baantna?</p>
+              <p class="msg dost">Haan. Computation graph wahi karta hai. Har chhota step bolta hai: “mere input ko thoda badloge to final total kitna badlega?”</p>
+              <p class="msg me">Derivative wali line pe main usually atak jaata hoon.</p>
+              <p class="msg dost">Koi tension nahi. Aaj derivative ko calculator wali “thoda badha ke dekho” feeling se pakdenge. Formal calculus baad mein bhi aa sakta hai.</p>
+              <p class="msg me">To backprop koi black magic nahi?</p>
+              <p class="msg dost">Nahi dost. Bas forward receipt sambhalo, phir ulte order mein responsibility baanto. Ab tak theek?</p>
+            </div>
+            <h4>Gradient descent recap</h4>
+            <p>Training ka goal cost J ko kam karna hai. Agar kisi weight w ke hisaab se slope dw positive hai, w badhane se cost badhegi. To w ko thoda ghatao. Agar slope negative hai, w badhao. Minus sign direction sambhal leta hai.</p>
+            <div class="formula"><code>w := w − α · dw
+b := b − α · db</code><ul>
+              <li><b>α</b> = learning rate, kadam ka size</li>
+              <li><b>dw</b> = dJ/dw, cost ka slope w ke respect mein</li>
+              <li><b>:=</b> = update karke naya value rakho</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Old w</th><th>dw</th><th>α</th><th>New w</th></tr>
+              <tr><td>2.0</td><td>0.7</td><td>0.1</td><td>2.0 − 0.07 = <b>1.93</b></td></tr>
+              <tr><td>2.0</td><td>−0.7</td><td>0.1</td><td>2.0 + 0.07 = <b>2.07</b></td></tr>
+            </table></div>
+            <h4>Derivative ko chhote number se check karna</h4>
+            <p>Derivative ka matlab: input ko thoda sa hilao, output kitna badla. Agar tip = 5s hai, s ko 0.001 badhao, tip 0.005 badhegi. Slope = 0.005 / 0.001 = 5. Itna sa “hila ke dekho” test beginners ke liye bahut useful hai.</p>
+            <h4>Computation graph: cafe bill ka audit</h4>
+            <p>Apna original bill example lete hain. Tumne cafe se sandwiches order kiye: price p = ₹120, quantity q = 3, delivery d = ₹40, aur tax factor t = 1.05. Total bill J = (p × q + d) × t. Isko graph mein tod do: u = p × q, v = u + d, J = v × t.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 450 210" role="img" aria-label="Cafe bill computation graph price quantity delivery tax se total tak">
+                <g fill="#edf3ff" stroke="#3567e8"><rect x="18" y="35" width="70" height="35" rx="8"/><rect x="18" y="115" width="70" height="35" rx="8"/></g>
+                <rect x="112" y="75" width="70" height="35" rx="8" fill="#f2edff" stroke="#7653d6"/>
+                <rect x="112" y="150" width="70" height="35" rx="8" fill="#edf3ff" stroke="#3567e8"/>
+                <rect x="218" y="105" width="72" height="35" rx="8" fill="#fff3ec" stroke="#e0703a"/>
+                <rect x="218" y="32" width="72" height="35" rx="8" fill="#edf3ff" stroke="#3567e8"/>
+                <rect x="340" y="75" width="82" height="45" rx="10" fill="#e9f7f3" stroke="#159477"/>
+                <g stroke="#8a96aa" fill="none" stroke-width="2"><path d="M88,52 C105,60 105,82 112,92"/><path d="M88,132 C105,125 105,104 112,96"/><path d="M182,92 C200,95 205,113 218,122"/><path d="M182,168 C205,165 205,135 218,125"/><path d="M290,122 C315,122 315,98 340,98"/><path d="M290,50 C315,55 315,82 340,92"/></g>
+                <g font-size="11" text-anchor="middle" fill="#273142"><text x="53" y="57">p=120</text><text x="53" y="137">q=3</text><text x="147" y="97">u=pq=360</text><text x="147" y="172">d=40</text><text x="254" y="127">v=400</text><text x="254" y="55">t=1.05</text><text x="381" y="95">J=420</text><text x="381" y="111">total</text></g>
+              </svg>
+              <div class="cap">Receipt ka forward pass: p aur q se subtotal, delivery jodo, tax lagao.</div>
+            </figure>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Node</th><th>Forward value</th><th>Backward derivative</th></tr>
+              <tr><td>J = v × t</td><td>400 × 1.05 = 420</td><td>dJ/dv = 1.05, dJ/dt = 400</td></tr>
+              <tr><td>v = u + d</td><td>360 + 40 = 400</td><td>dJ/du = 1.05, dJ/dd = 1.05</td></tr>
+              <tr><td>u = p × q</td><td>120 × 3 = 360</td><td>dJ/dp = 1.05 × 3 = 3.15, dJ/dq = 1.05 × 120 = 126</td></tr>
+            </table></div>
+            <p>Interpretation sweet hai: price ₹1 badhe to total ₹3.15 badhega, kyunki 3 sandwiches aur 5% tax. Quantity 1 badhe to total ₹126 badhega, kyunki ek extra sandwich ₹120 plus tax. Yehi “local slope × peeche se aaya slope” hai.</p>
+            <pre class="code">p, q, d, t = 120, 3, 40, 1.05
+u = p * q
+v = u + d
+J = v * t
+# backward: dJ/dp=3.15, dJ/dq=126, dJ/dd=1.05, dJ/dt=400</pre>
+            <h4>dvar notation ko receipt se jodo</h4>
+            <p>Bill graph mein <strong>dp</strong> ka matlab “price mein chhota change final bill ko kitna change karega.” Neural network mein bhi <strong>dw</strong> ka matlab “weight badalne se cost ka kya asar.” Naam short hai, par sentence lamba padho to clarity aati hai.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Forward values cache nahi kiye to backward mein problem hogi. dJ/dq nikaalne ke liye p aur t ke forward values chahiye the.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Computation graph formula ko tukdon mein todta hai; backprop wahi tukde ulte order mein slope ke saath chalata hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>dvar naam weird kyu hai?</summary><p>Ye shorthand hai. da ka matlab a ka chhota badlav nahi, course notation mein dJ/da hai. Context se padhna.</p></details>
+            <details class="qa"><summary>Gradient descent har baar cost kam karega?</summary><p>Agar learning rate reasonable hai to aam taur pe. Bahut bada α ho to cost uchhal ke badh sakti hai.</p></details>
+            <details class="qa"><summary>Computation graph manually banana zaroori?</summary><p>Libraries khud banati hain. Par intuition se tum shape aur gradient bugs pakad paoge.</p></details>
+            <details class="qa"><summary>Bill example mein dJ/dq = 126 ka unit kya hai?</summary><p>Ye “rupees per extra item” jaisa hai. Quantity 1 badhe to total bill ₹126 badhega, given current price ₹120 aur tax factor 1.05.</p></details>
+            <details class="qa"><summary>Backward pass mein values forward se kyu chahiye?</summary><p>Local slopes current values pe depend kar sakte hain. Bill example mein dJ/dq = t×p tha, to p aur t ke forward values chahiye. Isi liye cache important hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>w = 5, dw = 2, α = 0.1. New w?</summary><p>w := 5 − 0.1×2 = <b>4.8</b>.</p></details>
+              <details class="qa"><summary>J = 4a, a ko 0.001 badhaya to J kitna badhega?</summary><p>0.004. Slope = 0.004 / 0.001 = <b>4</b>.</p></details>
+              <details class="qa"><summary>Cafe bill mein p=120, q=3, d=40, t=1.05. dJ/dp?</summary><p>dJ/dp = t × q = 1.05 × 3 = <b>3.15</b>. Price ₹1 badhe to total ₹3.15 badhega.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="n4"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-logistic-regression-neuron.html"><small>← Pichhla</small>Logistic regression — ek neuron wala network</a>
+          <a class="pager-next" href="dl-logistic-gradients.html"><small>Agla →</small>Logistic regression ke gradients</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

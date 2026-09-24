@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Unsupervised learning aur clustering: Answer key nahi, phir bhi structure. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Unsupervised learning aur clustering (ML · 3) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../unsupervised.html">ML · 3: Unsupervised Learning, Recommenders, RL</a> › Topic 1 / 13</nav>
+        <p class="eyebrow">ML · 3 · TOPIC 01 · CLUSTERING</p>
+        <h1>Unsupervised learning aur clustering</h1>
+        <p>Answer key nahi, phir bhi structure</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 3 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="u1" class="current" aria-current="page" href="unsupervised-clustering.html"><span>01</span>Unsupervised learning aur clustering</a>
+            <a data-topic-link="u2" href="k-means.html"><span>02</span>K-means algorithm</a>
+            <a data-topic-link="u3" href="k-means-cost-choose-k.html"><span>03</span>K-means cost, initialization aur K chunna</a>
+            <a data-topic-link="u4" href="anomaly-gaussian.html"><span>04</span>Anomaly detection aur Gaussian</a>
+            <a data-topic-link="u5" href="anomaly-algorithm.html"><span>05</span>Anomaly detection algorithm aur evaluation</a>
+            <a data-topic-link="u6" href="recommender-features.html"><span>06</span>Recommender: item features ke saath</a>
+            <a data-topic-link="u7" href="collaborative-filtering.html"><span>07</span>Collaborative filtering aur binary labels</a>
+            <a data-topic-link="u8" href="mean-normalization.html"><span>08</span>Mean normalization, TensorFlow aur related items</a>
+            <a data-topic-link="u9" href="content-based-filtering.html"><span>09</span>Content-based filtering aur deep learning</a>
+            <a data-topic-link="u10" href="pca.html"><span>10</span>PCA — bahut features ko kam mein samet-na</a>
+            <a data-topic-link="u11" href="reinforcement-learning-basics.html"><span>11</span>Reinforcement learning basics</a>
+            <a data-topic-link="u12" href="q-function-bellman.html"><span>12</span>Q-function aur Bellman equation</a>
+            <a data-topic-link="u13" href="deep-q-network.html"><span>13</span>Continuous states aur Deep Q-Network</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11,u12,u13"><span>ML · 3 progress</span><strong data-progress-label>0 / 13 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Duniya ka zyadatar data bina labels ka hai. Usme se kuch kaam ka nikaalna — yahan se shuru hota hai.</div>
+        
+        
+        <article class="lesson-card single" id="u1">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Unsupervised learning mein answer key hi nahi hoti. Phir model seekhta kya hai?</p>
+              <p class="msg dost">Socho tum nayi city mein kiraana dukaan kholte ho. Kisi ne customer labels nahi diye. Par ek mahine baad tum khud notice karte ho: kuch log roz subah doodh-bread, kuch weekend pe monthly saamaan, kuch raat ko sirf chips-cold drink. Label kisi ne nahi diya — tumne <strong>khud groups pehchaan liye</strong>.</p>
+              <p class="msg dost">Yahi unsupervised learning hai. Data mein chhupa <strong>structure</strong> dhundhna. Aur uska sabse common kaam hai <strong>clustering</strong> — milte-julte examples ko ek group mein daalna.</p>
+            </div>
+            <div class="compare-grid">
+              <div><b>Supervised</b>Data: (x, y). “Ye photo billi hai.” Model sikhta hai x → y.</div>
+              <div><b>Unsupervised</b>Data: sirf x. “Ye rahe photos.” Model khud groups/patterns dhundhta hai.</div>
+            </div>
+            <figure class="figure">
+              <svg viewBox="0 0 400 200" role="img" aria-label="Bina rang ke dots jo teen natural groups mein baithe hain">
+                <line x1="30" y1="185" x2="390" y2="185" stroke="#b8c2d3"/><line x1="30" y1="10" x2="30" y2="185" stroke="#b8c2d3"/>
+                <g fill="#8a96aa"><circle cx="80" cy="140" r="5"/><circle cx="95" cy="152" r="5"/><circle cx="70" cy="160" r="5"/><circle cx="100" cy="135" r="5"/><circle cx="85" cy="125" r="5"/>
+                <circle cx="210" cy="60" r="5"/><circle cx="225" cy="45" r="5"/><circle cx="195" cy="50" r="5"/><circle cx="230" cy="70" r="5"/><circle cx="215" cy="35" r="5"/>
+                <circle cx="320" cy="140" r="5"/><circle cx="335" cy="125" r="5"/><circle cx="345" cy="150" r="5"/><circle cx="310" cy="160" r="5"/><circle cx="330" cy="165" r="5"/></g>
+                <text x="385" y="198" font-size="11" text-anchor="end" fill="#7a879b">kitni baar aate hain →</text><text x="36" y="22" font-size="11" fill="#7a879b">kitna kharch</text>
+              </svg>
+              <div class="cap">Kisi dot pe label nahi — phir bhi aankh ko teen group dikh rahe hain. Clustering algorithm yahi “dekhna” seekhta hai.</div>
+            </figure>
+            <h4>Clustering kahan use hota hai?</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Kaam</th><th>Kya group hota hai</th></tr>
+              <tr><td>Customer segments</td><td>Shopping pattern se “budget”, “premium”, “kabhi-kabhi” jaise groups</td></tr>
+              <tr><td>News grouping</td><td>Ek hi ghatna ke baare mein alag-alag articles ek saath</td></tr>
+              <tr><td>DNA / biology</td><td>Milte-julte gene patterns wale log/cells</td></tr>
+              <tr><td>Astronomy</td><td>Space mein taaron ke jhund pehchanna</td></tr>
+            </table></div>
+            <p>Is module ka route map simple hai: <strong>clustering</strong> se groups, <strong>anomaly detection</strong> se ajeeb cases, aur <strong>dimensionality reduction / PCA</strong> se bahut saare features ko kam mein samet-na. Abhi bas itna feel lo: answer key nahi, phir bhi data mein kahani chhupi hoti hai.</p>
+
+            <h4>Cluster ka matlab numbers se</h4>
+            <div class="chat"><p class="msg me">Aankh ko group dikhna theek hai, par computer ko kaise feel hota hai ki ye log similar hain?</p><p class="msg dost">Computer feelings nahi, distance dekhta hai. Features ko numbers banao: mahine mein visits aur spend. Jo points paas-paas, woh likely ek cluster.</p></div>
+            <div class="table-wrap"><table class="calc"><tr><th>Customer</th><th>Visits/month</th><th>Spend (₹)</th><th>Natural reading</th></tr><tr><td>A</td><td>2</td><td>300</td><td>Occasional</td></tr><tr><td>B</td><td>3</td><td>350</td><td>Occasional</td></tr><tr><td>C</td><td>12</td><td>2500</td><td>Regular premium</td></tr><tr><td>D</td><td>11</td><td>2300</td><td>Regular premium</td></tr><tr><td>E</td><td>20</td><td>500</td><td>Frequent small buys</td></tr></table></div>
+            <p>Algorithm pehle sirf group numbers dega: cluster 0, 1, 2. Naam tum doge after looking: “occasional”, “premium”, “daily small”. Matlab model grouping karta hai, meaning insaan lagata hai.</p>
+            <div class="lesson-callout"><b>Important:</b> Agar spend rupees mein aur visits chhote number mein hain, scaling zaroori ho sakti hai. Warna spend distance pe hawi ho jaayega.</div>
+            <h4>Scaling ka chhota warning example</h4>
+            <p>Visits 2 se 20 ke beech hain, spend 300 se 2500. Agar raw distance use ki, spend feature sabko dominate karega.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Difference</th><th>Visits part</th><th>Spend part</th><th>Distance pe effect</th></tr><tr><td>A vs B</td><td>1</td><td>50</td><td>Spend ka square 2500</td></tr><tr><td>C vs D</td><td>1</td><td>200</td><td>Spend ka square 40000</td></tr></table></div>
+            <p>Scaling ke baad dono features ko fair volume milta hai. K-means se pehle ye habit bana lo.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Unsupervised = answer key nahi, sirf data. Model khud groups ya patterns dhundhta hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Groups ka naam (“budget”, “premium”) model deta hai?</summary><p>Nahi. Model bas bolta hai “group 1, group 2, group 3”. Unko dekh ke meaning aur naam <strong>insaan</strong> deta hai.</p></details>
+            <details class="qa"><summary>Kaise pata group sahi bane?</summary><p>Aksar ek “sahi” answer hota hi nahi. Check karo: groups ka koi matlab ban raha hai? Business ya science ke kaam aa rahe hain? Dobara chalane pe roughly similar aate hain? Agar haan, to group useful hai.</p></details>
+
+            <details class="qa"><summary>Unsupervised result galat kaise bolenge?</summary><p>Galat tab jab groups ka use-case mein fayda na ho, unstable hon, ya obvious nonsense ho. “Ground truth” kam hota hai, isliye usefulness aur sanity check important.</p></details>
+            <details class="qa"><summary>Clustering classification se pehle use ho sakti hai?</summary><p>Haan. Kabhi clusters ko features ke tarah use karte hain, ya data samajhne ke liye pehle clustering karte hain. Par clusters ko blindly labels mat samjho.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Customers ke groups banana, koi label nahi — supervised ya unsupervised?</summary><p><b>Unsupervised</b>.</p></details>
+              <details class="qa"><summary>Cluster ka naam (“premium customers”) kaun deta hai?</summary><p><b>Insaan</b> — model sirf group number deta hai.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="u1"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="random-forest-xgboost.html"><small>← Pichhla · ML · 2</small>Random forest aur XGBoost</a>
+          <a class="pager-next" href="k-means.html"><small>Agla →</small>K-means algorithm</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

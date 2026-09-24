@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Photos ke liye bane networks. Edge detection aur convolution se shuru, phir ResNet, Inception, MobileNet, object detection (YOLO), segmentation (U-Net), face recognition aur neural style transfer.">
+  <title>DL · 4: Convolutional Neural Networks — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="index.html">Learning map</a><a href="maths.html">Maths</a><a href="ml.html">ML</a><a class="active" href="dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="module-hero">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Learning map</a> › <a href="dl.html">Deep Learning Specialization</a></nav>
+      <p class="eyebrow">DL COURSE 4 • COMPUTER VISION</p>
+      <h1>Convolutional Neural Networks</h1>
+      <p>Photos ke liye bane networks. Edge detection aur convolution se shuru, phir ResNet, Inception, MobileNet, object detection (YOLO), segmentation (U-Net), face recognition aur neural style transfer.</p>
+      <div class="module-path"><span>Convolution</span> → <span>CNN banao</span> → <span>Famous architectures</span> → <span>Detection</span> → <span>Faces aur art</span></div>
+      <div class="hero-actions"><a class="button button-primary" href="topics/dl-cv-edge-detection.html">Topic 01 se shuru karo →</a>
+      <div class="progress-box inline" data-module-topics="c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15"><span>Progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div></div>
+    </section>
+    <div class="module-overview">
+      <section class="lesson-group"><p class="eyebrow">CONVOLUTION KI BUNIYAAD</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="c1" href="topics/dl-cv-edge-detection.html">
+          <span class="topic-index">01</span>
+          <span class="topic-card-text"><b>Computer vision aur edge detection</b><small>Photo mein pehle kinare dikhte hain</small><em>Convolution ka pehla kaam dikhta hai yahan — aur ye bhi ki normal network photos ke liye kyu nahi chalta.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="c2" href="topics/dl-padding-stride.html">
+          <span class="topic-index">02</span>
+          <span class="topic-card-text"><b>Padding aur strided convolution</b><small>Photo chhoti na ho, aur kadam bade ho</small><em>Har CNN architecture mein layer ka output size isi formula se nikalta hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="c3" href="topics/dl-conv-volumes-layer.html">
+          <span class="topic-index">03</span>
+          <span class="topic-card-text"><b>Volumes pe convolution aur ek conv layer</b><small>RGB photo, kai filters, ek layer</small><em>Asli photos mein 3 channels hote hain aur layers mein darjanon filters. Yahan poori ek CNN layer ban jaati hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="c4" href="topics/dl-pooling-cnn-example.html">
+          <span class="topic-index">04</span>
+          <span class="topic-card-text"><b>Pooling, poora CNN example aur convolution kyu</b><small>Sab jodke ek network</small><em>Pehli baar poora CNN dekhoge — layer by layer sizes aur parameters ke saath — aur samjhoge ki ye itna efficient kyu hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">FAMOUS ARCHITECTURES</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="c5" href="topics/dl-classic-networks.html">
+          <span class="topic-index">05</span>
+          <span class="topic-card-text"><b>Classic networks: LeNet-5, AlexNet, VGG-16</b><small>Doosron ke design padhna seekho</small><em>Achhe architectures padhna coding seekhne jaisa hai — doosron ka code padh ke hi achha code likhna aata hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="c6" href="topics/dl-resnets.html">
+          <span class="topic-index">06</span>
+          <span class="topic-card-text"><b>ResNets</b><small>Shortcut wala raasta</small><em>ResNet ne 100+ layer ke networks ko trainable banaya. Skip connection ka idea aaj har jagah hai, transformers mein bhi.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="c7" href="topics/dl-inception.html">
+          <span class="topic-index">07</span>
+          <span class="topic-card-text"><b>1×1 convolution aur Inception network</b><small>Sab filter sizes ek saath</small><em>1×1 convolution chhota dikhta hai par computation bachane ka bada hathiyaar hai. Inception isi pe khada hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="c8" href="topics/dl-mobilenet-efficientnet.html">
+          <span class="topic-index">08</span>
+          <span class="topic-card-text"><b>MobileNet aur EfficientNet</b><small>Phone pe chalne layak CNN</small><em>Har model server pe nahi chalta. Phone aur chhote devices ke liye kam computation wale designs chahiye.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="c9" href="topics/dl-cnn-practical-advice.html">
+          <span class="topic-index">09</span>
+          <span class="topic-card-text"><b>CNN practical advice</b><small>Open source, transfer learning, augmentation</small><em>Asli project mein zero se network kam hi banate hain. Ye page batata hai ki pro log kaise shuru karte hain.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">OBJECT DETECTION</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="c10" href="topics/dl-localization-landmarks.html">
+          <span class="topic-index">10</span>
+          <span class="topic-card-text"><b>Object localization aur landmark detection</b><small>Kya hai, aur kahan hai</small><em>Detection ki taraf pehla kadam: sirf “gaadi hai” nahi, “gaadi yahan hai”.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="c11" href="topics/dl-sliding-windows.html">
+          <span class="topic-index">11</span>
+          <span class="topic-card-text"><b>Sliding windows aur uska convolutional version</b><small>Khidki ghumao, par smart tarike se</small><em>Detection ka seedha tareeka bahut slow hai. Convolution se usko tez karne ki trick YOLO tak le jaati hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="c12" href="topics/dl-yolo.html">
+          <span class="topic-index">12</span>
+          <span class="topic-card-text"><b>YOLO: IoU, non-max suppression, anchor boxes</b><small>Ek nazar mein sab dhoondo</small><em>Real-time detection ka sabse famous algorithm. Isme detection ke saare zaroori tukde ek saath aate hain.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="c13" href="topics/dl-region-proposals-unet.html">
+          <span class="topic-index">13</span>
+          <span class="topic-card-text"><b>Region proposals aur semantic segmentation (U-Net)</b><small>Box se aage: har pixel ka label</small><em>Medical scans aur self-driving mein box kaafi nahi — har pixel ka pata chahiye. U-Net iska standard jawab hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">FACES AUR ART</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="c14" href="topics/dl-face-recognition.html">
+          <span class="topic-index">14</span>
+          <span class="topic-card-text"><b>Face recognition: one-shot, Siamese, triplet loss</b><small>Ek hi photo se pehchaan</small><em>Office ka face gate, phone unlock — sab isi idea pe. Aur ye “ek example se seekhna” ki problem ka khoobsurat hal hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="c15" href="topics/dl-neural-style-transfer.html">
+          <span class="topic-index">15</span>
+          <span class="topic-card-text"><b>Neural style transfer aur ConvNet andar kya seekhta hai</b><small>Tumhari photo, kisi painting ke style mein</small><em>Maza bhi, aur ye samajh bhi ki CNN ki alag layers photo ke alag hisse pakadti hain.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <div class="next-module"><div><p class="eyebrow">IS COURSE KE BAAD</p><h2>Sequence Models</h2><p>Jahan order matter karta hai: sentences, awaaz, music. RNN, GRU, LSTM, word embeddings (Word2Vec, GloVe), seq2seq aur beam search, attention, speech, aur aakhir mein Transformers — aaj ke language models ki neev.</p></div><a class="button button-primary" href="dl-sequence-models.html">DL · 5 dekho →</a></div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

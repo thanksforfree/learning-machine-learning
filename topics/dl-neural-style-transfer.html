@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Neural style transfer aur ConvNet andar kya seekhta hai: Tumhari photo, kisi painting ke style mein. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Neural style transfer aur ConvNet andar kya seekhta hai (DL · 4) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-convolutional-networks.html">DL · 4: Convolutional Neural Networks</a> › Topic 15 / 15</nav>
+        <p class="eyebrow">DL · 4 · TOPIC 15 · FACES AUR ART</p>
+        <h1>Neural style transfer aur ConvNet andar kya seekhta hai</h1>
+        <p>Tumhari photo, kisi painting ke style mein</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 4 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="c1" href="dl-cv-edge-detection.html"><span>01</span>Computer vision aur edge detection</a>
+            <a data-topic-link="c2" href="dl-padding-stride.html"><span>02</span>Padding aur strided convolution</a>
+            <a data-topic-link="c3" href="dl-conv-volumes-layer.html"><span>03</span>Volumes pe convolution aur ek conv layer</a>
+            <a data-topic-link="c4" href="dl-pooling-cnn-example.html"><span>04</span>Pooling, poora CNN example aur convolution kyu</a>
+            <a data-topic-link="c5" href="dl-classic-networks.html"><span>05</span>Classic networks: LeNet-5, AlexNet, VGG-16</a>
+            <a data-topic-link="c6" href="dl-resnets.html"><span>06</span>ResNets</a>
+            <a data-topic-link="c7" href="dl-inception.html"><span>07</span>1×1 convolution aur Inception network</a>
+            <a data-topic-link="c8" href="dl-mobilenet-efficientnet.html"><span>08</span>MobileNet aur EfficientNet</a>
+            <a data-topic-link="c9" href="dl-cnn-practical-advice.html"><span>09</span>CNN practical advice</a>
+            <a data-topic-link="c10" href="dl-localization-landmarks.html"><span>10</span>Object localization aur landmark detection</a>
+            <a data-topic-link="c11" href="dl-sliding-windows.html"><span>11</span>Sliding windows aur uska convolutional version</a>
+            <a data-topic-link="c12" href="dl-yolo.html"><span>12</span>YOLO: IoU, non-max suppression, anchor boxes</a>
+            <a data-topic-link="c13" href="dl-region-proposals-unet.html"><span>13</span>Region proposals aur semantic segmentation (U-Net)</a>
+            <a data-topic-link="c14" href="dl-face-recognition.html"><span>14</span>Face recognition: one-shot, Siamese, triplet loss</a>
+            <a data-topic-link="c15" class="current" aria-current="page" href="dl-neural-style-transfer.html"><span>15</span>Neural style transfer aur ConvNet andar kya seekhta hai</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15"><span>DL · 4 progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Maza bhi, aur ye samajh bhi ki CNN ki alag layers photo ke alag hisse pakadti hain.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z6" href="maths-vectors-matrices.html"><small>Maths</small>Vectors, matrices aur dot product</a></div></div>
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Content C, style S, generated G</li><li>Hidden units kya dekhte hain: layer 1 kinaare, gehri layers textures aur objects</li><li>Cost J(G) = α J_content + β J_style, pixels pe gradient descent</li><li>Content cost: ek layer ke activations ka farak</li><li>Style cost: Gram matrix, channels ki correlation, kai layers</li><li>1D aur 3D convolution: ECG, CT scan, video</li></ul></details>
+        <article class="lesson-card single" id="c15">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Neural style transfer matlab meri selfie ko Madhubani painting jaisa bana dena?</p>
+              <p class="msg dost">Haan, par sirf filter lagana nahi. Model ek photo ka content rakhta hai aur doosri image ka style churaata hai — jaise tumhari gali ka scene, par rangoli ke patterns mein.</p>
+              <p class="msg me">CNN ko art ka style kaise samajh aata hai?</p>
+              <p class="msg dost">CNN ki layers image ke alag clues pakadti hain. Shallow layers edges aur colors, deeper layers textures aur objects. Style transfer in activations ke saath khelta hai.</p>
+            </div>
+
+            <h4>Teen images: C, S, G</h4>
+            <div class="compare-grid">
+              <div><b>Content C</b>Jiski structure rakhni hai: tumhari photo, India Gate, office desk.</div>
+              <div><b>Style S</b>Jiska rang-texture lena hai: Madhubani, Warli, rangoli, oil painting.</div>
+              <div><b>Generated G</b>Pixels jo optimize honge. Target: C jaisa layout, S jaisi feel.</div>
+            </div>
+            <p>Interesting twist: yahan model ke weights train nahi ho rahe. Pretrained CNN fixed hai. Hum <strong>image G ke pixels</strong> ko gradient descent se update karte hain.</p>
+
+            <h4>ConvNet andar kya dekh raha hota hai?</h4>
+            <p>Layer 1 ke filters simple edges, color blobs, corners jaise low-level clues pe fire karte hain. Thodi deeper layers textures: brick wall, cloth pattern, leaves. Aur aur deeper layers object parts: wheel, eye, window, face-like shapes. Isliye content ke liye deeper layer useful, style ke liye multiple shallow-to-mid layers useful.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 430 170" role="img" aria-label="CNN layers from edges to textures to objects">
+                <rect x="25" y="52" width="70" height="55" rx="8" fill="#edf3ff" stroke="#3567e8" stroke-width="2"/><text x="60" y="83" font-size="11" text-anchor="middle" fill="#4b5871">pixels</text>
+                <text x="120" y="84" font-size="18" fill="#8a96aa">→</text>
+                <rect x="145" y="52" width="70" height="55" rx="8" fill="#e9f7f3" stroke="#159477" stroke-width="2"/><path d="M160,95 L198,60" stroke="#159477" stroke-width="4"/><text x="180" y="125" font-size="11" text-anchor="middle" fill="#4b5871">edges</text>
+                <text x="240" y="84" font-size="18" fill="#8a96aa">→</text>
+                <rect x="265" y="52" width="70" height="55" rx="8" fill="#fff3ec" stroke="#e0703a" stroke-width="2"/><circle cx="285" cy="72" r="6" fill="#e0703a"/><circle cx="310" cy="88" r="6" fill="#e0703a"/><circle cx="298" cy="98" r="4" fill="#e0703a"/><text x="300" y="125" font-size="11" text-anchor="middle" fill="#4b5871">textures</text>
+                <text x="355" y="84" font-size="18" fill="#8a96aa">→</text>
+                <text x="395" y="82" font-size="11" text-anchor="middle" fill="#4b5871">objects</text>
+              </svg>
+              <div class="cap">Layer depth badhne ke saath features raw pixels se meaning ki taraf jaate hain.</div>
+            </figure>
+
+            <h4>Total cost: content aur style ka tug-of-war</h4>
+            <p>Generated image G ko do teachers check karte hain. Content teacher poochta hai: “scene C jaisa hai?” Style teacher poochta hai: “texture/colors S jaise hain?”</p>
+            <div class="formula"><code>J(G) = α J_content(C,G) + β J_style(S,G)</code><ul>
+              <li><b>α</b> = content ko kitna importance</li>
+              <li><b>β</b> = style ko kitna importance</li>
+              <li><b>Gradient descent</b> weights pe nahi, G ke pixels pe chalta hai.</li>
+            </ul></div>
+            <p>α zyada rakho to photo original jaisi rahegi. β zyada rakho to style heavy ho jayega — kabhi-kabhi face bhi rangoli mein kho jaata hai.</p>
+
+            <h4>Content cost: activations ka farak</h4>
+            <p>Ek chosen deep layer lo. Content image C aur generated image G ko CNN se pass karo. Us layer ki activations compare karo. Agar activations similar hain, network ko dono ka structure similar lag raha hai.</p>
+            <div class="formula"><code>J_content = ½ × Σ(a_C − a_G)²</code><ul>
+              <li><b>a_C</b> = chosen layer pe content image ki activations</li>
+              <li><b>a_G</b> = same layer pe generated image ki activations</li>
+            </ul></div>
+            <p>Mini numbers: a_C=[1,2], a_G=[1.5,1.0]. Cost = ½×((−0.5)² + 1²) = ½×1.25 = <strong>0.625</strong>.</p>
+
+            <h4>Style cost: Gram matrix se texture ki dosti</h4>
+            <p>Style sirf “ye pixel red hai” nahi. Style mein patterns hote hain: kaunse channels saath-saath activate hote hain. Gram matrix channels ki correlation batata hai.</p>
+            <p>Maan lo ek layer mein 2 channels aur 3 positions hain:</p>
+            <div class="formula"><code>F = [[1, 2, 0],
+     [0, 1, 3]]
+Gram = F Fᵀ = [[5, 2],
+               [2,10]]</code><ul>
+              <li><b>5</b> = channel 1 ki self-energy: 1²+2²+0²</li>
+              <li><b>10</b> = channel 2 ki self-energy: 0²+1²+3²</li>
+              <li><b>2</b> = dono channels saath kitne active: 1×0 + 2×1 + 0×3</li>
+            </ul></div>
+            <p>Style cost S aur G ke Gram matrices ka difference hota hai. Aksar style ko kai layers pe measure karte hain: shallow layers color/brush strokes, deeper layers larger texture motifs.</p>
+
+            <h4>Pixels pe gradient descent</h4>
+            <p>Process thoda ulta lagta hai: random noise ya content image se G start karo. CNN fixed rakho. Cost nikalo. Phir G ke pixels ko thoda update karo taaki content aur style dono better match ho.</p>
+            <pre class="code">G = tf.Variable(content_image)     <span class="cm"># pixels trainable hain</span>
+for step in range(steps):
+    with tf.GradientTape() as tape:
+        acts = vgg(G)
+        loss = alpha * content_loss(acts) + beta * style_loss(acts)
+    grad = tape.gradient(loss, G)
+    optimizer.apply_gradients([(grad, G)])
+    G.assign(tf.clip_by_value(G, 0, 1))</pre>
+
+            <h4>1D aur 3D convolution bhi hoti hai</h4>
+            <p>Convolution sirf photos ke liye nahi. <strong>1D convolution</strong> time signals pe chal sakti hai: ECG, audio waveform, sensor readings. Filter time axis pe slide hota hai. <strong>3D convolution</strong> CT scan volume ya video clips pe use hoti hai — height, width, aur depth/time teen axes pe filter slide karta hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Data</th><th>Conv type</th><th>Example</th></tr>
+              <tr><td>ECG line</td><td>1D</td><td>Heartbeat pattern detect</td></tr>
+              <tr><td>Photo</td><td>2D</td><td>Edges, textures, objects</td></tr>
+              <tr><td>CT scan / video</td><td>3D</td><td>Volume lesion ya motion clue</td></tr>
+            </table></div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Style transfer mein generated image ko train karte waqt CNN ko accidentally trainable mat chhod dena. Agar weights badal gaye, “teacher” khud answer key badalne lagega.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Style transfer fixed CNN ke activations se content structure aur Gram matrices se style texture compare karta hai, phir generated pixels ko optimize karta hai.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Style ke liye Gram matrix hi kyu?</summary><p>Kyuki style location-specific nahi hota. Madhubani pattern photo ke kis corner mein hai, utna important nahi; channels ka saath-saath activate hona important hai. Gram matrix location ko average karke co-activation pakadta hai.</p></details>
+            <details class="qa"><summary>Generated image random noise se start karni chahiye ya content image se?</summary><p>Dono possible. Content image se start karoge to structure jaldi stable rehta hai. Noise se start karoge to style zyada free ho sakta hai, par optimize karna mushkil.</p></details>
+            <details class="qa"><summary>β bahut bada rakha to kya hoga?</summary><p>Style dominate karega. Colors/textures strong honge, par content object distort ho sakta hai. Jaise chai mein elaichi itni daal di ki chai ka taste hi gaya.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>a_C=[2,0], a_G=[1,3]. J_content = ½Σ(a_C−a_G)² kitna?</summary><p>Differences: 1 aur −3. Squares: 1 aur 9. Sum=10. Half = <b>5</b>.</p></details>
+              <details class="qa"><summary>F ke channels [1,1] aur [2,0] hain. Gram matrix?</summary><p>G₁₁=1²+1²=2, G₂₂=2²+0²=4, G₁₂=1×2+1×0=2. Matrix <b>[[2,2],[2,4]]</b>.</p></details>
+              <details class="qa"><summary>ECG signal ke liye 1D, 2D ya 3D convolution?</summary><p>Usually <b>1D convolution</b>, kyunki signal time axis pe ek sequence hota hai.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="c15"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-face-recognition.html"><small>← Pichhla</small>Face recognition: one-shot, Siamese, triplet loss</a>
+          <a class="pager-next" href="dl-why-sequence-models.html"><small>Agla · DL · 5 →</small>Sequence models kyu, aur notation</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

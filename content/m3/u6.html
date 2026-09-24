@@ -1,0 +1,44 @@
+            <div class="chat">
+              <p class="msg me">Netflix/YouTube ko kaise pata chal jaata hai ki mujhe kya pasand aayega? Thoda creepy bhi lagta hai.</p>
+              <p class="msg dost">Fair feeling hai. Ek table socho: rows = movies, columns = users, andar = rating (0–5 stars). Zyadatar cells <strong>khaali (?)</strong> hain, kyunki har insaan ne kuch hi movies dekhi. Recommender ka kaam: in khaali cells ka andaaza lagao, aur sabse zyada wale suggest karo.</p>
+            </div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Movie</th><th>Riya</th><th>Kabir</th><th>Neha</th><th>Arjun</th></tr>
+              <tr><td>Pyaar Ka Safar (romance)</td><td>5</td><td>5</td><td>0</td><td>?</td></tr>
+              <tr><td>Dil Ki Baatein (romance)</td><td>5</td><td>?</td><td>?</td><td>0</td></tr>
+              <tr><td>Chase 2 (action)</td><td>0</td><td>0</td><td>5</td><td>4</td></tr>
+              <tr><td>Toofan Express (action)</td><td>?</td><td>0</td><td>5</td><td>?</td></tr>
+            </table></div>
+            <p>(Movies ke naam kaalpanik hain, warna copyright uncle aa jayenge.) Ek nazar mein dikh raha: Riya-Kabir romance pasand, Neha-Arjun action. Arjun ko “Pyaar Ka Safar” shayad pasand nahi aayegi. Computer ko ye pattern kaise dikhe?</p>
+            <h4>Pehla tareeka: har movie ke features pata hon</h4>
+            <p>Maan lo har movie ke 2 features diye hain: x₁ = kitni romance, x₂ = kitni action (0–1).</p>
+            <div class="chat">
+              <p class="msg dost">Ab <strong>har user ke liye ek chhota linear regression</strong>! Riya ke apne weights w aur b. Predicted rating = w · x + b. Riya ka w = [5, 0] (romance pe 5, action pe 0), b = 0.</p>
+            </div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Movie</th><th>x (romance, action)</th><th>Riya ka predicted rating = 5·romance + 0·action</th></tr>
+              <tr><td>Pyaar Ka Safar</td><td>[0.9, 0.0]</td><td>4.5</td></tr>
+              <tr><td>Toofan Express</td><td>[0.1, 1.0]</td><td class="bad">0.5 → mat dikhao</td></tr>
+              <tr><td>Nayi movie “Ishq 2”</td><td>[0.95, 0.1]</td><td class="good">4.75 → suggest karo ✓</td></tr>
+            </table></div>
+            <div class="formula"><code>Riya ki cost = (1/2) × Σ (jin movies ko rate kiya) (w·x + b − asli rating)²  +  (λ/2) Σ w²</code><ul><li>Sirf un movies pe galti gino jahan rating hai (khaali “?” ignore).</li><li>Har user ka apna chhota model. Sab users ki cost jod ke ek saath gradient descent.</li></ul></div>
+
+            <h4>Ek user ki cost numbers se</h4>
+            <div class="chat"><p class="msg me">Cost formula mein sirf rated movies gin rahe hain. Ek example dikhao na.</p><p class="msg dost">Chalo Riya ke do rated movies lete hain. Question mark wale cells ko bill mein include hi nahi karna.</p></div>
+            <p>Riya ke weights w = [5, 0], b = 0. Regularization abhi ignore karte hain.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Movie</th><th>x</th><th>Asli rating</th><th>Prediction</th><th>Error²</th></tr><tr><td>Pyaar Ka Safar</td><td>[0.9, 0.0]</td><td>5</td><td>4.5</td><td>(4.5−5)² = 0.25</td></tr><tr><td>Chase 2</td><td>[0.1, 1.0]</td><td>0</td><td>0.5</td><td>(0.5−0)² = 0.25</td></tr><tr><td>Toofan Express</td><td>[0.1, 1.0]</td><td>?</td><td>0.5</td><td>Ignore</td></tr></table></div>
+            <p>Cost ka data part = 1/2 × (0.25 + 0.25) = <b>0.25</b>. Question mark pe prediction nikal sakta hai, par training galti nahi ginti kyunki sach rating pata hi nahi.</p>
+            <div class="lesson-callout"><b>Cold start hint:</b> Agar naye user ne kuch rate nahi kiya, content features ya popular items se start karna padta hai. Sirf ratings table kaafi nahi.</div>
+            <h4>Regularization rating ko tame rakhta hai</h4>
+            <p>Agar user ne sirf ek movie ko 5 diya, model uske weights ko extreme bana sakta hai. λ bolta hai: “bhai, thoda shaant.”</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Weights</th><th>Data fit</th><th>λ penalty feel</th></tr><tr><td>[20, 0]</td><td>Ek rating fit ho sakti</td><td class="bad">Bahut bada penalty</td></tr><tr><td>[5, 0]</td><td>Reasonable fit</td><td class="good">Controlled</td></tr></table></div>
+            <p>Recommenders sparse hote hain, isliye regularization overfitting se bachane mein kaafi kaam aata hai.</p>
+            <div class="lesson-callout"><b>Beginner checkpoint:</b> “?” ko zero mat banao. Zero ek real dislike rating hai; “?” ka matlab unknown. Dono mix kar diye to recommender ulta seekhega.</div>
+            <p>Ratings table sparse hoti hai, isliye “unknown” ko ignore karna important hai. Unknown ko 0 treat kiya to model sochega user ne movie dekhi aur dislike ki, jo sach nahi hai.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Movie features pata hon to har user ke liye ek chhota linear regression — rating = w·x + b.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Movie ke “romance 0.9” jaise features kaun likhega?</summary><p>Yahi problem hai! Hazaaron movies ke liye manually likhna mushkil, aur kaunse features matter karte hain pata bhi nahi. Agla topic (collaborative filtering) ye features <strong>khud seekh</strong> leta hai.</p></details>
+            <details class="qa"><summary>0 rating aur ? mein farak?</summary><p>0 = dekha aur bilkul pasand nahi aaya (information hai!). ? = dekha hi nahi (koi information nahi). Training mein sirf rated khaane gine jaate hain.</p></details>
+
+            <details class="qa"><summary>Ratings ko 0–5 hi rehne dein ya normalize karein?</summary><p>Often normalize karte hain, especially collaborative filtering mein. Scale manageable hota hai aur naye users/items ke defaults better hote hain.</p></details>
+            <details class="qa"><summary>Movie feature manually galat ho to?</summary><p>Prediction bhi galat ho sakti hai. Agar “action” movie ko romance tag kar diya, romance lovers ko recommend ho jaayegi. Feature quality matters.</p></details>

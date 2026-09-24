@@ -1,0 +1,84 @@
+            <div class="chat">
+              <p class="msg me">Mini-batch gradient descent mein line zig-zag kyu chalti hai? Seedha best point ki taraf kyu nahi jaati?</p>
+              <p class="msg dost">Socho tum gali mein cycle chala rahe ho. Road ke dono side speed breakers hain. Tumhara target seedha aage hai, par cycle left-right hil rahi hai.</p>
+              <p class="msg me">To handle pakad ke average direction mein chalna padega?</p>
+              <p class="msg dost">Exactly. Momentum handle ko stable karta hai. RMSprop side wali hila-hili ko dabaata hai. Adam dono ka combo pack hai.</p>
+              <p class="msg me">Adam matlab optimizer ka jugaadu dost?</p>
+              <p class="msg dost">Haan, par jugaad nahi — moving averages ka disciplined use.</p>
+            </div>
+            <h4>Momentum: gradients ka moving average</h4>
+            <p>Har mini-batch ka gradient thoda noisy hota hai. Momentum bolta hai: “ek batch ki cheekh pe mat nacho, recent gradients ka smooth direction dekho.”</p>
+            <div class="formula"><code>v_dW = βv_dW + (1 − β)dW
+W = W − αv_dW</code><ul>
+              <li><b>dW</b> = current mini-batch ka gradient</li>
+              <li><b>v_dW</b> = gradient ka moving average</li>
+              <li><b>β</b> aksar 0.9, matlab roughly 10 batches ki memory</li>
+              <li><b>α</b> = learning rate, actual kadam ka size</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Step</th><th>Gradient (x, y)</th><th>Momentum v, β = 0.9</th><th>Feel</th></tr>
+              <tr><td>1</td><td>(8, 1)</td><td>(0.800, 0.100)</td><td>x side ka pehla jhatka</td></tr>
+              <tr><td>2</td><td>(−7, 1)</td><td>(0.020, 0.190)</td><td class="good">x cancel, y build</td></tr>
+              <tr><td>3</td><td>(6, 1)</td><td>(0.618, 0.271)</td><td>aage ki direction zyada clear</td></tr>
+            </table></div>
+            <figure class="figure">
+              <svg viewBox="0 0 420 210" role="img" aria-label="Zig-zag gradient descent aur smooth momentum path comparison">
+                <path d="M40,30 Q210,320 380,30" fill="none" stroke="#b8c2d3" stroke-width="3"/>
+                <polyline points="90,70 260,110 120,145 240,165 200,178" fill="none" stroke="#c2410c" stroke-width="2" stroke-dasharray="5 4"/>
+                <polyline points="90,70 135,115 165,145 188,165 200,178" fill="none" stroke="#159477" stroke-width="3"/>
+                <g fill="#c2410c"><circle cx="90" cy="70" r="5"/><circle cx="260" cy="110" r="5"/><circle cx="120" cy="145" r="5"/></g>
+                <g fill="#159477"><circle cx="135" cy="115" r="5"/><circle cx="165" cy="145" r="5"/><circle cx="200" cy="178" r="6"/></g>
+                <text x="270" y="105" font-size="11" fill="#c2410c">noisy zig-zag</text>
+                <text x="215" y="160" font-size="11" fill="#159477">momentum smooth</text>
+              </svg>
+              <div class="cap">Momentum side-to-side drama ko average karke target ki taraf zyada seedha chalta hai.</div>
+            </figure>
+            <h4>RMSprop: bade gradient wali direction ko thoda slow</h4>
+            <p>Kabhi ek direction mein gradient bahut bada hota hai, doosri mein chhota. Result: patli gali mein cycle jaise left-right ping-pong. RMSprop squared gradients ka moving average rakhta hai aur update ko uske square-root se divide karta hai.</p>
+            <div class="formula"><code>s_dW = βs_dW + (1 − β)(dW)²
+W = W − α × dW / (√s_dW + ε)</code><ul>
+              <li><b>s_dW</b> = squared gradients ka moving average</li>
+              <li><b>√s_dW</b> bada ho to us direction ka step chhota</li>
+              <li><b>ε</b> chhota number, zero se divide hone se bachata hai</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Gradient</th><th>s_x, s_y after update (β = 0.9)</th><th>Divide karne ka effect</th></tr>
+              <tr><td>(8, 1)</td><td>(6.40, 0.10)</td><td>x mein denominator bada, y mein chhota</td></tr>
+              <tr><td>(−7, 1)</td><td>(10.66, 0.19)</td><td>oscillation wali x direction aur dabti</td></tr>
+              <tr><td>(6, 1)</td><td>(13.19, 0.27)</td><td class="good">patli gali mein zyada stable</td></tr>
+            </table></div>
+            <h4>Adam = Momentum + RMSprop + bias correction</h4>
+            <p>Adam do diaries rakhta hai: v gradients ka average, s squared gradients ka average. Dono v_0 = 0 se start hote hain, isliye first steps mein bias correction lagti hai.</p>
+            <div class="formula"><code>v = β₁v + (1 − β₁)dW
+s = β₂s + (1 − β₂)(dW)²
+v_corrected = v / (1 − β₁ᵗ)
+s_corrected = s / (1 − β₂ᵗ)
+W = W − α × v_corrected / (√s_corrected + ε)</code><ul>
+              <li><b>β₁ = 0.9</b> momentum wali memory</li>
+              <li><b>β₂ = 0.999</b> squared-gradient wali lambi memory</li>
+              <li><b>ε = 10⁻⁸</b> default chhota safety number</li>
+            </ul></div>
+            <div class="lesson-callout"><b>Hyperparameter sach:</b> Adam mein aksar β₁, β₂, ε ko default chhod dete hain. Sabse zyada tuning learning rate α ki hoti hai. α galat hua to Adam bhi gussa ho jaata hai.</div>
+            <pre class="code">optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+with tf.GradientTape() as tape:
+    loss = model_loss(x_batch, y_batch)
+grads = tape.gradient(loss, model.trainable_variables)
+optimizer.apply_gradients(zip(grads, model.trainable_variables))  <span class="cm"># Adam update</span></pre>
+            <div class="compare-grid">
+              <div><b>Momentum</b>Direction smooth. Noisy mini-batches mein helpful.</div>
+              <div><b>RMSprop</b>Har parameter ka step scale alag. Patli gali jaisi loss surface mein helpful.</div>
+              <div><b>Adam</b>Dono ideas plus correction. Practical default choice.</div>
+              <div><b>Plain GD</b>Simple, par bade deep nets mein aksar slow.</div>
+            </div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Adam use kar rahe ho matlab learning rate bhool jao — aisa nahi. Loss explode ho raha hai to pehla shak α pe hi rakho.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Momentum direction ko smooth karta hai, RMSprop step ko scale karta hai, Adam dono ko saath chalaata hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Kya Adam hamesha best hai?</summary><p>Nahi. Bahut projects mein Adam se fast start milta hai. Kabhi SGD + momentum final performance mein achha ho sakta hai. Par beginner ke liye Adam safe default hai.</p></details>
+            <details class="qa"><summary>RMSprop mein squared gradient kyu?</summary><p>Square sign ko hata deta hai aur bade gradients ko aur clearly bada dikhata hai. Direction nahi, magnitude ki aadat measure karni hai.</p></details>
+            <details class="qa"><summary>β₂ itna 0.999 kyu?</summary><p>Squared gradients noisy hote hain. Unka stable estimate chahiye, isliye lambi memory. β₁ ko gradients ki direction ke liye thoda faster rakhte hain.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>β = 0.9, v_old = 2, current gradient = 6. Naya v?</summary><p>v = 0.9 × 2 + 0.1 × 6 = 1.8 + 0.6 = <b>2.4</b>.</p></details>
+              <details class="qa"><summary>Adam mein kaunse hyperparameter ko sabse pehle tune karoge?</summary><p><b>α learning rate</b>. β₁, β₂, ε ko pehle default rakhna practical hota hai.</p></details>
+              <details class="qa"><summary>RMSprop denominator bada ho gaya. Step bada hoga ya chhota?</summary><p><b>Chhota</b>, kyunki update gradient ko denominator se divide karta hai.</p></details>
+            </div>

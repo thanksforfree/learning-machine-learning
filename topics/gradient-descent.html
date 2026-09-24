@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Gradient descent — pahad se neeche utarna: Computer best w, b kaise dhundhta hai. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Gradient descent — pahad se neeche utarna (ML · 1) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-blue">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../supervised.html">ML · 1: Supervised Machine Learning</a> › Topic 4 / 12</nav>
+        <p class="eyebrow">ML · 1 · TOPIC 04 · NUMBER PREDICT KARNA</p>
+        <h1>Gradient descent — pahad se neeche utarna</h1>
+        <p>Computer best w, b kaise dhundhta hai</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 1 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="s1" href="ml-kya-hai.html"><span>01</span>Machine learning asal mein hai kya?</a>
+            <a data-topic-link="s2" href="linear-regression.html"><span>02</span>Linear regression — seedhi line ka model</a>
+            <a data-topic-link="s3" href="cost-function.html"><span>03</span>Cost function — line ko marks dena</a>
+            <a data-topic-link="s4" class="current" aria-current="page" href="gradient-descent.html"><span>04</span>Gradient descent — pahad se neeche utarna</a>
+            <a data-topic-link="s5" href="multiple-features.html"><span>05</span>Multiple features aur vectorization</a>
+            <a data-topic-link="s6" href="feature-scaling.html"><span>06</span>Feature scaling aur training check</a>
+            <a data-topic-link="s7" href="feature-engineering.html"><span>07</span>Feature engineering aur polynomial regression</a>
+            <a data-topic-link="s8" href="logistic-regression.html"><span>08</span>Logistic regression aur sigmoid</a>
+            <a data-topic-link="s9" href="decision-boundary.html"><span>09</span>Decision boundary</a>
+            <a data-topic-link="s10" href="logistic-cost.html"><span>10</span>Logistic cost (log loss)</a>
+            <a data-topic-link="s11" href="overfitting.html"><span>11</span>Underfitting aur overfitting</a>
+            <a data-topic-link="s12" href="regularization.html"><span>12</span>Regularization — weights pe lagaam</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12"><span>ML · 1 progress</span><strong data-progress-label>0 / 12 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Ye ML ka engine hai. Linear regression, logistic regression, neural networks — sab isi (ya iske smart version Adam) se train hote hain.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z7" href="maths-slope-derivative.html"><small>Maths</small>Slope, derivative aur chain rule</a></div></div>
+        
+        <article class="lesson-card single" id="s4">
+          <div class="lesson-body">
+
+            <div class="chat">
+              <p class="msg me">Samajh gaya, cost kam karna hai. Par computer best w aur b dhundhega kaise? Har value try karega?</p>
+              <p class="msg dost">Nahi, usme to saalon lag jayenge. Ek scene socho: raat ko tum pahad pe ho, itni dhund hai ki kuch nahi dikhta. Neeche gaon jaana hai. Kya karoge?</p>
+              <p class="msg me">Pair se feel karunga ki zameen kis taraf neeche jhuk rahi hai, aur us taraf ek kadam lunga.</p>
+              <p class="msg dost">Exactly! Phir ruko, dobara feel karo, phir ek kadam. Baar baar. Dheere dheere neeche pahunch jaoge. Yahi <strong>gradient descent</strong> hai. Pahad = cost ki katori. Tumhari position = abhi ke w, b. Zameen ka jhukaav = gradient (slope).</p>
+              <p class="msg me">Agar kadam ulte direction mein pad gaya?</p>
+              <p class="msg dost">Phir cost badhegi — wahi signal hai ki sign ya learning rate check karo. Training graph model ka mood-board hota hai.</p>
+            </div>
+            <div class="formula"><code>w = w − α × (slope, w ke hisaab se)
+b = b − α × (slope, b ke hisaab se)</code><ul>
+              <li><b>α</b> (alpha) = learning rate = ek kadam kitna bada</li>
+              <li><b>slope</b> (derivative) = is jagah zameen kitni aur kis taraf jhuki hai</li>
+              <li><b>minus sign</b> = hamesha neeche ki taraf. Slope positive (aage chadhai) → w ghatega. Slope negative → w badhega. Minus khud direction sambhal leta hai.</li>
+            </ul></div>
+            <h4>Step-by-step numbers ke saath</h4>
+            <p>Ek simple cost lo: <strong>J(w) = (w − 3)²</strong>. Seedha dikh raha hai ki best w = 3 hai (tab cost 0). Iska slope = 2(w − 3). Shuru karo w = 0 se, α = 0.1 ke saath:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Step</th><th>Abhi w</th><th>Slope = 2(w − 3)</th><th>Naya w = w − 0.1 × slope</th></tr>
+              <tr><td>1</td><td>0</td><td>−6</td><td>0.6</td></tr>
+              <tr><td>2</td><td>0.6</td><td>−4.8</td><td>1.08</td></tr>
+              <tr><td>3</td><td>1.08</td><td>−3.84</td><td>1.46</td></tr>
+              <tr><td>4</td><td>1.46</td><td>−3.07</td><td>1.77</td></tr>
+              <tr><td>…</td><td>…</td><td>0 ke paas</td><td class="good">→ 3 ke paas pahunch gaya</td></tr>
+            </table></div>
+            <p>Kadam dekho: 0.6, 0.48, 0.38, 0.31… <strong>apne aap chhote</strong> ho rahe hain. Kyunki gaddhe ke paas zameen kam jhuki hai, slope chhota hai, to kadam bhi chhota. Jaise station paas aate hi auto wala speed dheere kar deta hai.</p>
+            <h4>Learning rate — kadam ka size bahut matter karta hai</h4>
+            <div class="figure-row">
+              <figure class="figure"><svg viewBox="0 0 400 210" role="img" aria-label="Sahi learning rate: ball dheere dheere neeche aati hai">
+                <path d="M40,30 Q200,330 360,30" fill="none" stroke="#b8c2d3" stroke-width="3"/>
+                <polyline points="72,84 104,126 136,156 168,174 200,180" fill="none" stroke="#159477" stroke-width="2" stroke-dasharray="4 3"/>
+                <g fill="#159477"><circle cx="72" cy="84" r="6"/><circle cx="104" cy="126" r="6"/><circle cx="136" cy="156" r="6"/><circle cx="168" cy="174" r="6"/><circle cx="200" cy="180" r="7"/></g>
+              </svg><div class="cap"><b>Sahi α:</b> aaram se neeche pahuncha ✓</div></figure>
+              <figure class="figure"><svg viewBox="0 0 400 210" role="img" aria-label="Bahut bada learning rate: ball idhar udhar uchhal ke upar chali jaati hai">
+                <path d="M40,30 Q200,330 360,30" fill="none" stroke="#b8c2d3" stroke-width="3"/>
+                <polyline points="152,166 264,156 104,126 328,84" fill="none" stroke="#c2410c" stroke-width="2" stroke-dasharray="4 3"/>
+                <g fill="#c2410c"><circle cx="152" cy="166" r="6"/><circle cx="264" cy="156" r="6"/><circle cx="104" cy="126" r="6"/><circle cx="328" cy="84" r="6"/></g>
+              </svg><div class="cap"><b>Bahut bada α:</b> gaddha cross karke upar chala gaya ✗</div></figure>
+            </div>
+            <p>Upar wale example mein α = 1.1 lo: w = 0 → 6.6 → −1.32 → 8.18 → … har baar 3 se <em>aur door</em>. Isko “diverge” kehte hain. Aur α = 0.001 lo to pahunchega zaroor, par hazaaron steps mein.</p>
+            <div class="mistake"><b>Dhyan rakhna — simultaneous update:</b> w aur b dono ka naya value <em>purani</em> values se calculate karo, phir dono ko ek saath badlo. Pehle w badal diya aur phir naye w se b ka slope nikala — to galat hai.</div>
+            <p><strong>“Batch” gradient descent</strong> = har kadam pe <em>saare</em> training examples dekh ke slope nikaalna. Aur good news: linear regression ki katori mein sirf <strong>ek hi gaddha</strong> hota hai, galat gaddhe mein phasne ka dar nahi.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Slope dekho → ulti taraf chhota kadam lo → repeat. Jab tak cost kam hona band na ho.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Mujhe derivative / calculus nahi aata. Chalega?</summary><p>Bilkul chalega. Tumhe bas itna samajhna hai: <strong>derivative = slope = kis taraf aur kitni dhalaan</strong>. Asli calculation NumPy/TensorFlow jaisi libraries kar deti hain.</p></details>
+            <details class="qa"><summary>Gaddhe mein pahunch ke algorithm ruk kaise jata hai?</summary><p>Gaddhe ke bilkul neeche zameen flat hai → slope 0 → kadam = α × 0 = 0. Automatic ruk jata hai. Isliye α ko beech mein chhota karne ki zaroorat bhi nahi padti.</p></details>
+            <details class="qa"><summary>Kitne steps chalana hai?</summary><p>Jab tak cost kam hona lagbhag band na ho jaye. Isko “converge hona” kehte hain. Topic 06 mein graph se check karna seekhoge.</p></details>
+            <details class="qa"><summary>Local minimum kya hota hai?</summary><p>Agar pahad mein kai gaddhe hon, to tum sabse paas wale gaddhe mein ruk sakte ho jo sabse gehra na ho. Linear regression mein ye problem nahi (ek hi katori). Neural networks mein zameen zyada ubad-khabad hoti hai.</p></details>
+            <details class="qa"><summary>Achha α kaise choose karein?</summary><p>Aise try karo: 0.001, 0.003, 0.01, 0.03, 0.1, 0.3… (har baar lagbhag 3 guna). Har ek ke liye cost ka graph dekho. Sabse bada α jo cost ko <em>stable tarike se</em> ghata raha ho — woh le lo.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>w = 5, slope = 4, α = 0.1 → naya w?</summary><p>5 − 0.1 × 4 = <b>4.6</b>.</p></details>
+              <details class="qa"><summary>Cost har step badh rahi hai. Pehla shak kispe?</summary><p>Learning rate α bahut bada — ya code mein sign ka bug.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="s4"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="cost-function.html"><small>← Pichhla</small>Cost function — line ko marks dena</a>
+          <a class="pager-next" href="multiple-features.html"><small>Agla →</small>Multiple features aur vectorization</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

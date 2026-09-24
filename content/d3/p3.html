@@ -1,0 +1,79 @@
+            <div class="chat">
+              <p class="msg me">Model dev set pe best hai. Launch karun?</p>
+              <p class="msg dost">Pehle ye bata: dev set users jaisa hai?</p>
+              <p class="msg me">Umm… dev set mein mostly clean DSLR photos hain. Users phone se raat mein photo bhejte hain.</p>
+              <p class="msg dost">To tum cricket ki practice tennis ball se kar rahe ho aur match leather ball se. Score misleading hoga.</p>
+              <p class="msg me">Dev set bhi ek target hota hai?</p>
+              <p class="msg dost">Exactly. Dev set aur metric team ka nishaana hain. Nishaana galat to mehnat galat.</p>
+            </div>
+
+            <h4>Dev aur test same distribution se</h4>
+            <p>Dev set ka kaam hai model choices karwana. Test set ka kaam hai final honest report. Dono future user data jaise hone chahiye, aur ideally same distribution se sample hone chahiye.</p>
+            <p>Crop app example: users phone se leaves ki photos bhejte hain — kuch blur, kuch shadow, kuch low-end camera. Agar dev set lab ki clean photos se bana, team lab-photo champion banayegi, farmer-photo champion nahi.</p>
+            <div class="visual-flow">
+              <span>User data pool<br><small>future jaisa</small></span><b>→</b>
+              <span>Dev set<br><small>model choose</small></span><b>+</b>
+              <span>Test set<br><small>final report</small></span><b>→</b>
+              <span class="flow-highlight">Same target</span>
+            </div>
+
+            <h4>Galat split ka device example</h4>
+            <p>Warehouse barcode reader bana rahe ho. Agar train/dev/test ko device type ke hisaab se alag kar diya, diagnosis toot jaayega.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Split</th><th>Data</th><th>Kya problem</th></tr>
+              <tr><td>Train</td><td>Fixed ceiling scanners</td><td>Model clean top-view pe seekhega</td></tr>
+              <tr><td>Dev</td><td>Handheld scanners, dusty lens</td><td class="bad">Dev error device mismatch dikhayega</td></tr>
+              <tr><td>Test</td><td>Phone camera scans</td><td class="bad">Test dev se bhi alag</td></tr>
+            </table></div>
+            <p>Better: future warehouse use ka mixed pool banao, phir us pool se random dev/test sample lo. Extra scanner data train mein add kar sakte ho, par dev/test target ko represent karein.</p>
+
+            <h4>Dev/test size aaj ke zamane mein</h4>
+            <p>Purane chhote data era mein 60/20/20 split common tha. Big data mein test/dev ko huge rakhna zaroori nahi. Bas itna ki metric reliable ho.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Total labelled examples</th><th>Reasonable split idea</th><th>Note</th></tr>
+              <tr><td>1,000</td><td>700 train, 150 dev, 150 test</td><td>Har example precious</td></tr>
+              <tr><td>1,00,000</td><td>98,000 train, 1,000 dev, 1,000 test</td><td class="good">Dev/test enough stable</td></tr>
+              <tr><td>1 crore</td><td>99.8 lakh train, 10k dev, 10k test</td><td class="good">Tiny percentage bhi kaafi</td></tr>
+            </table></div>
+            <p>Rule percentage ka nahi, confidence ka hai. Agar dev set mein only 50 examples hain, 1 galti se metric 2% hil jayega. Agar 10,000 examples hain, 1 galti sirf 0.01%.</p>
+
+            <h4>Metric kab badalna?</h4>
+            <p>Kabhi model metric ke hisaab se jeet raha hota hai, par product sense ke hisaab se loser hota hai. Tab metric badlo.</p>
+            <p>Maan lo customer-support triage model tickets ko queue mein bhejta hai. Model A ka overall error kam hai, par prepaid order refund tickets galat queue mein bhejta hai. Model B ka overall error thoda zyada, par refund misses kam. Agar refund miss 6 guna mehenga hai, metric ko weighted banao.</p>
+            <div class="formula"><code>weighted error = normal routing mistakes + 6 ? refund-miss mistakes</code><ul>
+              <li><b>normal routing mistakes</b> = aam ticket galat queue mein gaya</li>
+              <li><b>refund-miss</b> = refund ticket urgent queue mein nahi gaya</li>
+              <li><b>6</b> = product/team ka cost weight; domain ke hisaab se choose hota hai</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Model</th><th>Normal mistakes</th><th>Refund miss</th><th>Old error count</th><th>Weighted error</th></tr>
+              <tr><td>A</td><td>90</td><td>9</td><td class="good">99</td><td class="bad">90 + 6×9 = 144</td></tr>
+              <tr><td>B</td><td>112</td><td>3</td><td>115</td><td class="good">112 + 6×3 = 130</td></tr>
+            </table></div>
+            <p>Old metric A ko winner bolta tha. Weighted metric B ko. Agar business reality B ke favour mein hai, metric update karna sahi hai.</p>
+
+            <h4>Pehle nishaana tay, phir nishaana lagana</h4>
+            <p>Do alag kaam hain:</p>
+            <div class="compare-grid">
+              <div><b>Nishaana tay karna</b>Dev/test distribution aur metric choose karna. “Humein kya optimize karna hai?”</div>
+              <div><b>Nishaana lagana</b>Model train/tune karna. “Is target pe best score kaise laayein?”</div>
+            </div>
+            <p>Beginner galti: metric galat nikla to bhi model tune karte rehna. Senior move: ruk ke target fix karo, phir tuning pe jao.</p>
+
+            <h4>Dev set user data jaisa na ho to?</h4>
+            <p>Agar dev set old product ka data hai aur ab app naye users ke liye launch ho rahi hai, dev set badlo. Haan, pehle wale experiments se comparison toot sakta hai. Par galat compass pakad ke chalne se better hai compass reset karna.</p>
+            <div class="lesson-callout"><b>Simple rule:</b> Dev set woh duniya dikhaye jahan tum model ko improve karna chahte ho. Test set usi duniya ka final honest sample ho.</div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Test set pe baar-baar model choose mat karo. Test set ko board exam jaise treat karo — final mein kholna, daily mock test nahi.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Dev/test setup model se pehle ka decision hai. Galat target pe best model bhi product mein flop lag sakta hai.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Sirf dev set rakhein, test nahi?</summary><p>Early research ya internal prototype mein kabhi okay hai. Par public number report karna hai, paper/product launch hai, ya stakeholder promise hai, to separate test set rakho.</p></details>
+            <details class="qa"><summary>Dev aur test size equal hone chahiye?</summary><p>Nahi. Dono reliable hone chahiye. Agar final report pe high confidence chahiye to test bada rakho. Hyperparameter tuning zyada hai to dev bhi stable rakho.</p></details>
+            <details class="qa"><summary>Metric badalne se cheating lagti hai?</summary><p>Agar test pe result dekh ke metric apne favour mein badla, cheating. Agar product pain samajh aaya aur team openly metric update kare, woh good engineering hai.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>10,000 example dev set mein 230 mistakes. Error kitna? Ek extra mistake se kitna change?</summary><p>Error = 230/10,000 = 2.3%. Ek extra mistake = 1/10,000 = 0.01%. <b>Final answer: 2.3%, change 0.01%</b>.</p></details>
+              <details class="qa"><summary>Model A: 60 normal mistakes, 7 refund misses. Model B: 82 normal, 2 refund misses. Refund weight 5. Winner?</summary><p>A weighted = 60 + 5×7 = 95. B weighted = 82 + 5×2 = 92. <b>Final answer: B</b>.</p></details>
+              <details class="qa"><summary>Food-photo app ke dev set mein restaurant menu photos hain, users ghar ki plate photos bhejte hain. Kya karo?</summary><p>Dev/test ko user-style ghar ki photos se refresh karo. Menu photos training mein useful ho sakti hain, par target dev/test nahi. <b>Final answer: dev set badlo</b>.</p></details>
+            </div>

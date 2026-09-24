@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Probability level 2: conditional, likelihood, cross-entropy: Language models aur softmax ki bhasha. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Probability level 2: conditional, likelihood, cross-entropy (Maths) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a class="active" href="../maths.html">Maths</a><a href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../maths.html">Maths: Maths — zero se deep learning tak</a> › Topic 14 / 16</nav>
+        <p class="eyebrow">MATHS · TOPIC 14 · LEVEL 3 · DEEP LEARNING KI MATHS</p>
+        <h1>Probability level 2: conditional, likelihood, cross-entropy</h1>
+        <p>Language models aur softmax ki bhasha</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>Maths ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="z1" href="maths-symbols.html"><span>01</span>Symbols aur formula padhna</a>
+            <a data-topic-link="z2" href="maths-graphs.html"><span>02</span>Graph, line aur slope</a>
+            <a data-topic-link="z3" href="maths-functions.html"><span>03</span>Function = input-output machine</a>
+            <a data-topic-link="z4" href="maths-powers-e-log.html"><span>04</span>Power, e aur log</a>
+            <a data-topic-link="z5" href="maths-average-probability.html"><span>05</span>Average, phailaav aur probability</a>
+            <a data-topic-link="z6" href="maths-vectors-matrices.html"><span>06</span>Vectors, matrices aur dot product</a>
+            <a data-topic-link="z7" href="maths-slope-derivative.html"><span>07</span>Slope, derivative aur chain rule</a>
+            <a data-topic-link="z8" href="maths-python-numpy.html"><span>08</span>Python aur NumPy crash course</a>
+            <a data-topic-link="z9" href="maths-broadcasting-shapes.html"><span>09</span>Broadcasting, shapes aur reshape</a>
+            <a data-topic-link="z10" href="maths-computation-graph.html"><span>10</span>Computation graph aur activation ke derivatives</a>
+            <a data-topic-link="z11" href="maths-matrix-gradients.html"><span>11</span>Matrix gradients aur dimensions ka hisaab</a>
+            <a data-topic-link="z12" href="maths-norms-similarity.html"><span>12</span>Norms, distance aur cosine similarity</a>
+            <a data-topic-link="z13" href="maths-moving-average.html"><span>13</span>Exponentially weighted (moving) average</a>
+            <a data-topic-link="z14" class="current" aria-current="page" href="maths-probability-2.html"><span>14</span>Probability level 2: conditional, likelihood, cross-entropy</a>
+            <a data-topic-link="z15" href="maths-randomness-scale.html"><span>15</span>Randomness, variance aur scale</a>
+            <a data-topic-link="z16" href="maths-convolution.html"><span>16</span>Convolution: sliding dot product</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="z1,z2,z3,z4,z5,z6,z7,z8,z9,z10,z11,z12,z13,z14,z15,z16"><span>Maths progress</span><strong data-progress-label>0 / 16 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Language model ek sentence ki probability nikaalta hai, beam search sabse likely sentence dhundhta hai, aur har classifier cross-entropy se train hota hai. Ye sab yahan ki probability pe tika hai.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Conditional probability P(A | B) — rozmarra ke example se</li><li>Chain rule of probability: sentence ki probability = shabdon ki probabilities ka product</li><li>Likelihood aur maximum likelihood (sikka example)</li><li>Negative log-likelihood = cross-entropy loss</li><li>argmax, aur distribution se sampling (np.random.choice)</li><li>Chhoti probabilities ka product → logs ka sum (underflow se bachna)</li></ul></details>
+        <article class="lesson-card single" id="z14">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Probability Level 1 mein chance tha. Level 2 mein kya naya hai?</p>
+              <p class="msg dost">Ab chance akela nahi, context ke saath aayega. “Baarish ka chance” alag, “cloudy hai to baarish ka chance” alag.</p>
+              <p class="msg me">Language model bhi aise hi sochta hai?</p>
+              <p class="msg dost">Haan. “chai” ke baad “peena” ka chance, “train” ke baad “late” ka chance — pichhle shabdon ke condition pe.</p>
+            </div>
+            <h4>Conditional probability: P(A | B)</h4>
+            <p><code>P(A | B)</code> padho: “B ho chuka hai, ab A ka chance kya?” Example: 100 din observe kiye. 30 din cloudy the. Un 30 cloudy dinon mein 18 din baarish hui.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Sawaal</th><th>Hisaab</th><th>Answer</th></tr>
+              <tr><td>Cloudy ka chance</td><td>30 ÷ 100</td><td>0.30</td></tr>
+              <tr><td>Baarish | Cloudy</td><td>18 ÷ 30</td><td><b>0.60</b></td></tr>
+              <tr><td>Cloudy aur baarish dono</td><td>0.30 × 0.60</td><td><b>0.18</b></td></tr>
+            </table></div>
+            <div class="formula"><code>P(A and B) = P(B) × P(A | B)</code><ul>
+              <li><b>P(B)</b> = pehle context ka chance.</li>
+              <li><b>P(A | B)</b> = context milne ke baad A ka chance.</li>
+            </ul></div>
+            <h4>Sentence probability = chain rule</h4>
+            <p>Sentence ko left se right banao. Har shabd ka chance pichhle shabdon pe depend karega.</p>
+            <div class="formula"><code>P(y₁, y₂, y₃) = P(y₁) × P(y₂ | y₁) × P(y₃ | y₁,y₂)</code><ul>
+              <li>“main” ka chance maan lo 0.8.</li>
+              <li>“main” ke baad “chai” ka chance 0.5.</li>
+              <li>“main chai” ke baad “peeta” ka chance 0.25.</li>
+              <li>Sentence chance = 0.8 × 0.5 × 0.25 = <b>0.1</b>.</li>
+            </ul></div>
+            <h4>Likelihood — data dekh ke model ko score dena</h4>
+            <p>Likelihood ka mood: “Agar model ye bol raha hai, to hamara observed data kitna believable hai?” Coin example: 10 toss mein 8 heads, 2 tails aaye.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Model</th><th>Likelihood for 8H, 2T</th><th>Value</th></tr>
+              <tr><td>Coin heads chance 0.7</td><td>0.7⁸ × 0.3²</td><td><b>0.00519</b></td></tr>
+              <tr><td>Coin heads chance 0.5</td><td>0.5¹⁰</td><td><b>0.00098</b></td></tr>
+            </table></div>
+            <p>0.7 wala model is data ko zyada believable banata hai. Maximum likelihood training ka idea: parameters aise choose karo jo training labels ko high probability dein.</p>
+            <h4>Negative log-likelihood = cross-entropy loss</h4>
+            <p>Products chhote hote jaate hain, isliye log use karte hain. High probability ko chhoti saza, low probability ko badi saza.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Correct class ko probability</th><th>Loss = −log(p)</th><th>Feel</th></tr>
+              <tr><td>0.7</td><td>0.357</td><td>Achha, chhoti saza</td></tr>
+              <tr><td>0.2</td><td>1.609</td><td>Kaafi galat</td></tr>
+              <tr><td>0.1</td><td>2.303</td><td>Confident galti, badi saza</td></tr>
+            </table></div>
+            <p>Upar sentence example ka log loss: <code>−(log 0.8 + log 0.5 + log 0.25) = 2.303</code>, kyunki total probability 0.1 thi aur <code>−log(0.1) = 2.303</code>.</p>
+            <h4>argmax vs sampling</h4>
+            <p>Softmax model har option ka probability distribution deta hai. Example scores <code>[2, 1, 0.1]</code> ka softmax ≈ <code>[0.659, 0.242, 0.099]</code>.</p>
+            <div class="compare-grid">
+              <div><b>argmax</b>Sabse bada probability choose karo. Predictable, safe. Yahan class 1 (0.659) choose hogi.</div>
+              <div><b>sampling</b>Probability ke hisaab se random choose karo. Kabhi class 2 bhi aa sakti hai. Text generation mein variety aati hai.</div>
+            </div>
+<pre class="code">import numpy as np
+
+probs = np.array([0.659, 0.242, 0.099])
+print(np.argmax(probs))                 <span class="cm"># 0, sabse likely</span>
+choice = np.random.choice([0, 1, 2], p=probs)
+print(choice)                           <span class="cm"># probabilities ke hisaab se random</span></pre>
+            <h4>Chhoti probabilities: product se log sum tak</h4>
+            <p>100 shabdon ki sentence mein probabilities multiply karoge to number bahut chhota ho jayega. Computer ke floating-point mein underflow aa sakta hai. Logs product ko sum bana dete hain:</p>
+            <div class="formula"><code>log(p₁ × p₂ × p₃) = log p₁ + log p₂ + log p₃</code><ul>
+              <li>Product: 0.8 × 0.5 × 0.25 = 0.1</li>
+              <li>Log sum: log 0.8 + log 0.5 + log 0.25 = log 0.1</li>
+              <li>Beam search aur language models logs mein score rakhte hain.</li>
+            </ul></div>
+            <h4>Deep learning mein ye kahan milega?</h4>
+            <p>DL Course 2 ke softmax regression page mein, DL Course 5 ke language model, beam search, Word2Vec negative sampling, aur Transformer output softmax mein.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Probability multiply karte waqt independence assume mat karna jab relation ho. Sentence mein words independent nahi hote, isliye conditional probabilities use karte hain.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Conditional probability context wala chance hai. Training mein correct answer ko high probability dena = likelihood badhana = cross-entropy ghatana.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Cross-entropy aur negative log-likelihood same hain?</summary><p>One-hot labels ke common classification setup mein practically same number milta hai: correct class ki probability ka <code>−log</code>.</p></details>
+            <details class="qa"><summary>Sampling galti kyu kare jab argmax best hai?</summary><p>Creative tasks mein hamesha top word lene se text boring/repetitive ho sakta hai. Sampling controlled randomness deti hai.</p></details>
+            <details class="qa"><summary>Loss 2.303 ka matlab bad hai?</summary><p>Depend karta hai classes pe. 10 classes mein random guess ka loss ≈ −log(0.1) = 2.303. Usse neeche jaana learning ka sign hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>50 students mein 20 ne umbrella laya. Un 20 mein 15 ko rain warning mili thi. P(warning | umbrella)?</summary><p>Umbrella wale 20 mein warning wale 15. Probability = 15 ÷ 20 = <b>0.75</b>.</p></details>
+              <details class="qa"><summary>Correct class probability 0.25 hai. Loss?</summary><p><code>−log(0.25) ≈ <b>1.386</b></code>.</p></details>
+              <details class="qa"><summary><code>[0.1, 0.7, 0.2]</code> pe argmax ka index?</summary><p>Sabse bada 0.7 index 1 pe hai (zero-based). Final answer <b>1</b>.</p></details>
+            </div>
+            
+            <div class="used-box"><h4>Ye maths aage kahan kaam aayegi</h4><div class="chips"><a class="chip" data-topic-link="i14" href="dl-softmax-regression.html"><small>DL · 2</small>Softmax regression</a><a class="chip" data-topic-link="q4" href="dl-language-model-sampling.html"><small>DL · 5</small>Language model aur naye sentences banana</a><a class="chip" data-topic-link="q8" href="dl-word2vec-negative-sampling.html"><small>DL · 5</small>Embedding matrix, Word2Vec aur negative sampling</a><a class="chip" data-topic-link="q10" href="dl-seq2seq-beam-search.html"><small>DL · 5</small>Sequence-to-sequence aur beam search</a></div></div>
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="z14"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="maths-moving-average.html"><small>← Pichhla</small>Exponentially weighted (moving) average</a>
+          <a class="pager-next" href="maths-randomness-scale.html"><small>Agla →</small>Randomness, variance aur scale</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

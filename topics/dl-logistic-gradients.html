@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Logistic regression ke gradients: dz = a − y ka jaadu. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Logistic regression ke gradients (DL · 1) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-blue">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-neural-networks.html">DL · 1: Neural Networks and Deep Learning</a> › Topic 5 / 11</nav>
+        <p class="eyebrow">DL · 1 · TOPIC 05 · EK NEURON</p>
+        <h1>Logistic regression ke gradients</h1>
+        <p>dz = a − y ka jaadu</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 1 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="n1" href="dl-what-is-deep-learning.html"><span>01</span>Deep learning kya hai, aur ab hi kyu chal pada?</a>
+            <a data-topic-link="n2" href="dl-binary-classification.html"><span>02</span>Binary classification aur notation</a>
+            <a data-topic-link="n3" href="dl-logistic-regression-neuron.html"><span>03</span>Logistic regression — ek neuron wala network</a>
+            <a data-topic-link="n4" href="dl-computation-graph.html"><span>04</span>Gradient descent aur computation graph</a>
+            <a data-topic-link="n5" class="current" aria-current="page" href="dl-logistic-gradients.html"><span>05</span>Logistic regression ke gradients</a>
+            <a data-topic-link="n6" href="dl-vectorization.html"><span>06</span>Vectorization aur broadcasting</a>
+            <a data-topic-link="n7" href="dl-shallow-network.html"><span>07</span>Shallow neural network: ek hidden layer</a>
+            <a data-topic-link="n8" href="dl-activation-functions.html"><span>08</span>Activation functions aur unke derivatives</a>
+            <a data-topic-link="n9" href="dl-shallow-backprop.html"><span>09</span>Shallow network ka backprop aur random initialization</a>
+            <a data-topic-link="n10" href="dl-deep-network.html"><span>10</span>Deep L-layer network aur dimensions</a>
+            <a data-topic-link="n11" href="dl-why-deep-building-blocks.html"><span>11</span>Deep kyu? Building blocks, parameters aur hyperparameters</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11"><span>DL · 1 progress</span><strong data-progress-label>0 / 11 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Yahi formulas neural network ki aakhri layer mein har jagah aayenge. Aur yahin pata chalta hai ki for-loops kyu dushman hain.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z10" href="maths-computation-graph.html"><small>Maths</small>Computation graph aur activation ke derivatives</a><a class="chip" data-topic-link="z11" href="maths-matrix-gradients.html"><small>Maths</small>Matrix gradients aur dimensions ka hisaab</a></div></div>
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Ek example ke liye computation graph: z → a → L</li><li>da, dz = a − y, dw = x·dz, db = dz</li><li>m examples ke liye: gradients ka average</li><li>Ek iteration ka poora algorithm (loops ke saath)</li><li>Do for-loops ki problem — slow kyu</li></ul></details>
+        <article class="lesson-card single" id="n5">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Logistic regression ka gradient dekh ke lagta hai formula jungle shuru ho gaya.</p>
+              <p class="msg dost">Pehli nazar mein haan. Par is jungle mein ek shortcut road hai: dz = a − y.</p>
+              <p class="msg me">Itna simple result sach mein kaam karta hai?</p>
+              <p class="msg dost">Haan. Sigmoid aur log loss ki jodi smart hai. Dono milke messy terms cancel kar dete hain.</p>
+              <p class="msg me">Mujhe bas yeh samajhna hai ki weight ko blame kaise milta hai.</p>
+              <p class="msg dost">Socho exam mein galti hui. Agar tumne kisi clue ko zyada importance di thi, us clue ka weight zyada correction lega. Feature x error dz ko scale karta hai.</p>
+              <p class="msg me">Aur m examples mein sab apna vote denge?</p>
+              <p class="msg dost">Bilkul. Har example ka vote jodo, average lo, phir calm update. Isi se training stable rehti hai.</p>
+            </div>
+            <h4>Ek example ka graph: z → a → L</h4>
+            <p>Forward mein z = wᵀx + b, a = sigmoid(z), aur loss L(a, y). Backward mein pehle loss ka a pe effect, phir z pe, phir w aur b pe.</p>
+            <div class="formula"><code>da = −y/a + (1−y)/(1−a)
+dz = a − y
+dw = x · dz
+db = dz</code><ul>
+              <li><b>da</b> = dL/da, loss output chance se kitna sensitive hai</li>
+              <li><b>dz</b> = dL/dz, sigmoid ke pehle score ka gradient</li>
+              <li><b>dw</b> ka shape w jaisa, har feature x se scale hota hai</li>
+            </ul></div>
+            <figure class="figure">
+              <svg viewBox="0 0 430 180" role="img" aria-label="Logistic regression computation graph z se a se loss tak aur gradients wapas">
+                <rect x="35" y="65" width="70" height="45" rx="10" fill="#edf3ff" stroke="#3567e8"/>
+                <rect x="160" y="65" width="70" height="45" rx="10" fill="#f2edff" stroke="#7653d6"/>
+                <rect x="285" y="65" width="85" height="45" rx="10" fill="#fff3ec" stroke="#e0703a"/>
+                <g stroke="#8a96aa" stroke-width="2" fill="none"><path d="M105,88 H160"/><path d="M230,88 H285"/><path d="M285,125 C230,155 160,155 105,125" stroke-dasharray="5 4"/></g>
+                <g font-size="11" text-anchor="middle" fill="#273142"><text x="70" y="92">z</text><text x="195" y="85">a=σ(z)</text><text x="195" y="101">chance</text><text x="327" y="92">L(a,y)</text><text x="195" y="168">backward: da, dz, dw, db</text></g>
+              </svg>
+              <div class="cap">Forward prediction, backward responsibility.</div>
+            </figure>
+            <h4>Numbers se dz = a − y feel karo</h4>
+            <p>Ek example lo: x = [2, 3], y = 1, model output a = 0.8. Model sahi side pe hai, par perfect nahi.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Quantity</th><th>Value</th><th>Meaning</th></tr>
+              <tr><td>dz</td><td>0.8 − 1 = −0.2</td><td>score z ko badhana chahiye</td></tr>
+              <tr><td>dw₁</td><td>2 × (−0.2) = −0.4</td><td>x₁ ka weight badhega after update</td></tr>
+              <tr><td>dw₂</td><td>3 × (−0.2) = −0.6</td><td>x₂ ka weight badhega after update</td></tr>
+              <tr><td>db</td><td>−0.2</td><td>bias bhi badhega after update</td></tr>
+            </table></div>
+            <p>Negative gradient ka matlab update mein minus negative hoga, to weight badhega. Since y = 1 tha aur a sirf 0.8, model ko output aur upar push karna hai.</p>
+            <h4>m examples: gradients ka average</h4>
+            <p>Training set mein ek example nahi hota. Har example apna dz, dw, db vote deta hai. End mein average lete hain, taaki update poore batch ka mood follow kare.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Example</th><th>x</th><th>a</th><th>y</th><th>dz</th><th>x·dz</th></tr>
+              <tr><td>1</td><td>[1, 2]</td><td>0.9</td><td>1</td><td>−0.1</td><td>[−0.1, −0.2]</td></tr>
+              <tr><td>2</td><td>[3, 1]</td><td>0.4</td><td>0</td><td>0.4</td><td>[1.2, 0.4]</td></tr>
+              <tr><td>Average</td><td>—</td><td>—</td><td>—</td><td>0.15</td><td class="good">dw = [0.55, 0.10]</td></tr>
+            </table></div>
+            <div class="formula"><code>dw = (1/m) × Σ x⁽ⁱ⁾ dz⁽ⁱ⁾
+db = (1/m) × Σ dz⁽ⁱ⁾</code><ul>
+              <li><b>dw</b> = saare examples ke weight gradients ka average</li>
+              <li><b>db</b> = dz values ka average</li>
+            </ul></div>
+            <h4>Ek iteration loops ke saath</h4>
+            <p>Beginner version mein hum examples pe loop laga sakte hain: forward karo, gradients jodo, average lo, update karo. Ye concept clear karta hai, par bade data pe slow hota hai.</p>
+            <pre class="code">dw = np.zeros_like(w)
+db = 0
+for i in range(m):
+    z = np.dot(w.T, X[:, i]) + b
+    a = sigmoid(z)
+    dz = a - Y[0, i]
+    dw += X[:, i:i+1] * dz  <span class="cm"># column shape rakho</span>
+    db += dz
+dw /= m; db /= m</pre>
+            <h4>Do for-loops ki problem</h4>
+            <p>Agar examples pe loop aur features pe loop dono laga diye, to Python har chhoti multiplication khud karega. Deep learning mein m aur nₓ dono bade ho sakte hain. NumPy/C libraries matrix operation ek saath karte hain, isliye next page pe vectorization hero banega.</p>
+            <h4>dz ka sign kya keh raha hai?</h4>
+            <p>dz = a − y ek tiny feedback message hai. Positive dz bolta hai: “output zyada ho gaya, score neeche lao.” Negative dz bolta hai: “output kam reh gaya, score upar le jao.” Feature x phir decide karta hai ki kaunsa weight kitna move kare.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>a</th><th>y</th><th>dz</th><th>Message</th></tr>
+              <tr><td>0.85</td><td>0</td><td>0.85</td><td class="bad">bahut high, neeche lao</td></tr>
+              <tr><td>0.20</td><td>1</td><td>−0.80</td><td class="bad">bahut low, upar lao</td></tr>
+              <tr><td>0.52</td><td>1</td><td>−0.48</td><td>thoda aur upar</td></tr>
+            </table></div>
+            <div class="mistake"><b>Dhyan rakhna:</b> dz = a − y sirf sigmoid + log loss combo ke liye clean form hai. Har activation/loss pair mein blindly copy mat karna.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Logistic neuron mein output error hi dz hai; features us error ko weights tak pahunchate hain.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>da formula yaad karna padega?</summary><p>Nahi. Useful intuition dz = a − y hai. da graph samjhane ke liye hai; code mein vectorized formulas use honge.</p></details>
+            <details class="qa"><summary>db = dz kyu?</summary><p>z = wᵀx + b mein b ka coefficient 1 hai. b ko 1 badhao to z 1 badhta hai, isliye local slope 1.</p></details>
+            <details class="qa"><summary>Average kyu, sum kyu nahi?</summary><p>Average se gradient ka scale dataset size se independent rehta hai. m double hua to update double nahi hona chahiye.</p></details>
+            <details class="qa"><summary>dz positive ho to hamesha weight ghatega?</summary><p>Agar feature x positive hai to dw positive hoga aur update mein weight ghatega. Agar x negative ho, direction flip ho sakti hai. Isliye dw = x·dz dekhna zaroori hai.</p></details>
+            <details class="qa"><summary>Loops wala algorithm padhna bekaar hai agar vectorization use karni hai?</summary><p>Bilkul nahi. Loops concept ko human-readable banate hain. Vectorization wahi concept fast form mein likhti hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>a = 0.3, y = 0. dz?</summary><p>dz = 0.3 − 0 = <b>0.3</b>.</p></details>
+              <details class="qa"><summary>x = [4, 2], dz = −0.5. dw for this example?</summary><p>dw = x·dz = <b>[−2, −1]</b>.</p></details>
+              <details class="qa"><summary>Positive dz update mein weight ko kis direction mein dhakel sakta hai?</summary><p>Feature positive ho to dw positive, update w := w − αdw se weight ghatega.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="n5"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-computation-graph.html"><small>← Pichhla</small>Gradient descent aur computation graph</a>
+          <a class="pager-next" href="dl-vectorization.html"><small>Agla →</small>Vectorization aur broadcasting</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

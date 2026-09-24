@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Deep learning frameworks aur TensorFlow: Backprop library ko karne do. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Deep learning frameworks aur TensorFlow (DL · 2) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-improving-networks.html">DL · 2: Improving Deep Neural Networks</a> › Topic 15 / 15</nav>
+        <p class="eyebrow">DL · 2 · TOPIC 15 · MULTICLASS</p>
+        <h1>Deep learning frameworks aur TensorFlow</h1>
+        <p>Backprop library ko karne do</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 2 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="i1" href="dl-train-dev-test-bias-variance.html"><span>01</span>Train/dev/test aur bias-variance</a>
+            <a data-topic-link="i2" href="dl-l2-regularization.html"><span>02</span>L2 regularization</a>
+            <a data-topic-link="i3" href="dl-dropout.html"><span>03</span>Dropout</a>
+            <a data-topic-link="i4" href="dl-augmentation-early-stopping.html"><span>04</span>Data augmentation aur early stopping</a>
+            <a data-topic-link="i5" href="dl-normalizing-inputs.html"><span>05</span>Inputs normalize karna</a>
+            <a data-topic-link="i6" href="dl-vanishing-exploding-init.html"><span>06</span>Vanishing/exploding gradients aur weight initialization</a>
+            <a data-topic-link="i7" href="dl-gradient-checking.html"><span>07</span>Gradient checking</a>
+            <a data-topic-link="i8" href="dl-mini-batch.html"><span>08</span>Mini-batch gradient descent</a>
+            <a data-topic-link="i9" href="dl-exponentially-weighted-averages.html"><span>09</span>Exponentially weighted averages</a>
+            <a data-topic-link="i10" href="dl-momentum-rmsprop-adam.html"><span>10</span>Momentum, RMSprop aur Adam</a>
+            <a data-topic-link="i11" href="dl-learning-rate-decay-local-optima.html"><span>11</span>Learning rate decay aur local optima ka sach</a>
+            <a data-topic-link="i12" href="dl-hyperparameter-tuning.html"><span>12</span>Hyperparameter tuning ka tareeka</a>
+            <a data-topic-link="i13" href="dl-batch-normalization.html"><span>13</span>Batch normalization</a>
+            <a data-topic-link="i14" href="dl-softmax-regression.html"><span>14</span>Softmax regression</a>
+            <a data-topic-link="i15" class="current" aria-current="page" href="dl-frameworks-tensorflow.html"><span>15</span>Deep learning frameworks aur TensorFlow</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15"><span>DL · 2 progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Ab tak sab haath se kiya. Asli projects mein framework chahiye — aur uske andar kya ho raha hai, woh tum ab jaante ho.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z8" href="maths-python-numpy.html"><small>Maths</small>Python aur NumPy crash course</a></div></div>
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Framework kaise chunein: aasani, speed, sach mein open</li><li>tf.Variable, GradientTape, optimizer</li><li>Ek chhota example: (w − 5)² ko minimize karna</li><li>Framework forward se backward khud bana leta hai (computation graph)</li><li>Custom training loop vs model.fit</li></ul></details>
+        <article class="lesson-card single" id="i15">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Ab tak hum gradients haath se nikaal rahe the. Asli projects mein bhi itna sab manually?</p>
+              <p class="msg dost">Nahi dost. Asli kitchen mein mixer-grinder use karte hain, sil-batta sirf samajhne ke liye. Framework backprop khud kar deta hai.</p>
+              <p class="msg me">To phir pehle itni mehnat kyu?</p>
+              <p class="msg dost">Taaki jab TensorFlow error de ya loss na gire, tum andhere mein na ho. Tumhe pata hai andar computation graph aur gradients chal rahe hain.</p>
+              <p class="msg me">Framework choose kaise karte hain?</p>
+              <p class="msg dost">Aasani, speed, community, aur sach mein open ecosystem. Aaj hum TensorFlow 2 style dekhenge.</p>
+            </div>
+            <h4>Framework kaise chunein</h4>
+            <p>Deep learning framework ka kaam hai tensors sambhalna, GPU use karna, gradients nikaalna, optimizers chalana, aur models save/deploy karna. Choose karte waqt teen practical sawaal poochho:</p>
+            <div class="compare-grid">
+              <div><b>Aasani</b>Code padhne-likhne mein natural lagta hai? Debug kar paate ho?</div>
+              <div><b>Speed</b>CPU/GPU pe operations fast hain? Production mein scale kar sakta hai?</div>
+              <div><b>Open ecosystem</b>Docs, examples, community, saved models, deployment tools available hain?</div>
+              <div><b>Team fit</b>Team already kya use karti hai? Existing codebase ka cost bhi real hota hai.</div>
+            </div>
+            <h4>TensorFlow ke teen hero: Variable, GradientTape, optimizer</h4>
+            <div class="formula"><code>Forward pass: loss = f(variables)
+Backward pass: gradients = tape.gradient(loss, variables)
+Update: optimizer.apply_gradients(...)</code><ul>
+              <li><b>tf.Variable</b> = trainable value, jaise w, b</li>
+              <li><b>tf.GradientTape</b> = forward operations record karta hai</li>
+              <li><b>optimizer</b> = gradients se variables update karta hai, jaise Adam</li>
+            </ul></div>
+            <figure class="figure">
+              <svg viewBox="0 0 420 210" role="img" aria-label="TensorFlow GradientTape records forward pass then computes gradients for optimizer update">
+                <rect x="35" y="70" width="90" height="60" rx="10" fill="#edf3ff" stroke="#3567e8"/>
+                <rect x="165" y="70" width="90" height="60" rx="10" fill="#fff3ec" stroke="#e0703a"/>
+                <rect x="295" y="70" width="90" height="60" rx="10" fill="#e9f7f3" stroke="#159477"/>
+                <text x="80" y="95" font-size="11" text-anchor="middle" fill="#3567e8">Variables</text><text x="80" y="112" font-size="11" text-anchor="middle" fill="#3567e8">w, b</text>
+                <text x="210" y="95" font-size="11" text-anchor="middle" fill="#e0703a">Tape records</text><text x="210" y="112" font-size="11" text-anchor="middle" fill="#e0703a">loss</text>
+                <text x="340" y="95" font-size="11" text-anchor="middle" fill="#159477">Optimizer</text><text x="340" y="112" font-size="11" text-anchor="middle" fill="#159477">update</text>
+                <path d="M125,100 L165,100" stroke="#8a96aa" stroke-width="2"/><path d="M255,100 L295,100" stroke="#8a96aa" stroke-width="2"/>
+                <path d="M340,132 C300,180 120,180 80,132" fill="none" stroke="#7653d6" stroke-width="2" stroke-dasharray="5 4"/>
+                <text x="210" y="190" font-size="11" text-anchor="middle" fill="#7653d6">updated variables se next step</text>
+              </svg>
+              <div class="cap">Tum forward likhte ho. Tape backward ka raasta bana leta hai. Optimizer kadam leta hai.</div>
+            </figure>
+            <h4>Chhota example: (w − 5)² minimize karna</h4>
+            <p>Goal: w ko 5 ke paas le jaana, kyunki loss (w − 5)² minimum tab 0 hota hai. Pehle manually socho: w = 0 pe gradient 2(w − 5) = −10. Gradient descent α = 0.1 hota to w = 1 ban jaata. TensorFlow ye gradient khud nikaal sakta hai.</p>
+            <pre class="code">import tensorflow as tf
+
+w = tf.Variable(0.0)
+optimizer = tf.keras.optimizers.Adam(learning_rate=0.1)
+
+for step in range(40):
+    with tf.GradientTape() as tape:
+        loss = (w - 5.0) ** 2
+    grad = tape.gradient(loss, [w])
+    optimizer.apply_gradients(zip(grad, [w]))
+
+print(w.numpy(), loss.numpy())  <span class="cm"># w 5 ke paas, loss 0 ke paas</span></pre>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Manual GD intuition</th><th>w</th><th>loss</th><th>gradient 2(w − 5)</th><th>α = 0.1 update</th></tr>
+              <tr><td>Start</td><td>0</td><td>25</td><td>−10</td><td>w = 1</td></tr>
+              <tr><td>Next</td><td>1</td><td>16</td><td>−8</td><td>w = 1.8</td></tr>
+              <tr><td>Next</td><td>1.8</td><td>10.24</td><td>−6.4</td><td>w = 2.44</td></tr>
+            </table></div>
+            <p>Code Adam use karta hai, isliye exact path manual GD table jaisa nahi hoga. Par concept same: gradient nikalo, optimizer se w update karo, repeat.</p>
+            <h4>Framework forward se backward khud bana leta hai</h4>
+            <p>GradientTape ke andar jo TensorFlow operations chalte hain, tape unka computation graph record karta hai. Jab tum <code>tape.gradient(loss, variables)</code> bolte ho, TensorFlow chain rule laga ke gradients nikaal deta hai. Yahi wajah hai ki tum custom loss bhi likh sakte ho.</p>
+            <div class="lesson-callout"><b>Important:</b> Tape sirf TensorFlow operations ko track karta hai. Beech mein value ko Python number ya NumPy array bana ke graph tod diya, to gradient None aa sakta hai.</div>
+            <h4>Custom training loop vs model.fit</h4>
+            <div class="compare-grid">
+              <div><b>model.fit</b>Standard supervised training ke liye simple. Model, loss, optimizer compile karo, fit chalao. Fast prototyping.</div>
+              <div><b>Custom loop</b>Jab loss unusual ho, multiple optimizers hon, RL/GAN style training ho, ya har step pe custom logic chahiye.</div>
+            </div>
+            <pre class="code">model = tf.keras.Sequential([
+    tf.keras.layers.Dense(16, activation="relu"),
+    tf.keras.layers.Dense(3, activation="softmax")
+])
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(0.001),
+    loss="sparse_categorical_crossentropy",
+    metrics=["accuracy"]
+)
+model.fit(X_train, y_train, epochs=5, batch_size=32)</pre>
+            <p>Beginner rule: pehle <code>model.fit</code> use karo. Jab tumhe training process ke andar special control chahiye, tab custom loop. Dono mein gradients wahi chain rule se nikalte hain.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> tf.Variable trainable parameter ke liye use karo. Agar w plain Python float hai, optimizer usko update nahi karega. Aur GradientTape ke bahar loss calculate karke gradient maangoge to tape ke paas record hi nahi hoga.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Framework magic nahi; wahi computation graph, gradients, aur optimizer hai. Bas library boring backprop ka kaam reliable tarike se kar deti hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>PyTorch ya TensorFlow — kaunsa better?</summary><p>Dono strong hain. Is page mein TensorFlow 2 use kar rahe hain. Framework se zyada important hai ki tum tensors, gradients, optimizer aur evaluation samjho.</p></details>
+            <details class="qa"><summary>GradientTape har baar kyu banana padta hai?</summary><p>Default tape ek forward pass record karta hai. Har training step naya forward pass hota hai, isliye naya tape clean aur safe hota hai.</p></details>
+            <details class="qa"><summary>Adam optimizer gradients khud nikaalta hai?</summary><p>Nahi. Gradients tape nikaalta hai. Adam un gradients ka moving-average logic use karke variables update karta hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Loss (w − 5)² hai. w = 3 pe gradient kya?</summary><p>Gradient = 2(w − 5) = 2(3 − 5) = <b>−4</b>.</p></details>
+              <details class="qa"><summary>tf.Variable ka role kya?</summary><p>Trainable value rakhna, jise optimizer update kar sake — jaise weights/biases.</p></details>
+              <details class="qa"><summary>Standard classification model train karna hai. Pehle custom loop ya model.fit?</summary><p><b>model.fit</b>. Simple case mein wahi clean aur fast hai.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="i15"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-softmax-regression.html"><small>← Pichhla</small>Softmax regression</a>
+          <a class="pager-next" href="dl-ml-strategy-orthogonalization.html"><small>Agla · DL · 3 →</small>ML strategy aur orthogonalization</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

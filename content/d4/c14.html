@@ -1,0 +1,77 @@
+            <div class="chat">
+              <p class="msg me">Face recognition mein problem kya hai? Bas classifier bana do: employee-101, employee-102, employee-103...</p>
+              <p class="msg dost">Office mein kal naya employee join hua. Uski sirf ek Aadhaar-style photo hai. Classifier ko naye class ke liye retrain karoge?</p>
+              <p class="msg me">Haan, woh to annoying hai.</p>
+              <p class="msg dost">Isliye face systems aksar “ye do photos same person hain kya?” seekhte hain. Naya person add karna = uski encoding database mein save karna.</p>
+            </div>
+
+            <h4>Verification vs recognition</h4>
+            <div class="compare-grid">
+              <div><b>Verification (1:1)</b>Claim check: “Main employee-102 hoon.” System stored employee-102 photo se compare karta hai. Phone unlock type.</div>
+              <div><b>Recognition (1:K)</b>Unknown face ko K logon ke database se match karo. Office gate camera type.</div>
+            </div>
+            <p><strong>Liveness</strong> bhi zaroori hai. Warna koi printed photo ya phone screen dikha ke gate khol de. Blink, depth, short video, IR pattern jaise checks practical systems mein use hote hain.</p>
+
+            <h4>One-shot learning: ek photo se kaam chalana</h4>
+            <p>Normal classifier har person ke many examples maangta hai. Face verification mein goal hai similarity function seekhna:</p>
+            <div class="formula"><code>d(img₁, img₂) ≤ τ  ⇒ same person</code><ul>
+              <li><b>d</b> = distance, chhota matlab faces similar</li>
+              <li><b>τ</b> (tau) = threshold</li>
+              <li>Agar distance threshold se kam hai, access allow; warna reject.</li>
+            </ul></div>
+            <p>Example: τ=0.70. Gate pe live photo aur database photo ka distance 0.42 hai, allow. Distance 0.91 hai, reject. Threshold zyada strict karoge to security high, par genuine log bhi kabhi reject ho sakte hain.</p>
+
+            <h4>Siamese network: photo ko 128-number ID card banao</h4>
+            <p>Siamese network mein same CNN dono photos pe chalta hai. Same weights, same processing. Har photo se 128 numbers ki encoding nikalti hai. Phir encodings ke beech distance nikaalte hain.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 440 210" role="img" aria-label="Two face images pass through same network to encodings">
+                <rect x="30" y="45" width="70" height="70" rx="10" fill="#edf3ff" stroke="#3567e8" stroke-width="2"/>
+                <circle cx="65" cy="78" r="18" fill="#3567e8"/><text x="65" y="135" font-size="11" text-anchor="middle" fill="#4b5871">photo A</text>
+                <rect x="30" y="125" width="70" height="70" rx="10" fill="#f2edff" stroke="#7653d6" stroke-width="2"/>
+                <circle cx="65" cy="158" r="18" fill="#7653d6"/><text x="65" y="205" font-size="11" text-anchor="middle" fill="#4b5871">photo B</text>
+                <rect x="150" y="60" width="95" height="45" rx="8" fill="#e9f7f3" stroke="#159477" stroke-width="2"/><text x="198" y="87" font-size="11" text-anchor="middle" fill="#4b5871">same CNN</text>
+                <rect x="150" y="140" width="95" height="45" rx="8" fill="#e9f7f3" stroke="#159477" stroke-width="2"/><text x="198" y="167" font-size="11" text-anchor="middle" fill="#4b5871">same CNN</text>
+                <g stroke="#8a96aa" stroke-width="2"><line x1="100" y1="80" x2="150" y2="82"/><line x1="100" y1="160" x2="150" y2="162"/><line x1="245" y1="82" x2="300" y2="95"/><line x1="245" y1="162" x2="300" y2="125"/></g>
+                <rect x="300" y="78" width="92" height="62" rx="8" fill="#fff3ec" stroke="#e0703a" stroke-width="2"/>
+                <text x="346" y="102" font-size="11" text-anchor="middle" fill="#4b5871">distance</text><text x="346" y="122" font-size="11" text-anchor="middle" fill="#4b5871">compare</text>
+              </svg>
+              <div class="cap">“Siamese” ka matlab twin towers: dono branches weights share karti hain.</div>
+            </figure>
+
+            <h4>Triplet loss: anchor, positive, negative</h4>
+            <p>Training mein teen images lo: Anchor A, Positive P (same person), Negative N (different person). Hum chahte hain A-P distance, A-N distance se margin α ke hisaab se chhota ho.</p>
+            <div class="formula"><code>L = max(0, d(A,P) − d(A,N) + α)</code><ul>
+              <li><b>d(A,P)</b> = same person distance, chhota chahiye</li>
+              <li><b>d(A,N)</b> = different person distance, bada chahiye</li>
+              <li><b>α</b> = safety gap, jaise 0.2</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>d(A,P)</th><th>d(A,N)</th><th>α</th><th>Loss</th></tr>
+              <tr><td>0.42</td><td>0.75</td><td>0.20</td><td class="good">max(0, −0.13)=0</td></tr>
+              <tr><td>0.42</td><td>0.55</td><td>0.20</td><td class="bad">max(0, 0.07)=0.07</td></tr>
+            </table></div>
+            <p>Second row mein negative photo abhi too close hai. Model ko push karna padega: different person door jao, same person paas aao.</p>
+
+            <h4>Mushkil triplets chuno</h4>
+            <p>Agar negative bahut easy hai — jaise Anchor office employee aur Negative ek poster ka cartoon — loss already 0 hoga. Model kuch nahi seekhega. Useful triplets woh hain jahan negative thoda confusing ho: same lighting, similar age, similar pose. Training ke liye ek person ki multiple photos chahiye, taaki same person ke expression, angle, glasses, light variation model dekh sake.</p>
+
+            <h4>Verification ko binary classification bhi bana sakte ho</h4>
+            <p>Ek aur approach: do encodings lo, unka difference ya product features banao, phir small network sigmoid output de: same person ka probability. Ye direct “same/not same” classifier hai. Triplet loss distance space ko shape karta hai; binary classifier pair decision directly seekhta hai. Dono ideas practical systems mein mil sakte hain.</p>
+
+            <h4>Database encodings pehle se save karo</h4>
+            <p>Office gate pe 2000 employees hain. Har baar unki photos CNN se pass karna waste hai. Pehle se har employee ka 128-number encoding save karo. Gate pe live face ka encoding nikalo, database encodings se distance compare karo.</p>
+            <div class="visual-flow"><span>Employee photos</span><b>→</b><span>Encodings save</span><b>→</b><span>Live face encoding</span><b>→</b><span class="flow-highlight">Nearest match + threshold</span></div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Nearest person mil gaya matlab access allow nahi. Distance threshold bhi pass hona chahiye. Warna unknown visitor ko “database mein sabse zyada milta-julta” employee bana doge.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Face recognition mein model person names yaad nahi karta; woh faces ko encoding space mein rakhta hai jahan same person paas aur different person door hote hain.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>128 numbers ka meaning kya hota hai?</summary><p>Human-readable meaning nahi hota. Bas space aisa trained hai ki identity ke liye useful distances milen. Ek number “nose size” hi ho, zaroori nahi.</p></details>
+            <details class="qa"><summary>Threshold τ kaise choose karte hain?</summary><p>Validation set pe distances dekho. False accept aur false reject ka trade-off choose karo. Bank app zyada strict threshold rakhega; office attendance thoda relaxed ho sakta hai.</p></details>
+            <details class="qa"><summary>Recognition mein 1:K slow nahi?</summary><p>Database encodings precompute hote hain, isliye comparison fast vector distance hai. Bahut bade K ke liye nearest-neighbor search structures use kar sakte hain.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Triplet loss: d(A,P)=0.30, d(A,N)=0.45, α=0.20. Loss?</summary><p>L = max(0, 0.30 − 0.45 + 0.20) = max(0, 0.05) = <b>0.05</b>.</p></details>
+              <details class="qa"><summary>τ=0.65 hai. Live face distance 0.62 aaya. Verification allow?</summary><p>Distance threshold se kam hai, so similarity rule ke hisaab se <b>allow</b>. Real system mein liveness bhi pass hona chahiye.</p></details>
+              <details class="qa"><summary>Naye employee ko add karne ke liye poora model retrain karna zaroori?</summary><p>Aksar nahi. Uski photo ka encoding nikaal ke database mein save karo. Model tabhi retrain hoga jab overall performance improve karni ho.</p></details>
+            </div>

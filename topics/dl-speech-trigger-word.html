@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Speech recognition aur trigger word detection: “Hey phone” sunna. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Speech recognition aur trigger word detection (DL · 5) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-sequence-models.html">DL · 5: Sequence Models</a> › Topic 13 / 15</nav>
+        <p class="eyebrow">DL · 5 · TOPIC 13 · SEQ2SEQ AUR ATTENTION</p>
+        <h1>Speech recognition aur trigger word detection</h1>
+        <p>“Hey phone” sunna</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 5 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="q1" href="dl-why-sequence-models.html"><span>01</span>Sequence models kyu, aur notation</a>
+            <a data-topic-link="q2" href="dl-rnn-model.html"><span>02</span>Recurrent Neural Network (RNN)</a>
+            <a data-topic-link="q3" href="dl-bptt-rnn-types.html"><span>03</span>Backprop through time aur RNN ke types</a>
+            <a data-topic-link="q4" href="dl-language-model-sampling.html"><span>04</span>Language model aur naye sentences banana</a>
+            <a data-topic-link="q5" href="dl-vanishing-gradients-gru.html"><span>05</span>Vanishing gradients aur GRU</a>
+            <a data-topic-link="q6" href="dl-lstm-brnn-deep-rnn.html"><span>06</span>LSTM, bidirectional RNN aur deep RNN</a>
+            <a data-topic-link="q7" href="dl-word-embeddings.html"><span>07</span>Word embeddings: shabdon ko matlab wale numbers</a>
+            <a data-topic-link="q8" href="dl-word2vec-negative-sampling.html"><span>08</span>Embedding matrix, Word2Vec aur negative sampling</a>
+            <a data-topic-link="q9" href="dl-glove-sentiment-debiasing.html"><span>09</span>GloVe, sentiment classification aur bias hatana</a>
+            <a data-topic-link="q10" href="dl-seq2seq-beam-search.html"><span>10</span>Sequence-to-sequence aur beam search</a>
+            <a data-topic-link="q11" href="dl-beam-refinements-bleu.html"><span>11</span>Beam search refinements, error analysis aur BLEU</a>
+            <a data-topic-link="q12" href="dl-attention-model.html"><span>12</span>Attention model</a>
+            <a data-topic-link="q13" class="current" aria-current="page" href="dl-speech-trigger-word.html"><span>13</span>Speech recognition aur trigger word detection</a>
+            <a data-topic-link="q14" href="dl-transformer-self-attention.html"><span>14</span>Transformer intuition aur self-attention</a>
+            <a data-topic-link="q15" href="dl-multihead-transformer.html"><span>15</span>Multi-head attention aur Transformer network</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="q1,q2,q3,q4,q5,q6,q7,q8,q9,q10,q11,q12,q13,q14,q15"><span>DL · 5 progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Sequence models ka ek bahut asli use — awaaz. Aur CTC ka chalaak idea jo lambi awaaz ko chhote text se jodta hai.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Awaaz → spectrogram</li><li>Phonemes wala purana tareeka vs end-to-end</li><li>Bade datasets (hazaaron ghante)</li><li>Speech ke liye attention model</li><li>CTC: repeat characters aur blank ko collapse karna (worked)</li><li>Trigger word: word ke baad label 1</li><li>Imbalance: 1 ko thodi der tak rakho</li></ul></details>
+        <article class="lesson-card single" id="q13">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Text samajh liya. Awaaz mein sequence model ka input kya hota hai? Raw wave?</p>
+              <p class="msg dost">Raw wave use ho sakti hai, par beginner intuition ke liye <strong>spectrogram</strong> best hai. Awaaz ko time ke saath frequency-energy ki image bana do.</p>
+              <p class="msg me">Matlab “hello” ek picture ban gaya?</p>
+              <p class="msg dost">Haan. Jaise music app mein equalizer hilta hai, waise hi. Model image jaisa pattern padhta hai, phir characters/words nikalta hai.</p>
+            </div>
+
+            <h4>Awaaz se spectrogram</h4>
+            <p>Microphone pressure values record karta hai: ek lambi wave. Spectrogram us wave ko chhote time windows mein todta hai aur har window mein kaunsi frequencies strong hain, ye dikhata hai. X-axis time, Y-axis frequency, color energy.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 460 190" role="img" aria-label="Waveform se spectrogram banta hai">
+                <path d="M25,60 C45,20 65,100 85,60 C105,20 125,100 145,60 C165,20 185,100 205,60" fill="none" stroke="#3567e8" stroke-width="2"/>
+                <text x="70" y="125" font-size="11" fill="#3567e8">waveform</text>
+                <path d="M225,65 L275,65" stroke="#8a96aa" stroke-width="2"/>
+                <polygon points="275,65 265,60 265,70" fill="#8a96aa"/>
+                <rect x="295" y="25" width="125" height="105" rx="8" fill="#edf3ff" stroke="#b8c2d3"/>
+                <rect x="310" y="95" width="14" height="18" fill="#3567e8" opacity="0.35"/>
+                <rect x="330" y="70" width="14" height="43" fill="#7653d6" opacity="0.50"/>
+                <rect x="350" y="45" width="14" height="68" fill="#e0703a" opacity="0.65"/>
+                <rect x="370" y="82" width="14" height="31" fill="#159477" opacity="0.55"/>
+                <rect x="390" y="58" width="14" height="55" fill="#3567e8" opacity="0.45"/>
+                <text x="330" y="150" font-size="11" fill="#7a879b">spectrogram</text>
+              </svg>
+              <div class="cap">Speech model ko time-frequency pattern milta hai, sirf raw squiggle nahi.</div>
+            </figure>
+
+            <h4>Phonemes wala purana route vs end-to-end</h4>
+            <p>Purane speech systems aksar pipeline banate the: audio se phonemes, phonemes se words, words se sentence. Phoneme matlab sound unit, jaise “ka”, “aa”, “t” type building blocks. Pipeline understandable thi, par har stage ki galti next stage ko pass ho jaati thi.</p>
+            <p>End-to-end model bolta hai: spectrogram do, directly characters/words predict karunga. Ye simple sounding hai, par data bahut chahiye. Hazaaron ghante audio aur transcripts ke bina model accent, noise, speed, mic quality sab nahi seekh paata.</p>
+            <div class="compare-grid">
+              <div><b>Old pipeline</b>Audio → phonemes → words. Debug easy, engineering heavy.</div>
+              <div><b>End-to-end</b>Audio → text. Data hungry, par large datasets pe strong.</div>
+            </div>
+
+            <h4>Speech ke liye attention model</h4>
+            <p>Speech input frames text output se bahut zyada hote hain. Ek second audio mein 100 frames ho sakte hain, par output kuch characters. Attention decoder ko relevant audio frames pe focus karne deta hai. “chai” likhte waqt model us sound ke frames pe dhyan de sakta hai.</p>
+            <div class="formula"><code>P(text | audio) = Π⟨t⟩ P(char⟨t⟩ | previous chars, audio features)</code><ul>
+              <li><b>audio features</b> = spectrogram frames ya encoder outputs</li>
+              <li><b>previous chars</b> = decoder already kya likh chuka</li>
+            </ul></div>
+
+            <h4>CTC: lambi awaaz ko chhote text se align karna</h4>
+            <p>Speech mein exact alignment mushkil hai. “chai” ke kis millisecond pe “ch” khatam aur “ai” start? CTC ek clever shortcut deta hai: har audio frame pe character ya blank predict karo. Baad mein repeats collapse karo, blanks hatao.</p>
+            <div class="formula"><code>CTC collapse: repeat characters ko merge karo, phir blank “_” hatao</code><ul>
+              <li><b>Blank</b> = “is frame pe naya character nahi”</li>
+              <li><b>Repeats</b> = same sound several frames tak stretch ho sakta hai</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Frame outputs</th><th>After repeat collapse</th><th>After removing blanks</th></tr>
+              <tr><td>c c _ h h a _ i i</td><td>c _ h a _ i</td><td class="good">chai</td></tr>
+              <tr><td>n _ n a a</td><td>n _ n a</td><td class="good">nna</td></tr>
+            </table></div>
+            <p>Second row important hai. Blank beech mein ho to repeated letters separate reh sakte hain. Isliye “nna” ban sakta hai, sirf “na” nahi.</p>
+            <pre class="code">def ctc_collapse(path):
+    out = []
+    for ch in path:
+        if not out or ch != out[-1]:
+            out.append(ch)
+    return "".join(ch for ch in out if ch != "_")  <span class="cm"># blanks hatao</span>
+
+print(ctc_collapse(["c", "c", "_", "h", "h", "a", "_", "i", "i"]))</pre>
+
+            <h4>Trigger word detection: “Hey phone” sunte hi label 1</h4>
+            <p>Ab task alag hai: continuous audio aa raha hai, model ko batana hai trigger word abhi bola gaya ya nahi. Har time frame pe label output karo: 0 normally, 1 trigger word ke baad.</p>
+            <div class="visual-flow"><span>Audio stream</span><b>→</b><span>RNN/Conv model</span><b>→</b><span class="flow-highlight">0 0 0 1 1 1</span></div>
+            <p>Problem: labels imbalanced hote hain. 10 seconds audio mein “hey phone” sirf 0.5 second hai, baaki sab 0. Agar sirf ek frame pe 1 lagaya, model mostly zeros predict karke bhi happy ho sakta hai. Practical trick: trigger word ke baad 1 ko thodi der tak rakho, jaise 50 frames. Signal clearer ho jaata hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Setup</th><th>Frames</th><th>Positive labels</th><th>Positive ratio</th></tr>
+              <tr><td>Single-frame 1</td><td>1000</td><td>1</td><td class="bad">0.1%</td></tr>
+              <tr><td>1 ko 50 frames tak rakha</td><td>1000</td><td>50</td><td class="good">5%</td></tr>
+            </table></div>
+            <p>5% bhi imbalanced hai, par 0.1% se better. Model ko “haan, yahan kuch hua” ka zyada training signal milta hai.</p>
+
+            <div class="mistake"><b>Dhyan rakhna:</b> Speech demos quiet room mein impressive lagte hain. Real duniya mein fan noise, traffic, accent, cheap mic, overlapping speakers — sab test karo.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Speech model audio frames ko text ya trigger labels se jodta hai; CTC alignment ko simple banata hai, trigger detection imbalance ko carefully handle karta hai.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Spectrogram image hai, to CNN enough nahi?</summary><p>CNN useful ho sakta hai, par speech mein time order bhi important hai. Isliye CNN + RNN, attention, ya transformer style models use hote hain.</p></details>
+            <details class="qa"><summary>CTC mein blank space character jaisa hai?</summary><p>Nahi. Blank special “no character now” symbol hai. Space actual text ka character ho sakta hai, blank alignment helper hai.</p></details>
+            <details class="qa"><summary>Trigger word ke baad 1 kyu, word ke dauran kyu nahi?</summary><p>Wake word complete hone ke baad hi sure signal milta hai. “hey pho...” sunke jaldi fire karoge to false alarm badh sakta hai.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>CTC path “a a _ b b _” collapse hone ke baad final text kya?</summary><p>Repeats collapse: “a _ b _”. Blanks hatao: <b>ab</b>.</p></details>
+              <details class="qa"><summary>2000 frames mein trigger ke baad 80 frames ko 1 rakha. Positive ratio kya?</summary><p>80 / 2000 = 0.04 = <b>4%</b>.</p></details>
+              <details class="qa"><summary>End-to-end speech ko hazaaron ghante data kyu chahiye?</summary><p>Kyuki model ko accents, background noise, speaking speed, pronunciation, aur spelling mapping sab examples se hi seekhna padta hai.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="q13"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-attention-model.html"><small>← Pichhla</small>Attention model</a>
+          <a class="pager-next" href="dl-transformer-self-attention.html"><small>Agla →</small>Transformer intuition aur self-attention</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

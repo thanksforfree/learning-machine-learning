@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Logistic cost (log loss): Confident galti = bhaari saza. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Logistic cost (log loss) (ML · 1) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-blue">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../supervised.html">ML · 1: Supervised Machine Learning</a> › Topic 10 / 12</nav>
+        <p class="eyebrow">ML · 1 · TOPIC 10 · CATEGORY CHUNNA</p>
+        <h1>Logistic cost (log loss)</h1>
+        <p>Confident galti = bhaari saza</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 1 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="s1" href="ml-kya-hai.html"><span>01</span>Machine learning asal mein hai kya?</a>
+            <a data-topic-link="s2" href="linear-regression.html"><span>02</span>Linear regression — seedhi line ka model</a>
+            <a data-topic-link="s3" href="cost-function.html"><span>03</span>Cost function — line ko marks dena</a>
+            <a data-topic-link="s4" href="gradient-descent.html"><span>04</span>Gradient descent — pahad se neeche utarna</a>
+            <a data-topic-link="s5" href="multiple-features.html"><span>05</span>Multiple features aur vectorization</a>
+            <a data-topic-link="s6" href="feature-scaling.html"><span>06</span>Feature scaling aur training check</a>
+            <a data-topic-link="s7" href="feature-engineering.html"><span>07</span>Feature engineering aur polynomial regression</a>
+            <a data-topic-link="s8" href="logistic-regression.html"><span>08</span>Logistic regression aur sigmoid</a>
+            <a data-topic-link="s9" href="decision-boundary.html"><span>09</span>Decision boundary</a>
+            <a data-topic-link="s10" class="current" aria-current="page" href="logistic-cost.html"><span>10</span>Logistic cost (log loss)</a>
+            <a data-topic-link="s11" href="overfitting.html"><span>11</span>Underfitting aur overfitting</a>
+            <a data-topic-link="s12" href="regularization.html"><span>12</span>Regularization — weights pe lagaam</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12"><span>ML · 1 progress</span><strong data-progress-label>0 / 12 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Classification ka standard cost. Softmax wala loss aur neural network training dono isi idea pe hain.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z4" href="maths-powers-e-log.html"><small>Maths</small>Power, e aur log</a></div></div>
+        
+        <article class="lesson-card single" id="s10">
+          <div class="lesson-body">
+
+            <div class="chat">
+              <p class="msg me">Cost function wahi squared error wala use kar lein?</p>
+              <p class="msg dost">Sigmoid ke saath squared error lagao to katori nahi banti — lehrati hui zameen banti hai jisme bahut saare chhote gaddhe hote hain. Gradient descent kisi galat gaddhe mein phas sakta hai.</p>
+              <p class="msg me">To naya cost kaisa?</p>
+              <p class="msg dost">Idea bahut insaani hai. Ek dost bola “100% pakka kal baarish nahi hogi” aur baarish ho gayi — uski baat pe bharosa zero. Doosra bola “50-50 hai” — woh utna galat nahi tha. To: <strong>confident ho ke galat nikle to bahut badi saza</strong>, thoda unsure ho ke galat nikle to chhoti saza.</p>
+              <p class="msg me">Matlab overconfidence pe fine lag raha hai?</p>
+              <p class="msg dost">Bilkul. Log loss model ko bolta hai: “confident banna hai to sahi jagah ban, warna bill bada aayega.”</p>
+            </div>
+            <figure class="figure">
+              <svg viewBox="0 0 400 190" role="img" aria-label="Log loss curve: sahi class ko low probability dene par loss bahut badhta hai">
+                <line x1="35" y1="165" x2="375" y2="165" stroke="#b8c2d3"/><line x1="35" y1="20" x2="35" y2="165" stroke="#b8c2d3"/>
+                <path d="M45,35 C80,48 125,70 175,98 C230,128 300,150 365,160" fill="none" stroke="#3567e8" stroke-width="3"/>
+                <circle cx="60" cy="45" r="5" fill="#c2410c"/><text x="70" y="48" font-size="11" fill="#c2410c">low chance, high loss</text>
+                <circle cx="340" cy="156" r="5" fill="#159477"/><text x="250" y="152" font-size="11" fill="#159477">high chance, low loss</text>
+                <text x="375" y="182" font-size="11" text-anchor="end" fill="#7a879b">sahi answer ko diya chance →</text><text x="38" y="18" font-size="11" fill="#7a879b">loss</text>
+              </svg>
+              <div class="cap">Sahi class ko jitna kam chance doge, loss utna tez upar jaata hai.</div>
+            </figure>
+            <h4>Numbers dekho — email sach mein spam hai (y = 1)</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Model ne spam ka chance bola (f)</th><th>Loss = −log(f)</th><th>Matlab</th></tr>
+              <tr><td>0.99</td><td>0.01</td><td class="good">Shabash, almost zero saza</td></tr>
+              <tr><td>0.70</td><td>0.36</td><td>Theek-thaak</td></tr>
+              <tr><td>0.50</td><td>0.69</td><td>Confused tha</td></tr>
+              <tr><td>0.10</td><td>2.30</td><td class="bad">Galat</td></tr>
+              <tr><td>0.01</td><td>4.61</td><td class="bad">Confident + galat = bhaari saza</td></tr>
+            </table></div>
+            <p>Agar asli answer y = 0 hai (spam nahi), to ulta: loss = −log(1 − f). Model jitna zyada “spam” bolega, utni zyada saza.</p>
+            <div class="formula"><code>L = −y · log(f) − (1 − y) · log(1 − f)</code><ul>
+              <li><b>Trick:</b> y = 1 ho to doosra hissa (1 − y = 0) gayab. y = 0 ho to pehla hissa gayab. Ek formula, dono case.</li>
+              <li>Cost J = saare examples ke L ka average. Ye katori jaisa hota hai → gradient descent safe.</li>
+            </ul></div>
+            <p>Gradient descent ka update formula dikhne mein <strong>bilkul linear regression jaisa</strong> hi lagta hai — bas ab f ke andar sigmoid hai.</p>            <h4>Cost = losses ka average</h4>
+            <p>Teen emails pe mini calculation dekho:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Email</th><th>Asli y</th><th>Model f</th><th>Loss</th></tr>
+              <tr><td>A</td><td>1</td><td>0.80</td><td>−log(0.80) = 0.22</td></tr>
+              <tr><td>B</td><td>0</td><td>0.80</td><td>−log(0.20) = 1.61</td></tr>
+              <tr><td>C</td><td>1</td><td>0.60</td><td>−log(0.60) = 0.51</td></tr>
+              <tr><td colspan="3"><b>Cost J</b></td><td>(0.22 + 1.61 + 0.51) ÷ 3 = <b>0.78</b></td></tr>
+            </table></div>
+            <p>Email B ne zyada cost badhaya, kyunki model ne not-spam email ko 80% spam bola. Confident galti ka bill bada.</p>
+
+            <h4>Squared error se intuition compare</h4>
+            <p>Beginner doubt genuine hai: “galti to galti hai, square kyu nahi?” Classification mein hume probability ki quality chahiye.</p>
+            <div class="compare-grid">
+              <div><b>Squared error</b>Number prediction ke liye mast. Par sigmoid ke saath training surface messy ho sakti hai.</div>
+              <div><b>Log loss</b>Sahi class ko low probability dene pe heavy penalty. Classification ke confidence ko better train karta hai.</div>
+            </div>
+            <p>Isliye logistic regression mein log loss standard hai. Tumhe formula ratna nahi; bas behaviour yaad: confident galti = mehenga bill.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Log loss poochta hai — “sahi answer ko tumne kitna chance diya tha?” Kam diya to zyada loss.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>log simple bhasha mein kya hai?</summary><p>Tumhe bas iski shape pata honi chahiye: log(1) = 0 (koi saza nahi), aur number jitna 0 ke kareeb jaata hai, −log utna bada hota jaata hai. Isi se “confident galti = badi saza” wala behaviour aata hai.</p></details>
+            <details class="qa"><summary>Ye formula ratna padega?</summary><p>Nahi. Meaning yaad rakho. Code mein library ka ek naam likhna hota hai (jaise BinaryCrossentropy).</p></details>
+            <details class="qa"><summary>“Cross-entropy” aur “log loss” alag hain?</summary><p>Nahi, haan/na wale problems ke liye binary cross-entropy aur log loss same cheez ke do naam hain.</p></details>
+            <details class="qa"><summary>Loss itna bada kyu ho sakta hai?</summary><p>Kyuki agar sahi answer ko model almost 0 chance de, to −log almost infinity ki taraf bhaagta hai. Isliye code mein probabilities ko kabhi-kabhi chhote safe range mein clip karte hain.</p></details>            <details class="qa"><summary>Accuracy achhi ho to log loss dekhna zaroori hai?</summary><p>Haan. Do models dono 90% accurate ho sakte hain, par ek galat answers pe 0.51 confidence rakhta hai aur doosra 0.999. Log loss doosre ko zyada punish karega — confidence quality dikhti hai.</p></details>            <details class="qa"><summary>Log loss zero kab hota hai?</summary><p>Sirf tab jab model har example pe sahi class ko 100% chance de. Real data mein noise hota hai, isliye exact zero expect mat karo. Cost ka trend neeche aa raha hai ya nahi, woh zyada useful signal hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>y = 1. f = 0.99 aur f = 0.01 pe loss?</summary><p>≈ 0.01 aur ≈ 4.6.</p></details>
+              <details class="qa"><summary>y = 0 ho to formula ka kaunsa hissa bachta hai?</summary><p>−log(1 − f).</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="s10"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="decision-boundary.html"><small>← Pichhla</small>Decision boundary</a>
+          <a class="pager-next" href="overfitting.html"><small>Agla →</small>Underfitting aur overfitting</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

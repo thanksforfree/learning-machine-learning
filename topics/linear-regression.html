@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Linear regression — seedhi line ka model: Sabse pehla aur sabse simple ML model. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Linear regression — seedhi line ka model (ML · 1) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-blue">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../supervised.html">ML · 1: Supervised Machine Learning</a> › Topic 2 / 12</nav>
+        <p class="eyebrow">ML · 1 · TOPIC 02 · NUMBER PREDICT KARNA</p>
+        <h1>Linear regression — seedhi line ka model</h1>
+        <p>Sabse pehla aur sabse simple ML model</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 1 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="s1" href="ml-kya-hai.html"><span>01</span>Machine learning asal mein hai kya?</a>
+            <a data-topic-link="s2" class="current" aria-current="page" href="linear-regression.html"><span>02</span>Linear regression — seedhi line ka model</a>
+            <a data-topic-link="s3" href="cost-function.html"><span>03</span>Cost function — line ko marks dena</a>
+            <a data-topic-link="s4" href="gradient-descent.html"><span>04</span>Gradient descent — pahad se neeche utarna</a>
+            <a data-topic-link="s5" href="multiple-features.html"><span>05</span>Multiple features aur vectorization</a>
+            <a data-topic-link="s6" href="feature-scaling.html"><span>06</span>Feature scaling aur training check</a>
+            <a data-topic-link="s7" href="feature-engineering.html"><span>07</span>Feature engineering aur polynomial regression</a>
+            <a data-topic-link="s8" href="logistic-regression.html"><span>08</span>Logistic regression aur sigmoid</a>
+            <a data-topic-link="s9" href="decision-boundary.html"><span>09</span>Decision boundary</a>
+            <a data-topic-link="s10" href="logistic-cost.html"><span>10</span>Logistic cost (log loss)</a>
+            <a data-topic-link="s11" href="overfitting.html"><span>11</span>Underfitting aur overfitting</a>
+            <a data-topic-link="s12" href="regularization.html"><span>12</span>Regularization — weights pe lagaam</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12"><span>ML · 1 progress</span><strong data-progress-label>0 / 12 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Ye course ka “hello world” hai. Isme jo seekhoge — model, parameters, prediction — wahi neural networks tak har jagah repeat hoga.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z2" href="maths-graphs.html"><small>Maths</small>Graph, line aur slope</a><a class="chip" data-topic-link="z3" href="maths-functions.html"><small>Maths</small>Function = input-output machine</a></div></div>
+        
+        <article class="lesson-card single" id="s2">
+          <div class="lesson-body">
+
+            <div class="chat">
+              <p class="msg me">Chalo ghar ka price predict karte hain. Shuru kahan se karein?</p>
+              <p class="msg dost">Pehle data ko <strong>dekho</strong>. Ek graph banao — neeche (x-axis) ghar ka size, upar (y-axis) uska price. Har purana bika hua ghar graph pe ek dot ban jayega.</p>
+              <p class="msg me">Theek hai, dots aa gaye. Ab?</p>
+              <p class="msg dost">Dekho dots upar ki taraf ja rahe hain — bada ghar, zyada price. Ab ek seedhi line kheencho jo dots ke beech se aise guzre ki sabke kareeb rahe. Bas! Yahi line tumhara <strong>model</strong> hai.</p>
+              <p class="msg me">Aur naye ghar ka price kaise nikalein?</p>
+              <p class="msg dost">Naya ghar 1600 sq ft ka hai? Neeche 1600 pe jao, seedha upar line tak, aur wahan se left dekho. Jo value mile, wahi predicted price. Computer yahi kaam ek chhote formula se karta hai.</p>
+              <p class="msg me">Line thodi galat hogi to?</p>
+              <p class="msg dost">Hogi hi. Property market mein broker, location, negotiation — sab noise hai. Hum perfect bhavishyavaani nahi, useful andaaza bana rahe hain.</p>
+            </div>
+            <figure class="figure">
+              <svg viewBox="0 0 400 220" role="img" aria-label="Dots aur unke beech se guzarti seedhi line; naye ghar ke liye dashed line se predicted price">
+                <line x1="40" y1="190" x2="390" y2="190" stroke="#b8c2d3"/><line x1="40" y1="10" x2="40" y2="190" stroke="#b8c2d3"/>
+                <text x="385" y="208" font-size="11" text-anchor="end" fill="#7a879b">size →</text><text x="12" y="20" font-size="11" fill="#7a879b">price</text>
+                <line x1="50" y1="172" x2="380" y2="42" stroke="#3567e8" stroke-width="3"/>
+                <g fill="#7b93e0"><circle cx="80" cy="162" r="5"/><circle cx="120" cy="148" r="5"/><circle cx="160" cy="130" r="5"/><circle cx="200" cy="118" r="5"/><circle cx="240" cy="100" r="5"/><circle cx="280" cy="86" r="5"/><circle cx="320" cy="62" r="5"/><circle cx="360" cy="52" r="5"/></g>
+                <line x1="300" y1="190" x2="300" y2="74" stroke="#e0703a" stroke-dasharray="5 4" stroke-width="2"/><line x1="300" y1="74" x2="40" y2="74" stroke="#e0703a" stroke-dasharray="5 4" stroke-width="2"/>
+                <circle cx="300" cy="74" r="6" fill="#e0703a"/>
+                <text x="300" y="205" font-size="11" text-anchor="middle" fill="#c2410c">naya ghar</text><text x="46" y="68" font-size="11" fill="#c2410c">predicted price</text>
+              </svg>
+              <div class="cap">Neele dots = purane ghar. Neeli line = model. Naranga dashed = naye ghar ka andaaza.</div>
+            </figure>
+            <div class="formula"><code>f(x) = w · x + b</code><ul>
+              <li><b>x</b> = ghar ka size (input)</li>
+              <li><b>w</b> = “weight” ya slope → har 1 sq ft badhne pe price kitna badhta hai</li>
+              <li><b>b</b> = “bias” ya starting value → line kis height se shuru hoti hai</li>
+              <li><b>f(x)</b> = predicted price (yahi ŷ hai)</li>
+            </ul></div>
+            <h4>Numbers se dekho</h4>
+            <p>Maan lo training ke baad model ne seekha: <strong>w = 0.04</strong> (yaani ₹4,000 per sq ft) aur <strong>b = 10 lakh</strong>.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Size</th><th>Calculation</th><th>Predicted price</th></tr>
+              <tr><td>800 sq ft</td><td>0.04 × 800 + 10</td><td>42 lakh</td></tr>
+              <tr><td>1200 sq ft</td><td>0.04 × 1200 + 10</td><td>58 lakh</td></tr>
+              <tr><td>1600 sq ft</td><td>0.04 × 1600 + 10</td><td>74 lakh</td></tr>
+            </table></div>
+            <p>Dekha? Har 400 sq ft badhne pe price 16 lakh badh raha hai (400 × 0.04). Yahi <strong>w ka matlab</strong> hai — size ka “per-unit asar”.</p>
+            <div class="compare-grid">
+              <div><b>w badlo to?</b>w bada → line zyada tedhi (size ka asar zyada). w = 0 → line bilkul flat (size ka koi asar nahi). w negative → line neeche jaati hai.</div>
+              <div><b>b badlo to?</b>Poori line upar ya neeche <em>khisak</em> jaati hai, tedhapan wahi rehta hai.</div>
+            </div>
+            <h4>Line ko haath se padhna</h4>
+            <p>Zero-background rule: line ka output blind trust mat karo, ek-do numbers daal ke feel lo. Maan lo x = 1000 sq ft.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Line</th><th>Hisaab</th><th>Feeling</th></tr>
+              <tr><td>0.04x + 10</td><td>0.04 × 1000 + 10 = <b>50</b></td><td>Base model</td></tr>
+              <tr><td>0.06x + 10</td><td>0.06 × 1000 + 10 = <b>70</b></td><td>w bada, size ka asar zyada</td></tr>
+              <tr><td>0.04x + 20</td><td>0.04 × 1000 + 20 = <b>60</b></td><td>b bada, poori line upar</td></tr>
+            </table></div>
+            <p>Yahan se intuition pakdo: <strong>w</strong> line ko ghumata hai, <strong>b</strong> line ko upar-neeche khiskata hai. Dono milke final price banate hain.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Linear regression = data ke beech se best seedhi line, jo w (tedhapan) aur b (shuruaat) se banti hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Line hi kyu? Curve kyu nahi?</summary><p>Hamesha simple se shuru karo — samajhna aasan, galti pakadna aasan. Aur haan, curve bhi bana sakte ho, usi trick se jo topic 07 mein hai.</p></details>
+            <details class="qa"><summary>w aur b ki value kaun decide karta hai — main?</summary><p>Nahi! Yahi to magic hai. Tum data doge, aur algorithm (gradient descent, topic 04) khud best w aur b dhundhega. Tumhara kaam hai sahi data dena, sahi type ka model chunna, aur result check karna.</p></details>
+            <details class="qa"><summary>b ko “bias” kyu kehte hain? Kya model biased hai?</summary><p>Nahi, yahan “bias” bas starting value ka naam hai. Module 2 mein “high bias” ek alag concept (underfitting) ke liye aayega — dono ko mix mat karna.</p></details>
+            <details class="qa"><summary>“Univariate linear regression” sunke dar lagta hai</summary><p>Uni = ek, variate = variable. Matlab bas <strong>ek input</strong> (size) wali line. Itna hi. Bade naam, chhota kaam.</p></details>
+            <details class="qa"><summary>Kya ye bilkul sahi price batayega?</summary><p>Nahi. Asli prices pe location, mood, negotiation sab ka asar hota hai — isko “noise” kehte hain. Model ek achha andaaza deta hai, bhavishyavaani nahi.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>w = 0.05, b = 5, size = 1000 sq ft → predicted price?</summary><p>0.05 × 1000 + 5 = <b>55 lakh</b>.</p></details>
+              <details class="qa"><summary>w negative ho to line kaisi dikhegi?</summary><p>Neeche girti hui — size badhe to prediction ghate.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="s2"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="ml-kya-hai.html"><small>← Pichhla</small>Machine learning asal mein hai kya?</a>
+          <a class="pager-next" href="cost-function.html"><small>Agla →</small>Cost function — line ko marks dena</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

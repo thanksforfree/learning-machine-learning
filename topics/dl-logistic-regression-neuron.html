@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Logistic regression — ek neuron wala network: ŷ = σ(wᵀx + b), loss aur cost. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Logistic regression — ek neuron wala network (DL · 1) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-blue">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-neural-networks.html">DL · 1: Neural Networks and Deep Learning</a> › Topic 3 / 11</nav>
+        <p class="eyebrow">DL · 1 · TOPIC 03 · EK NEURON</p>
+        <h1>Logistic regression — ek neuron wala network</h1>
+        <p>ŷ = σ(wᵀx + b), loss aur cost</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 1 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="n1" href="dl-what-is-deep-learning.html"><span>01</span>Deep learning kya hai, aur ab hi kyu chal pada?</a>
+            <a data-topic-link="n2" href="dl-binary-classification.html"><span>02</span>Binary classification aur notation</a>
+            <a data-topic-link="n3" class="current" aria-current="page" href="dl-logistic-regression-neuron.html"><span>03</span>Logistic regression — ek neuron wala network</a>
+            <a data-topic-link="n4" href="dl-computation-graph.html"><span>04</span>Gradient descent aur computation graph</a>
+            <a data-topic-link="n5" href="dl-logistic-gradients.html"><span>05</span>Logistic regression ke gradients</a>
+            <a data-topic-link="n6" href="dl-vectorization.html"><span>06</span>Vectorization aur broadcasting</a>
+            <a data-topic-link="n7" href="dl-shallow-network.html"><span>07</span>Shallow neural network: ek hidden layer</a>
+            <a data-topic-link="n8" href="dl-activation-functions.html"><span>08</span>Activation functions aur unke derivatives</a>
+            <a data-topic-link="n9" href="dl-shallow-backprop.html"><span>09</span>Shallow network ka backprop aur random initialization</a>
+            <a data-topic-link="n10" href="dl-deep-network.html"><span>10</span>Deep L-layer network aur dimensions</a>
+            <a data-topic-link="n11" href="dl-why-deep-building-blocks.html"><span>11</span>Deep kyu? Building blocks, parameters aur hyperparameters</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11"><span>DL · 1 progress</span><strong data-progress-label>0 / 11 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Ye sabse chhota neural network hai. Iski training samajh li to deep network bas isi ko baar-baar jodna hai.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z4" href="maths-powers-e-log.html"><small>Maths</small>Power, e aur log</a></div></div>
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>ŷ = σ(wᵀx + b) ka matlab</li><li>Sigmoid kyu (0 se 1 ka chance)</li><li>Loss function: ek example pe galti</li><li>Squared error yahan kyu nahi (non-convex)</li><li>Log loss ka intuition: y = 1 aur y = 0 dono case</li><li>Cost function: saare examples ka average</li><li>Ye loss kahan se aaya — maximum likelihood ka chhota sa idea</li></ul></details>
+        <article class="lesson-card single" id="n3">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Ek neuron kya actually karta hai? Andar koi chhota decision-maker baitha hai kya?</p>
+              <p class="msg dost">Kaash! Andar bas weighted bill banta hai. Har feature ka weight, sabka sum, phir bias.</p>
+              <p class="msg me">Phir sigmoid kyun chipka dete hain?</p>
+              <p class="msg dost">Kyuki binary problem mein answer chance jaisa chahiye. Raw score 12 ya −8 beginner ko kya batayega? 0.97 ya 0.02 zyada readable hai.</p>
+              <p class="msg me">Loss mujhe thoda judge jaisa lagta hai.</p>
+              <p class="msg dost">Bilkul judge hai, par fair judge. Confident sahi ho to halka smile, confident galat ho to strict daant.</p>
+              <p class="msg me">Squared error use karna easy tha, woh kyu nahi?</p>
+              <p class="msg dost">Easy dikhta hai, training ko bumps de sakta hai. Log loss sigmoid ke saath smooth raasta banata hai. Chalo dheere se dekhte hain.</p>
+            </div>
+            <h4>Logistic regression = sabse chhota neural network</h4>
+            <p>Is network mein input x, weights w, bias b, aur output ŷ hota hai. Hidden layer nahi. Phir bhi ye neural network ki language sikha deta hai: forward pass, loss, cost, gradients.</p>
+            <div class="formula"><code>z = wᵀx + b
+ŷ = a = σ(z) = 1 / (1 + e⁻ᶻ)</code><ul>
+              <li><b>w</b> = (nₓ, 1) weights</li>
+              <li><b>wᵀx</b> = dot product, saare clues ka weighted bill</li>
+              <li><b>σ</b> = sigmoid, kisi bhi real number ko 0–1 mein laata hai</li>
+            </ul></div>
+            <figure class="figure">
+              <svg viewBox="0 0 420 190" role="img" aria-label="Logistic regression neuron weighted sum se sigmoid chance banata hai">
+                <rect x="30" y="35" width="90" height="120" rx="14" fill="#edf3ff" stroke="#3567e8"/>
+                <circle cx="210" cy="95" r="42" fill="#f2edff" stroke="#7653d6"/>
+                <rect x="310" y="60" width="80" height="70" rx="14" fill="#e9f7f3" stroke="#159477"/>
+                <path d="M120,95 C150,95 165,95 168,95" stroke="#8a96aa" stroke-width="2" fill="none"/>
+                <path d="M252,95 C280,95 290,95 310,95" stroke="#8a96aa" stroke-width="2" fill="none"/>
+                <g font-size="11" text-anchor="middle" fill="#273142"><text x="75" y="80">x</text><text x="75" y="102">pixels</text><text x="210" y="88">z = wᵀx + b</text><text x="210" y="110">sigmoid</text><text x="350" y="90">ŷ</text><text x="350" y="110">chance</text></g>
+              </svg>
+              <div class="cap">Ek neuron: pehle score, phir probability.</div>
+            </figure>
+            <h4>Sigmoid kyu?</h4>
+            <p>Sigmoid ka output kabhi 0 se kam ya 1 se zyada nahi hota. z = 0 pe output 0.5. z bada positive ho to 1 ke paas, z bada negative ho to 0 ke paas. Binary classification mein ye perfect hai: output ko chance ki tarah padh sakte ho.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>z</th><th>σ(z)</th><th>Feeling</th></tr>
+              <tr><td>−2</td><td>0.119</td><td>label 1 unlikely</td></tr>
+              <tr><td>0</td><td>0.5</td><td>confused</td></tr>
+              <tr><td>2</td><td>0.881</td><td class="good">label 1 likely</td></tr>
+            </table></div>
+            <h4>Loss: ek example pe galti</h4>
+            <p>Loss ek training example ke liye punishment hai. Agar true y = 1 hai aur model 0.9 bolta hai, small punishment. Agar 0.1 bolta hai, badi punishment. Agar y = 0 hai to ulta.</p>
+            <div class="formula"><code>L(ŷ, y) = −[ y log(ŷ) + (1 − y) log(1 − ŷ) ]</code><ul>
+              <li><b>y = 1</b> ho to loss = −log(ŷ)</li>
+              <li><b>y = 0</b> ho to loss = −log(1 − ŷ)</li>
+              <li><b>confident wrong</b> prediction ko bahut badi saza milti hai</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Case</th><th>Prediction ŷ</th><th>Loss</th><th>Comment</th></tr>
+              <tr><td>y = 1</td><td>0.8</td><td>−log(0.8) = 0.223</td><td class="good">achha</td></tr>
+              <tr><td>y = 1</td><td>0.2</td><td>−log(0.2) = 1.609</td><td class="bad">confident galti</td></tr>
+              <tr><td>y = 0</td><td>0.8</td><td>−log(0.2) = 1.609</td><td class="bad">wrong side</td></tr>
+            </table></div>
+            <h4>Squared error yahan kyu avoid karte hain?</h4>
+            <p>Regression mein squared error mast hai. Par sigmoid ke saath squared error use karo to cost surface weird ho sakta hai, gradient descent ko extra bumps mil sakte hain. Log loss logistic regression ke liye clean convex cost deta hai. Beginner translation: training zyada predictable hoti hai.</p>
+            <h4>Cost: saare examples ka average</h4>
+            <p>Loss ek example ka. Cost poore training set ka average loss. Training ka goal: w aur b aise choose karo ki cost kam ho.</p>
+            <div class="formula"><code>J(w, b) = (1/m) × Σ L(ŷ⁽ⁱ⁾, y⁽ⁱ⁾)</code><ul>
+              <li><b>m</b> = training examples</li>
+              <li><b>Σ</b> = sab examples ka loss jodo</li>
+            </ul></div>
+            <p>Ye loss maximum likelihood idea se bhi aata hai: model true labels ko high probability de. Product of probabilities ko maximize karna logs ke baad isi log loss ko minimize karna ban jaata hai. Bas itna intuition kaafi hai.</p>
+            <pre class="code">import numpy as np
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+def loss(a, y):
+    return -(y*np.log(a) + (1-y)*np.log(1-a))  <span class="cm"># ek example</span></pre>
+            <h4>Maximum likelihood ka seedha feel</h4>
+            <p>Model ko aise parameters chahiye jo actual labels ko zyada probability dein. Agar y=1 hai to ŷ bada chahiye. Agar y=0 hai to 1−ŷ bada chahiye. Product of probabilities jaldi tiny ho jaata hai, isliye log use karte hain. Negative log ko minimize karna wahi baat hai: correct labels ko high probability do.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Example</th><th>y</th><th>ŷ</th><th>Correct label probability</th></tr>
+              <tr><td>1</td><td>1</td><td>0.7</td><td>0.7</td></tr>
+              <tr><td>2</td><td>0</td><td>0.2</td><td>1−0.2 = 0.8</td></tr>
+              <tr><td>Combined</td><td>—</td><td>—</td><td class="good">0.7 × 0.8 = 0.56</td></tr>
+            </table></div>
+            <div class="mistake"><b>Dhyan rakhna:</b> ŷ ko exact 0 ya 1 mat hone do jab log nikaal rahe ho. Code mein tiny epsilon clipping use karte hain, warna log(0) phat jaata hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> z score hai, sigmoid chance hai, loss chance ki imaandari check karta hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>ŷ aur a same cheez hain?</summary><p>Is neuron mein haan. a activation hai, aur output activation hi ŷ hai.</p></details>
+            <details class="qa"><summary>Threshold 0.5 hi kyu?</summary><p>Default hai kyunki 0.5 ke upar label 1 zyada likely. Real products mein cost ke hisaab se threshold badal sakte ho.</p></details>
+            <details class="qa"><summary>Log natural log hai ya base 10?</summary><p>ML formulas mein usually natural log. Base change karne se scale badalta hai, best parameters nahi.</p></details>
+            <details class="qa"><summary>Loss high hai to exactly kya badalta hai?</summary><p>Loss khud parameter nahi badalta. Backprop loss se gradients nikaalta hai, gradient descent W aur b update karta hai. Loss scorecard hai; gradients us scorecard se direction nikaalte hain.</p></details>
+            <details class="qa"><summary>Maximum likelihood ko detail mein abhi samajhna zaroori?</summary><p>Nahi. Bas itna pakdo: model ko correct labels ko high probability dene ke liye train kar rahe hain. Log loss isi goal ka convenient form hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>w = [2, −1], x = [3, 4], b = 0.5. z kitna?</summary><p>z = 2×3 + (−1)×4 + 0.5 = <b>2.5</b>.</p></details>
+              <details class="qa"><summary>y = 1, ŷ = 0.5. Loss?</summary><p>−log(0.5) ≈ <b>0.693</b>.</p></details>
+              <details class="qa"><summary>Sigmoid output 0.97 ka matlab kya?</summary><p>Model ko label 1 ka chance 97% lag raha hai. Ye guarantee nahi, confidence hai.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="n3"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-binary-classification.html"><small>← Pichhla</small>Binary classification aur notation</a>
+          <a class="pager-next" href="dl-computation-graph.html"><small>Agla →</small>Gradient descent aur computation graph</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

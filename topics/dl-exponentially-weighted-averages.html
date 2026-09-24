@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Exponentially weighted averages: Momentum aur Adam ki neev. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Exponentially weighted averages (DL · 2) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-improving-networks.html">DL · 2: Improving Deep Neural Networks</a> › Topic 9 / 15</nav>
+        <p class="eyebrow">DL · 2 · TOPIC 09 · OPTIMIZATION ALGORITHMS</p>
+        <h1>Exponentially weighted averages</h1>
+        <p>Momentum aur Adam ki neev</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 2 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="i1" href="dl-train-dev-test-bias-variance.html"><span>01</span>Train/dev/test aur bias-variance</a>
+            <a data-topic-link="i2" href="dl-l2-regularization.html"><span>02</span>L2 regularization</a>
+            <a data-topic-link="i3" href="dl-dropout.html"><span>03</span>Dropout</a>
+            <a data-topic-link="i4" href="dl-augmentation-early-stopping.html"><span>04</span>Data augmentation aur early stopping</a>
+            <a data-topic-link="i5" href="dl-normalizing-inputs.html"><span>05</span>Inputs normalize karna</a>
+            <a data-topic-link="i6" href="dl-vanishing-exploding-init.html"><span>06</span>Vanishing/exploding gradients aur weight initialization</a>
+            <a data-topic-link="i7" href="dl-gradient-checking.html"><span>07</span>Gradient checking</a>
+            <a data-topic-link="i8" href="dl-mini-batch.html"><span>08</span>Mini-batch gradient descent</a>
+            <a data-topic-link="i9" class="current" aria-current="page" href="dl-exponentially-weighted-averages.html"><span>09</span>Exponentially weighted averages</a>
+            <a data-topic-link="i10" href="dl-momentum-rmsprop-adam.html"><span>10</span>Momentum, RMSprop aur Adam</a>
+            <a data-topic-link="i11" href="dl-learning-rate-decay-local-optima.html"><span>11</span>Learning rate decay aur local optima ka sach</a>
+            <a data-topic-link="i12" href="dl-hyperparameter-tuning.html"><span>12</span>Hyperparameter tuning ka tareeka</a>
+            <a data-topic-link="i13" href="dl-batch-normalization.html"><span>13</span>Batch normalization</a>
+            <a data-topic-link="i14" href="dl-softmax-regression.html"><span>14</span>Softmax regression</a>
+            <a data-topic-link="i15" href="dl-frameworks-tensorflow.html"><span>15</span>Deep learning frameworks aur TensorFlow</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15"><span>DL · 2 progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Aage ke teen optimizers isi ek idea pe khade hain.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z13" href="maths-moving-average.html"><small>Maths</small>Exponentially weighted (moving) average</a></div></div>
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Shor wale rozmarra ke data (jaise daily AQI ya sabzi ke daam) pe smooth line</li><li>v_t = βv_{t−1} + (1 − β)θ_t</li><li>β = 0.9, 0.98, 0.5 — kitne din ka average</li><li>Purane din ka wazan kaise ghat-ta hai</li><li>Code mein ek hi variable</li><li>Bias correction v_t / (1 − βᵗ)</li></ul></details>
+        <article class="lesson-card single" id="i9">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Dost, training ka graph bahut hil raha hai. Kabhi loss neeche, kabhi upar. Main kis value pe bharosa karun?</p>
+              <p class="msg dost">Socho tum mohalle ki mandi mein tamatar ka daam roz note kar rahe ho. Ek din truck late, ek din supply zyada. Raw number se mood swing ho jayega.</p>
+              <p class="msg me">To average le loon?</p>
+              <p class="msg dost">Haan, par pichhle mahine ke daam ko aaj jitna importance mat do. Recent din zyada important, purane dheere-dheere fade. Bas yahi <strong>exponentially weighted average</strong> hai.</p>
+              <p class="msg me">Naam bada hai, idea simple lag raha hai.</p>
+              <p class="msg dost">Bilkul. Chai mein adrak dheere-dheere ghulti hai. Naya taste aata hai, purana poora gayab bhi nahi hota.</p>
+            </div>
+            <h4>Tamatar ke daam pe smooth line</h4>
+            <p>Raw sabzi price mein shor hota hai. Aaj baarish se supply late, kal mandi full. Par trend dekhna ho to smooth line chahiye. Har din ek naya daam θ_t aata hai, aur hum ek running value v_t update karte hain.</p>
+            <div class="formula"><code>v_t = βv_{t−1} + (1 − β)θ_t</code><ul>
+              <li><b>θ_t</b> = aaj ka asli daam, jaise Rs. 38/kg</li>
+              <li><b>v_t</b> = smooth daam jo hum rakhte hain</li>
+              <li><b>β</b> = purani memory kitni rakho. 0 ke paas = jaldi bhoolo, 1 ke paas = dheere bhoolo</li>
+              <li><b>1 − β</b> = naye daam ka weight</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Din</th><th>θ_t daam (Rs./kg)</th><th>v_t, β = 0.9</th><th>Bias-corrected v_t/(1 − βᵗ)</th></tr>
+              <tr><td>1</td><td>28</td><td>2.800</td><td>28.00</td></tr>
+              <tr><td>2</td><td>34</td><td>5.920</td><td>31.16</td></tr>
+              <tr><td>3</td><td>30</td><td>8.328</td><td>30.73</td></tr>
+              <tr><td>4</td><td>42</td><td>11.695</td><td>34.01</td></tr>
+              <tr><td>5</td><td>38</td><td>14.326</td><td>34.98</td></tr>
+            </table></div>
+            <p>Table mein v_t shuru mein bahut chhota dikh raha hai, kyunki v_0 = 0 se start kiya. Isliye pehle kuch din ke liye correction use kar sakte hain. Thodi der baad 1 − βᵗ lagbhag 1 ho jaata hai, correction ka asar kam.</p>
+            <h4>β ka matlab: kitne din yaad?</h4>
+            <p>Rough rule yaad rakho: average lagbhag <strong>1/(1 − β)</strong> recent daam ko dekhta hai. Exact nahi, par intuition ke liye mast hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>β</th><th>1/(1 − β)</th><th>Feel kaisa?</th></tr>
+              <tr><td>0.5</td><td>2 readings</td><td>Bahut jaldi react karta hai, smooth kam</td></tr>
+              <tr><td>0.9</td><td>10 readings</td><td class="good">Achha balance</td></tr>
+              <tr><td>0.98</td><td>50 readings</td><td>Bahut smooth, par late react</td></tr>
+            </table></div>
+            <figure class="figure">
+              <svg viewBox="0 0 420 210" role="img" aria-label="Raw tamatar price zig-zag line aur moving average smooth line">
+                <polyline points="35,150 85,105 135,130 185,55 235,80 285,70 335,110 385,60" fill="none" stroke="#c2410c" stroke-width="2" stroke-dasharray="5 4"/>
+                <polyline points="35,150 85,140 135,134 185,118 235,106 285,96 335,98 385,88" fill="none" stroke="#3567e8" stroke-width="3"/>
+                <g font-size="11" fill="#7a879b"><text x="40" y="180">din</text><text x="10" y="25">Rs./kg</text></g>
+                <text x="260" y="40" font-size="11" fill="#c2410c">raw reading</text>
+                <text x="260" y="60" font-size="11" fill="#3567e8">smooth v_t</text>
+                <line x1="30" y1="170" x2="400" y2="170" stroke="#b8c2d3"/><line x1="30" y1="20" x2="30" y2="170" stroke="#b8c2d3"/>
+              </svg>
+              <div class="cap">Orange line roz ka mood hai. Blue line trend hai — kam drama, zyada signal.</div>
+            </figure>
+            <h4>Purane din ka wazan kaise ghat-ta hai</h4>
+            <p>Aaj ka weight (1 − β). Kal ka β(1 − β). Parso ka β²(1 − β). Har step purana effect β se multiply hota jaata hai. Isliye naam mein “exponential” aata hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Reading kitni purani?</th><th>Weight, β = 0.9</th></tr>
+              <tr><td>Aaj</td><td>0.1000</td></tr>
+              <tr><td>1 din purani</td><td>0.0900</td></tr>
+              <tr><td>2 din purani</td><td>0.0810</td></tr>
+              <tr><td>5 din purani</td><td>0.0590</td></tr>
+              <tr><td>10 din purani</td><td>0.0349</td></tr>
+            </table></div>
+            <h4>Code mein ek hi variable</h4>
+            <p>Iska best part: saare purane daam store karne ki zaroorat nahi. Sirf v rakho, naya θ aate hi update karo.</p>
+            <pre class="code">beta = 0.9
+v = 0
+for theta in [28, 34, 30, 42, 38]:
+    v = beta * v + (1 - beta) * theta
+    print(v)   <span class="cm"># smooth value update hoti rahegi</span></pre>
+            <div class="lesson-callout"><b>DL connection:</b> Momentum gradients ka moving average rakhta hai. RMSprop squared gradients ka. Adam dono rakhta hai. Batch norm bhi mini-batch statistics ka moving average use karta hai.</div>
+            <div class="mistake"><b>Dhyan rakhna:</b> β bada karna hamesha better nahi. β = 0.98 line ko bahut smooth karega, par agar mandi ka daam achanak badla to woh late samjhega. Optimizers mein bhi same trade-off.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Naya signal thoda jodo, purani memory β se rakho. β jitna 1 ke paas, average utna smooth aur slow.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Normal average aur moving average mein asli farak?</summary><p>Normal average mein sab readings barabar. Moving average mein recent readings zyada important. Training mein recent gradients zyada kaam ke hote hain, isliye moving average useful hai.</p></details>
+            <details class="qa"><summary>Bias correction har baar lagana zaroori?</summary><p>Nahi. Shuruaat mein v_0 = 0 ki wajah se value chhoti hoti hai. Adam jaise optimizers first steps mein correction karte hain. Long training mein correction ka effect chhota ho jaata hai.</p></details>
+            <details class="qa"><summary>β ko learning rate samjhun?</summary><p>Nahi dost. Learning rate weight update ka kadam hai. β memory ka knob hai: purana kitna yaad, naya kitna suno.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>β = 0.8 ho to rough average kitni readings ka?</summary><p>1/(1 − 0.8) = 1/0.2 = <b>5 readings</b>.</p></details>
+              <details class="qa"><summary>v_0 = 0, β = 0.9, θ_1 = 50. v_1 kya?</summary><p>v_1 = 0.9 × 0 + 0.1 × 50 = <b>5</b>. Bias-corrected value 5/(1 − 0.9) = <b>50</b>.</p></details>
+              <details class="qa"><summary>β bahut chhota rakhoge to graph kaisa dikhega?</summary><p>Raw data jaisa hilta hua. Smooth kam hoga, par sudden change jaldi pakdega.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="i9"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-mini-batch.html"><small>← Pichhla</small>Mini-batch gradient descent</a>
+          <a class="pager-next" href="dl-momentum-rmsprop-adam.html"><small>Agla →</small>Momentum, RMSprop aur Adam</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

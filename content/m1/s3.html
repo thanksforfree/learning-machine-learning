@@ -1,0 +1,53 @@
+
+            <div class="chat">
+              <p class="msg me">Par dots ke beech se to 100 alag lines kheench sakte hain. Best kaunsi?</p>
+              <p class="msg dost">Ekdum sahi sawaal! Jaise teacher answer sheet check karta hai, waise hi har line ko check karo. Har ghar ke liye dekho: line ne kya bola vs asli price kya tha. Jo farak hai, woh <strong>galti (error)</strong> hai.</p>
+              <p class="msg me">Phir saari galtiyaan jod dein?</p>
+              <p class="msg dost">Almost. Ek chhota twist hai: pehle har galti ka <strong>square</strong> karo, phir sab ka <strong>average</strong> lo. Jo number aaye, woh us line ka “cost” hai. Jitna kam cost, utni achhi line.</p>
+              <p class="msg me">Cost matlab report card ka marks?</p>
+              <p class="msg dost">Haan, bas ulta report card: kam score = achha. Model ka goal hai is score ko neeche kheenchna.</p>
+            </div>
+            <figure class="figure">
+              <svg viewBox="0 0 400 200" role="img" aria-label="Har dot se line tak laal khadi lines galti dikhati hain">
+                <line x1="40" y1="180" x2="390" y2="180" stroke="#b8c2d3"/><line x1="40" y1="10" x2="40" y2="180" stroke="#b8c2d3"/>
+                <line x1="50" y1="165" x2="380" y2="35" stroke="#3567e8" stroke-width="3"/>
+                <g stroke="#e0703a" stroke-width="2"><line x1="90" y1="120" x2="90" y2="149"/><line x1="150" y1="150" x2="150" y2="126"/><line x1="210" y1="80" x2="210" y2="102"/><line x1="270" y1="100" x2="270" y2="78"/><line x1="330" y1="30" x2="330" y2="55"/></g>
+                <g fill="#7b93e0"><circle cx="90" cy="120" r="5"/><circle cx="150" cy="150" r="5"/><circle cx="210" cy="80" r="5"/><circle cx="270" cy="100" r="5"/><circle cx="330" cy="30" r="5"/></g>
+              </svg>
+              <div class="cap">Naranga lines = har ghar pe galti. Cost = in galtiyon ke squares ka average.</div>
+            </figure>
+            <h4>Do lines ka muqabla</h4>
+            <p>Teen ghar hain: (1000 sq ft, 50 lakh), (1500, 80 lakh), (2000, 95 lakh).</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th></th><th>Line A: f = 0.05x</th><th>Line B: f = 0.03x + 20</th></tr>
+              <tr><td>Guesses</td><td>50, 75, 100</td><td>50, 65, 80</td></tr>
+              <tr><td>Galti (guess − asli)</td><td>0, −5, +5</td><td>0, −15, −15</td></tr>
+              <tr><td>Square</td><td>0, 25, 25</td><td>0, 225, 225</td></tr>
+              <tr><td>Total</td><td>50</td><td>450</td></tr>
+              <tr><td>Cost J = total ÷ (2 × 3)</td><td class="good">8.3 ✓ jeet gayi</td><td class="bad">75</td></tr>
+            </table></div>
+            <div class="formula"><code>J(w, b) = (1 / 2m) × Σ ( f(x⁽ⁱ⁾) − y⁽ⁱ⁾ )²</code><ul>
+              <li><b>f(x⁽ⁱ⁾) − y⁽ⁱ⁾</b> = i-th ghar pe galti (guess − asli)</li>
+              <li><b>( )²</b> = galti ka square</li>
+              <li><b>Σ</b> (sigma) = “sab ghar ke liye jodo”</li>
+              <li><b>1/m</b> = average lena</li>
+              <li><b>1/2</b> = bas calculation neat karne ke liye (aage 2 cancel ho jata hai). Best line isse nahi badalti.</li>
+            </ul></div>
+            <p>Yahan ek baar table ke numbers khud jodo: Line A ka total 50 hai, phir 6 se divide. Cost 8.33. Bas, formula table ka compact version hai.</p>
+            <h4>Katori (bowl) wali picture — ye sabse important hai</h4>
+            <p>Har possible w ke liye cost nikaalo aur graph banao. Ek <strong>katori jaisi shape</strong> banti hai. Bahut chhota w → line bahut flat → galti zyada. Bahut bada w → line bahut tedhi → phir galti zyada. Beech mein ek point pe cost sabse kam — wahi best w hai.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 400 210" role="img" aria-label="Cost vs w ka U-shape graph; neeche wala point best w">
+                <line x1="30" y1="195" x2="380" y2="195" stroke="#b8c2d3"/><line x1="30" y1="10" x2="30" y2="195" stroke="#b8c2d3"/>
+                <path d="M40,30 Q200,330 360,30" fill="none" stroke="#3567e8" stroke-width="3"/>
+                <circle cx="200" cy="180" r="7" fill="#159477"/><text x="200" y="170" font-size="11" text-anchor="middle" fill="#159477">best w (cost sabse kam)</text>
+                <text x="372" y="210" font-size="11" text-anchor="end" fill="#7a879b">w →</text><text x="36" y="22" font-size="11" fill="#7a879b">cost J</text>
+              </svg>
+            </figure>
+            <p>w aur b <strong>dono</strong> ho to ye 3D katori ban jaati hai. Usko upar se dekho to same-height wale points chhalle (rings) banate hain — jaise map pe pahad ke contour. Isko <strong>contour plot</strong> kehte hain. Sabse andar wala chhota chhalla = best (w, b).</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Cost function line ki “galti ka score” hai. Training ka poora goal = ye score kam se kam karna.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Square kyu? Seedha galti kyu nahi jodte?</summary><p>Line A dekho: galti −5 aur +5. Seedha jodo to 0 — lagega line perfect hai! Square karne se minus gayab ho jata hai. Bonus: badi galti ko zyada saza milti hai. Galti 2 → 4, par galti 10 → 100.</p></details>
+            <details class="qa"><summary>Cost 0 ho gaya to model perfect hai?</summary><p>Training data pe perfect. Par ho sakta hai model ne data ratt liya ho aur naye ghar pe fail ho jaye. Isko overfitting kehte hain — topic 11.</p></details>
+            <details class="qa"><summary>Loss aur cost mein kya farak hai?</summary><p><strong>Loss</strong> = ek example ki galti. <strong>Cost</strong> = saare examples ki loss ka average. Ek ghar vs poori colony.</p></details>
+            <details class="qa"><summary>1/2 wala funda abhi bhi samajh nahi aaya</summary><p>Tension mat lo. Kisi bhi cheez ko 2 se divide karo to jo line pehle sabse kam cost wali thi, woh ab bhi sabse kam cost wali rahegi. Ranking nahi badalti. Bas aage slope nikaalte waqt formula saaf dikhta hai.</p></details>

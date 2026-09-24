@@ -1,0 +1,38 @@
+
+            <div class="chat">
+              <p class="msg me">Handwritten digit pehchanna hai — 0 se 9. Ab sirf haan/na nahi, 10 options hain. Ab kya?</p>
+              <p class="msg dost">Output layer mein 10 neurons rakho — har digit ka ek raw score. Phir <strong>softmax</strong> un scores ko chances mein badalta hai jinka total 100% ho. Election result ya IPL winning probability jaisa: sab teams ke chances milke 100%.</p>
+            </div>
+            <h4>Softmax step-by-step (3 options: billi, kutta, ghoda)</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Step</th><th>Billi</th><th>Kutta</th><th>Ghoda</th></tr>
+              <tr><td>Raw score z</td><td>2</td><td>1</td><td>0.1</td></tr>
+              <tr><td>e<sup>z</sup> (sab positive banao)</td><td>7.39</td><td>2.72</td><td>1.11</td></tr>
+              <tr><td>Total</td><td colspan="3">7.39 + 2.72 + 1.11 = 11.21</td></tr>
+              <tr><td>Divide by total</td><td class="good">0.66</td><td>0.24</td><td>0.10</td></tr>
+            </table></div>
+            <p>Model bol raha: “66% billi”. Loss sirf <strong>sahi answer</strong> ki probability dekhta hai: loss = −log(sahi class ka chance). Sach mein billi thi → −log(0.66) = 0.42, chalo theek. Sach mein ghoda tha → −log(0.10) = 2.30, ab kaafi daant padegi. Module 1 ka log loss hi hai, bas multiclass avatar.</p>
+            <div class="lesson-callout"><b>TensorFlow tip:</b> Aakhri layer ko <code>linear</code> rakho aur loss mein <code>from_logits=True</code> likho (SparseCategoricalCrossentropy). Isse computer softmax ko andar hi zyada accurate tarike se calculate karta hai. Prediction ke waqt chance chahiye to output pe <code>tf.nn.softmax</code> lagao.</div>
+            <h4>Multi-label — ek saath kai “haan”</h4>
+            <p>Self-driving car ki photo: “car hai? bus hai? pedestrian hai?” — teeno ek saath haan ho sakte hain. Yahan softmax nahi (woh ek hi chunta hai). <strong>3 alag sigmoid outputs</strong> lagao, har ek apna haan/na.</p>
+
+            <h4>Large logits ko safely handle karna</h4>
+            <div class="chat"><p class="msg me">Softmax mein e<sup>z</sup> hai. Agar z bada hua to number phat nahi jaayega?</p><p class="msg dost">Bilkul ho sakta hai. Isliye libraries ek smart trick use karti hain: sab logits mein se max subtract kar do. Probability same rehti hai, numbers manageable ho jaate hain.</p></div>
+            <p>Maan lo scores [10, 9, 7] hain. Max 10 subtract karne ke baad [0, −1, −3]. Softmax ka answer same rahega.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Class</th><th>z</th><th>z − max</th><th>e<sup>z−max</sup></th><th>Probability</th></tr><tr><td>A</td><td>10</td><td>0</td><td>1.00</td><td class="good">1.00 ÷ 1.42 = 0.70</td></tr><tr><td>B</td><td>9</td><td>−1</td><td>0.37</td><td>0.37 ÷ 1.42 = 0.26</td></tr><tr><td>C</td><td>7</td><td>−3</td><td>0.05</td><td>0.05 ÷ 1.42 = 0.04</td></tr></table></div>
+            <p>Total 1.00. Isi wajah se TensorFlow mein <code>from_logits=True</code> comfortable choice hai — library ye safe calculation andar kar leti hai.</p>
+            <div class="lesson-callout"><b>Chhota check:</b> Softmax chances ka total hamesha 1 hona chahiye. Agar total 1.2 ya 0.8 aa raha hai, calculation ya rounding check karo.</div>
+            <h4>Softmax vs multi-label sigmoid</h4>
+            <p>Sabse common confusion: “mere paas 5 labels hain, softmax laga du?” Pehle poochho — ek hi label sahi hai ya kai ek saath?</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Photo mein</th><th>Possible truth</th><th>Output setup</th></tr><tr><td>Digit</td><td>Sirf ek: 0 ya 1 ya ...</td><td class="good">10 outputs + softmax</td></tr><tr><td>Food photo</td><td>Pizza aur cold drink dono</td><td class="good">Har label ka sigmoid</td></tr><tr><td>News topic</td><td>Sports + politics ho sakta</td><td class="good">Multi-label sigmoids</td></tr></table></div>
+            <p>Softmax categories ko ek doosre se compete karata hai. Sigmoids independent sawaal poochte hain: “pizza hai?”, “drink hai?”, “person hai?”</p>
+            <div class="lesson-callout"><b>Beginner checkpoint:</b> Softmax probabilities ek doosre se linked hoti hain. Billi ka chance badha to kisi aur class ka chance ghatega, kyunki total 1 hi rehna hai.</div>
+            <p>Softmax output ko confidence samajhne se pehle yaad rakho: model confidently galat bhi ho sakta hai. Agar training data biased hai ya image ajeeb hai, 0.95 probability ka matlab “model bahut sure hai”, “model pakka sahi hai” nahi. Calibration alag topic hai.</p>
+            <p>Training ke labels bhi format ke hisaab se loss choose karte hain: labels 0/1/2 jaise integers hon to sparse categorical loss; one-hot vectors hon to categorical loss. Dono ka concept same hai, input format alag.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Ek hi answer chahiye → softmax. Kai answers ek saath ho sakte → har ek ke liye sigmoid.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>e<sup>z</sup> kyu? Seedha scores ko total se divide kyu nahi?</summary><p>Scores negative bhi ho sakte hain (−2), aur negative chance ka koi matlab nahi. e<sup>z</sup> sabko positive bana deta hai, aur bade score ko aur zyada highlight karta hai.</p></details>
+            <details class="qa"><summary>“Logits” kya hote hain?</summary><p>Softmax se pehle wale raw scores (2, 1, 0.1). from_logits=True matlab: “main raw scores de raha hoon, softmax tum andar safely kar lena.”</p></details>
+            <details class="qa"><summary>2 classes ke liye softmax laga sakte hain?</summary><p>Haan, woh logistic regression jaisa hi ban jaata hai. Par 2 classes ke liye ek sigmoid simple, halka aur padhne mein clean hai.</p></details>
+
+            <details class="qa"><summary>Softmax mein sabse bada score hamesha winner?</summary><p>Haan, highest z ki probability highest hogi. Softmax ranking nahi badalta, bas scores ko readable probabilities mein badal deta hai.</p></details>

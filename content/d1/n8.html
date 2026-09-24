@@ -1,0 +1,79 @@
+            <div class="chat">
+              <p class="msg me">Activation functions mujhe menu card jaise lag rahe hain. Sigmoid, tanh, ReLU... order kya karun?</p>
+              <p class="msg dost">Nice analogy. Dish task ke hisaab se choose hoti hai. Binary output pe sigmoid, hidden layers mein ReLU aam starter.</p>
+              <p class="msg me">Agar activation hi na lagayein?</p>
+              <p class="msg dost">Phir network boring ho jaata hai. Das linear layers milke bhi ek linear layer jaisa hi behave karengi.</p>
+              <p class="msg me">ReLU itna simple hai, bas negative ko zero. Ye kaise powerful?</p>
+              <p class="msg dost">Simple cheez training mein fast hoti hai. Positive side pe slope 1, gradients ko zinda rakhne mein help.</p>
+              <p class="msg me">Derivative table dekh ke maths wali feeling aa rahi hai.</p>
+              <p class="msg dost">Bas slope socho. Backprop ko har activation gate ka “kitna khula hai” chahiye. Formula us gate ka number hai.</p>
+            </div>
+            <h4>Sigmoid vs tanh</h4>
+            <p>Sigmoid output 0 se 1 mein deta hai, isliye binary output layer ke liye useful. Hidden layer mein tanh aksar sigmoid se better hota hai kyunki tanh ka output −1 se 1 mein hota hai, zero ke aas-paas centred. Isse next layer ko balanced inputs milte hain.</p>
+            <div class="compare-grid">
+              <div><b>Sigmoid</b>Range 0..1. Probability jaisa. Hidden mein saturation problem ho sakti hai.</div>
+              <div><b>tanh</b>Range −1..1. Zero-centred. Hidden layers mein sigmoid se usually nicer.</div>
+            </div>
+            <div class="formula"><code>sigmoid: a = 1/(1+e⁻ᶻ)
+tanh: a = (eᶻ − e⁻ᶻ)/(eᶻ + e⁻ᶻ)</code><ul>
+              <li><b>a</b> activation output hai</li>
+              <li><b>z</b> weighted sum hai</li>
+            </ul></div>
+            <figure class="figure">
+              <svg viewBox="0 0 430 220" role="img" aria-label="Sigmoid tanh ReLU aur Leaky ReLU activation shapes">
+                <line x1="40" y1="110" x2="390" y2="110" stroke="#b8c2d3"/><line x1="215" y1="25" x2="215" y2="190" stroke="#b8c2d3"/>
+                <path d="M55,155 C145,155 150,65 215,65 C280,65 285,35 380,35" fill="none" stroke="#3567e8" stroke-width="2"/>
+                <path d="M55,165 C140,165 150,35 215,110 C280,185 290,55 380,55" fill="none" stroke="#7653d6" stroke-width="2" opacity="0.8"/>
+                <path d="M55,110 L215,110 L380,35" fill="none" stroke="#159477" stroke-width="3"/>
+                <path d="M55,125 L215,110 L380,50" fill="none" stroke="#e0703a" stroke-width="2" stroke-dasharray="5 4"/>
+                <g font-size="11" fill="#273142"><text x="55" y="28" fill="#3567e8">sigmoid</text><text x="115" y="45" fill="#7653d6">tanh</text><text x="285" y="95" fill="#159477">ReLU</text><text x="260" y="165" fill="#e0703a">Leaky</text></g>
+              </svg>
+              <div class="cap">Different moods, different training behavior.</div>
+            </figure>
+            <h4>ReLU aur Leaky ReLU</h4>
+            <p>ReLU negative z pe 0, positive z pe z. Simple, fast, aur positive side pe slope 1, isliye deep networks mein gradients zyada der tak bach sakte hain. Leaky ReLU negative side ko bilkul dead nahi karta; chhota slope, jaise 0.01, de deta hai.</p>
+            <div class="formula"><code>ReLU(z) = max(0, z)
+LeakyReLU(z) = max(0.01z, z)</code><ul>
+              <li><b>hidden layers</b> mein ReLU common default</li>
+              <li><b>binary output</b> mein sigmoid, kyunki probability chahiye</li>
+            </ul></div>
+            <h4>Non-linear activation zaroori kyu?</h4>
+            <p>Agar har layer sirf linear ho: A = W X + b. Do linear transformations combine hoke ek badi linear transformation ban jaati hain. Matlab depth ka fayda gaya. Non-linearity network ko curves, boundaries, complex patterns banane ki ijazat deti hai.</p>
+            <h4>Derivatives: backprop ke slopes</h4>
+            <p>Backward pass mein activation ka slope chahiye. Usually code mein activation output a stored hota hai, phir derivative easy.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Activation</th><th>Derivative</th><th>Number</th></tr>
+              <tr><td>Sigmoid</td><td>a(1−a)</td><td>a=0.9 → 0.9×0.1 = <b>0.09</b></td></tr>
+              <tr><td>tanh</td><td>1−a²</td><td>a=0.6 → 1−0.36 = <b>0.64</b></td></tr>
+              <tr><td>ReLU</td><td>0 if z&lt;0, 1 if z&gt;0</td><td>z=3 → <b>1</b></td></tr>
+              <tr><td>Leaky ReLU</td><td>0.01 if z&lt;0, 1 if z&gt;0</td><td>z=−2 → <b>0.01</b></td></tr>
+            </table></div>
+            <pre class="code">def relu(Z):
+    return np.maximum(0, Z)
+
+def relu_backward(dA, Z):
+    dZ = dA.copy()
+    dZ[Z &lt;= 0] = 0        <span class="cm"># negative side ka slope 0</span>
+    return dZ</pre>
+            <h4>Activation choose karne ki pocket guide</h4>
+            <p>Pehli baar model bana rahe ho to hidden layers mein ReLU se start karo. Binary output ho to sigmoid. Multiclass output ho to softmax (aage course mein). Regression mein output activation target range pe depend karta hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Situation</th><th>Good first choice</th><th>Kyu</th></tr>
+              <tr><td>Hidden layers</td><td>ReLU</td><td class="good">fast, simple, gradients okay</td></tr>
+              <tr><td>Binary output</td><td>Sigmoid</td><td>0–1 chance</td></tr>
+              <tr><td>Can be negative regression</td><td>Linear</td><td>range restricted nahi</td></tr>
+            </table></div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Hidden layers mein sigmoid laga ke bahut deep network train karoge to saturation se gradients tiny ho sakte hain. ReLU pehle try karo.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Hidden mein ReLU/tanh patterns banate hain; output activation task ke answer format se choose hota hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>ReLU z=0 pe derivative kya?</summary><p>Technically undefined. Practice mein 0 ya 1 choose kar lo, farak nahi padta kyunki exact 0 rare hota hai.</p></details>
+            <details class="qa"><summary>Regression output ke liye kya activation?</summary><p>Agar output any real number ho sakta hai to linear. Agar non-negative chahiye, ReLU try kar sakte ho.</p></details>
+            <details class="qa"><summary>Leaky ReLU hamesha ReLU se better?</summary><p>Nahi. Kabhi help karta hai, kabhi same. Default ReLU se start karna safe hai.</p></details>
+            <details class="qa"><summary>tanh zero-centred hone se kya fayda?</summary><p>Next layer ko positive aur negative dono signals milte hain. Isse optimization kabhi-kabhi balanced hoti hai compared to sigmoid hidden activations jo mostly positive hoti hain.</p></details>
+            <details class="qa"><summary>Dead ReLU kya hota hai?</summary><p>Agar neuron hamesha negative z deta rahe, ReLU output 0 aur derivative 0 rahega. Phir woh neuron update se barely recover karta hai. Leaky ReLU kabhi-kabhi help karta hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>ReLU(−4) aur ReLU(2.5)?</summary><p>ReLU(−4)=<b>0</b>, ReLU(2.5)=<b>2.5</b>.</p></details>
+              <details class="qa"><summary>Sigmoid activation a=0.2 ho to derivative?</summary><p>a(1−a)=0.2×0.8=<b>0.16</b>.</p></details>
+              <details class="qa"><summary>Binary classifier ke output layer mein kaunsi activation natural hai?</summary><p><b>Sigmoid</b>, kyunki output ko probability ki tarah padh sakte hain.</p></details>
+            </div>

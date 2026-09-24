@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="K-means cost, initialization aur K chunna: Kai baar try karo, best rakho. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>K-means cost, initialization aur K chunna (ML · 3) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../unsupervised.html">ML · 3: Unsupervised Learning, Recommenders, RL</a> › Topic 3 / 13</nav>
+        <p class="eyebrow">ML · 3 · TOPIC 03 · CLUSTERING</p>
+        <h1>K-means cost, initialization aur K chunna</h1>
+        <p>Kai baar try karo, best rakho</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 3 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="u1" href="unsupervised-clustering.html"><span>01</span>Unsupervised learning aur clustering</a>
+            <a data-topic-link="u2" href="k-means.html"><span>02</span>K-means algorithm</a>
+            <a data-topic-link="u3" class="current" aria-current="page" href="k-means-cost-choose-k.html"><span>03</span>K-means cost, initialization aur K chunna</a>
+            <a data-topic-link="u4" href="anomaly-gaussian.html"><span>04</span>Anomaly detection aur Gaussian</a>
+            <a data-topic-link="u5" href="anomaly-algorithm.html"><span>05</span>Anomaly detection algorithm aur evaluation</a>
+            <a data-topic-link="u6" href="recommender-features.html"><span>06</span>Recommender: item features ke saath</a>
+            <a data-topic-link="u7" href="collaborative-filtering.html"><span>07</span>Collaborative filtering aur binary labels</a>
+            <a data-topic-link="u8" href="mean-normalization.html"><span>08</span>Mean normalization, TensorFlow aur related items</a>
+            <a data-topic-link="u9" href="content-based-filtering.html"><span>09</span>Content-based filtering aur deep learning</a>
+            <a data-topic-link="u10" href="pca.html"><span>10</span>PCA — bahut features ko kam mein samet-na</a>
+            <a data-topic-link="u11" href="reinforcement-learning-basics.html"><span>11</span>Reinforcement learning basics</a>
+            <a data-topic-link="u12" href="q-function-bellman.html"><span>12</span>Q-function aur Bellman equation</a>
+            <a data-topic-link="u13" href="deep-q-network.html"><span>13</span>Continuous states aur Deep Q-Network</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11,u12,u13"><span>ML · 3 progress</span><strong data-progress-label>0 / 13 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Algorithm chalana aasan hai; achha result lena aur sahi K chunna asli skill hai.</div>
+        
+        
+        <article class="lesson-card single" id="u3">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">K-means ka bhi cost function hota hai? Matlab clustering mein bhi marks milte hain?</p>
+              <p class="msg dost">Haan! Har point apne center se kitna door hai — un dooriyon ke square ka average. Isko <strong>distortion</strong> kehte hain. Achhe groups ka simple sign: point apne center ke paas, distortion kam.</p>
+            </div>
+            <div class="formula"><code>J = (1/m) × Σ (point − uska center)²</code><ul>
+              <li><b>Step 2</b> (points ko paas wale center pe bhejna) → J kam hota hai, kyunki har point ne sabse kam doori wala center chuna.</li>
+              <li><b>Step 3</b> (center ko average pe le jaana) → J kam hota hai, kyunki average hi woh jagah hai jahan squares ka total sabse kam hota hai.</li>
+              <li>Isliye J har round ya to ghatega ya same rahega — kabhi nahi badhega. Badhe to code mein bug hai!</li>
+            </ul></div>
+            <p>Pichle page ka example yaad hai? Aakhri groups {1,2,3} center 2 aur {10,11,12} center 11. Dooriyon ke square: 1, 0, 1, 1, 0, 1 → total 4 → J = 4/6 ≈ 0.67. Chhota number, matlab groups tight.</p>
+            <h4>Shuruaat kaise karein — random initialization</h4>
+            <div class="chat">
+              <p class="msg dost">K centers ke liye bas <strong>K random training points</strong> chun lo. Par badkismati se do centers ek hi group mein gir gaye to kya? Result kharab ho sakta hai — ek bada group do mein toot jaata hai, do alag group jud jaate hain.</p>
+              <p class="msg me">To?</p>
+              <p class="msg dost">Lottery ek baar nahi, kai baar kheelo! K-means ko 50–1000 baar alag random shuruaat se chalao, har baar J note karo, aur jiska <strong>J sabse kam</strong> ho woh result rakh lo.</p>
+            </div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Try</th><th>Final J</th><th></th></tr>
+              <tr><td>1</td><td>2.9</td><td class="bad">do group mix ho gaye</td></tr>
+              <tr><td>2</td><td>0.67</td><td class="good">best ✓ — ye rakho</td></tr>
+              <tr><td>3</td><td>0.67</td><td>same achha</td></tr>
+              <tr><td>4</td><td>1.8</td><td></td></tr>
+            </table></div>
+            <h4>K kitna rakhein?</h4>
+            <div class="compare-grid">
+              <div><b>Elbow method</b>K = 1, 2, 3 … ke liye J plot karo. J hamesha ghatega, par ek jagah ghatna achanak dheema hota hai — graph mein “kohni” (elbow). Wahan ka K. Par aksar kohni saaf dikhti hi nahi.</div>
+              <div><b>Kaam ke hisaab se (better)</b>Groups kis kaam aayenge? T-shirt ke liye K = 3 (S, M, L) sasta banega; K = 5 (XS–XL) better fit par zyada kharcha. Business trade-off se chuno.</div>
+            </div>
+            <div class="mistake"><b>Galti mat karna:</b> Sirf “sabse kam J” dekh ke K mat chuno. K badhaoge to J hamesha kam hoga — har point ka apna group ho to J = 0, par woh bekaar hai.</div>
+
+            <h4>Elbow method ka realistic example</h4>
+            <div class="chat"><p class="msg me">Elbow graph mein kohni clear na dikhe to kya karun?</p><p class="msg dost">Bahut baar clear nahi dikhti. Tab graph ko hint samjho, final judge nahi. Use-case bhi dekho: kya 4 groups business mein samajh aate hain ya 7?</p></div>
+            <div class="table-wrap"><table class="calc"><tr><th>K</th><th>Final J</th><th>Drop from previous</th><th>Reading</th></tr><tr><td>1</td><td>120</td><td>—</td><td>Sab ek group</td></tr><tr><td>2</td><td>55</td><td>65</td><td>Bada improvement</td></tr><tr><td>3</td><td>30</td><td>25</td><td>Still useful</td></tr><tr><td>4</td><td>24</td><td>6</td><td>Improvement slow</td></tr><tr><td>5</td><td>21</td><td>3</td><td>Marginal</td></tr></table></div>
+            <p>Yahan K = 3 ya 4 dono defendable hain. Agar product team 3 plans (Basic, Plus, Pro) banana chahti hai, K = 3. Agar operations 4 delivery zones handle kar sakti hai, K = 4 try karo.</p>
+            <div class="lesson-callout"><b>Seed fix:</b> Demo ya report ke liye random seed fix karo taaki result repeat ho. Experiment mein multiple seeds try karo taaki bad initialization se bach sako.</div>
+            <h4>Bad initialization se local optimum</h4>
+            <p>K-means perfect global answer guarantee nahi karta. Galat shuruaat se “theek-thaak par best nahi” result pe settle ho sakta hai.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Run</th><th>Initial centers</th><th>Final J</th><th>Decision</th></tr><tr><td>A</td><td>Dono left cluster mein</td><td>14.2</td><td class="bad">Weak</td></tr><tr><td>B</td><td>Alag natural groups mein</td><td>3.1</td><td class="good">Keep</td></tr><tr><td>C</td><td>Ek outlier ke paas</td><td>8.7</td><td>Not best</td></tr></table></div>
+            <p>Multiple random starts cheap insurance hain. Production mein <code>n_init</code> jaisi setting check karo.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Distortion kam karo, kai random starts try karke best rakho, aur K kaam ki zaroorat se chuno.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Har baar alag result kyu aata hai?</summary><p>Random shuruaat ki wajah se. Kai baar chala ke best J wala lo — ya code mein random “seed” fix karo taaki result dobara same aaye.</p></details>
+            <details class="qa"><summary>Kya K-means ke alawa bhi clustering methods hain?</summary><p>Haan — DBSCAN, hierarchical clustering, Gaussian mixtures aur bhi options hain. K-means sabse simple aur popular shuruaat hai, isliye pehle ise pakad lo.</p></details>
+
+            <details class="qa"><summary>K badhaane se J hamesha kyu ghatta hai?</summary><p>Zyada centers matlab points ko paas center milne ka chance zyada. Extreme case: har point apna center, J = 0. Isliye J alone se K choose nahi karte.</p></details>
+            <details class="qa"><summary>K-means non-spherical groups pe kaisa hai?</summary><p>Kamzor. K-means round-ish clusters pasand karta hai. Moon-shape, uneven density, ya weird shapes ho to DBSCAN/hierarchical better ho sakte hain.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>K-means ka cost kisi round mein badh sakta hai?</summary><p><b>Nahi</b>. Badhe to code mein bug.</p></details>
+              <details class="qa"><summary>3 runs ke final J: 5, 2, 8. Kaunsa rakhoge?</summary><p>J = <b>2</b> wala.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="u3"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="k-means.html"><small>← Pichhla</small>K-means algorithm</a>
+          <a class="pager-next" href="anomaly-gaussian.html"><small>Agla →</small>Anomaly detection aur Gaussian</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

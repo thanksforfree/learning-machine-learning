@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="L2 regularization: Weights ko chhota rakhne ki saza. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>L2 regularization (DL · 2) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-improving-networks.html">DL · 2: Improving Deep Neural Networks</a> › Topic 2 / 15</nav>
+        <p class="eyebrow">DL · 2 · TOPIC 02 · REGULARIZATION</p>
+        <h1>L2 regularization</h1>
+        <p>Weights ko chhota rakhne ki saza</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 2 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="i1" href="dl-train-dev-test-bias-variance.html"><span>01</span>Train/dev/test aur bias-variance</a>
+            <a data-topic-link="i2" class="current" aria-current="page" href="dl-l2-regularization.html"><span>02</span>L2 regularization</a>
+            <a data-topic-link="i3" href="dl-dropout.html"><span>03</span>Dropout</a>
+            <a data-topic-link="i4" href="dl-augmentation-early-stopping.html"><span>04</span>Data augmentation aur early stopping</a>
+            <a data-topic-link="i5" href="dl-normalizing-inputs.html"><span>05</span>Inputs normalize karna</a>
+            <a data-topic-link="i6" href="dl-vanishing-exploding-init.html"><span>06</span>Vanishing/exploding gradients aur weight initialization</a>
+            <a data-topic-link="i7" href="dl-gradient-checking.html"><span>07</span>Gradient checking</a>
+            <a data-topic-link="i8" href="dl-mini-batch.html"><span>08</span>Mini-batch gradient descent</a>
+            <a data-topic-link="i9" href="dl-exponentially-weighted-averages.html"><span>09</span>Exponentially weighted averages</a>
+            <a data-topic-link="i10" href="dl-momentum-rmsprop-adam.html"><span>10</span>Momentum, RMSprop aur Adam</a>
+            <a data-topic-link="i11" href="dl-learning-rate-decay-local-optima.html"><span>11</span>Learning rate decay aur local optima ka sach</a>
+            <a data-topic-link="i12" href="dl-hyperparameter-tuning.html"><span>12</span>Hyperparameter tuning ka tareeka</a>
+            <a data-topic-link="i13" href="dl-batch-normalization.html"><span>13</span>Batch normalization</a>
+            <a data-topic-link="i14" href="dl-softmax-regression.html"><span>14</span>Softmax regression</a>
+            <a data-topic-link="i15" href="dl-frameworks-tensorflow.html"><span>15</span>Deep learning frameworks aur TensorFlow</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15"><span>DL · 2 progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Overfitting ka sabse standard ilaaj. Dropout ya kuch bhi fancy try karne se pehle ye aata hai.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z12" href="maths-norms-similarity.html"><small>Maths</small>Norms, distance aur cosine similarity</a></div></div>
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Logistic regression mein L2 (aur L1 kya karta hai)</li><li>Neural network mein Frobenius norm</li><li>Backprop mein extra term aur “weight decay” naam kyu</li><li>Regularization overfitting kaise ghataata hai — do intuitions</li><li>Debug karte waqt cost mein regularization term bhi plot karna</li></ul></details>
+        <article class="lesson-card single" id="i2">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Mera model train pe mast, dev pe thoda drama. Overfit lag raha hai. Ab kya?</p>
+              <p class="msg dost">Socho school ka topper har answer mein 4 page likhta hai. Teacher bole: “Bhai, point pe aao.” L2 regularization bhi weights ko wahi bolta hai.</p>
+              <p class="msg me">Weights ko chhota rakhne se overfitting kaise rukta hai?</p>
+              <p class="msg dost">Bade weights model ko bahut tez, tedha-medha decision boundary banane dete hain. L2 bolta hai: useful pattern seekho, par hawa mein talwar mat ghumaao.</p>
+            </div>
+            <h4>Logistic regression mein L2</h4>
+            <p>Normal cost training errors ka average hota hai. L2 usme ek extra fine jodta hai: weights bade honge to fine zyada. Bias <code>b</code> ko aam taur pe fine nahi karte, kyunki b sirf whole line ko shift karta hai.</p>
+            <div class="formula"><code>J = normal cost + (λ / 2m) × Σ wⱼ²</code><ul>
+              <li><b>λ</b> (lambda) = regularization ki strength, knob tum choose karte ho</li>
+              <li><b>m</b> = training examples ki count</li>
+              <li><b>Σ wⱼ²</b> = saare weights ke squares ka total</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Example</th><th>Value</th></tr>
+              <tr><td>m = 4, λ = 0.2, weights = [3, 4]</td><td>Σw² = 9 + 16 = 25</td></tr>
+              <tr><td>Extra L2 fine</td><td>0.2 ÷ (2 × 4) × 25 = <b>0.625</b></td></tr>
+            </table></div>
+            <p>L1 regularization thoda alag hai: <code>Σ |wⱼ|</code>. Ye kai weights ko exactly zero bana sakta hai, matlab feature selection jaisa effect. Deep learning mein everyday default L2 zyada common hai.</p>
+            <h4>Neural network mein Frobenius norm</h4>
+            <p>Network mein weights matrix hote hain: W[1], W[2], ... L2 ka same idea matrix pe lagta hai. Matrix ke saare numbers square karo, add karo. Isko <strong>Frobenius norm squared</strong> bolte hain. Naam fancy hai, kaam simple: poori weight table ki “energy” naapna.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 420 180" role="img" aria-label="Weight matrix ke entries square karke total regularization fine banate hain">
+                <rect x="35" y="35" width="130" height="95" rx="10" fill="#edf3ff" stroke="#3567e8"/>
+                <g font-size="11" text-anchor="middle" fill="#24324a">
+                  <text x="70" y="68">2</text><text x="105" y="68">−1</text><text x="140" y="68">0</text>
+                  <text x="70" y="100">3</text><text x="105" y="100">1</text><text x="140" y="100">−2</text>
+                </g>
+                <text x="100" y="150" font-size="11" text-anchor="middle" fill="#3567e8">W matrix</text>
+                <path d="M180,82 L235,82" stroke="#8a96aa" stroke-width="2"/><text x="207" y="72" font-size="11" text-anchor="middle" fill="#8a96aa">square + add</text>
+                <rect x="255" y="48" width="130" height="70" rx="10" fill="#e9f7f3" stroke="#159477"/>
+                <text x="320" y="78" font-size="11" text-anchor="middle" fill="#24324a">4+1+0+9+1+4</text>
+                <text x="320" y="98" font-size="11" text-anchor="middle" fill="#159477">= 19</text>
+              </svg>
+              <div class="cap">Frobenius norm squared bas matrix ke saare weight squares ka total hai.</div>
+            </figure>
+            <h4>Backprop mein extra term: weight decay</h4>
+            <p>L2 add karne ke baad gradient mein ek extra term aata hai: <code>(λ/m)W</code>. Update dekh ke naam samajh aata hai. Har step weight thoda shrink hota hai, isliye log isko <strong>weight decay</strong> bhi bolte hain.</p>
+            <div class="formula"><code>dW = dW_from_loss + (λ/m)W
+W := W − αdW</code><ul>
+              <li><b>dW_from_loss</b> = normal backprop se aaya slope</li>
+              <li><b>(λ/m)W</b> = L2 ki wajah se shrink karne wali push</li>
+              <li><b>α</b> = learning rate</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>W</th><th>dW loss</th><th>λ/m × W</th><th>Naya W, α = 0.1</th></tr>
+              <tr><td>5</td><td>0.4</td><td>(0.6/10)×5 = 0.3</td><td>5 − 0.1×0.7 = <b>4.93</b></td></tr>
+            </table></div>
+            <pre class="code">m = X.shape[1]
+lambd = 0.6
+dW = dW_from_backprop + (lambd / m) * W  <span class="cm"># L2 ka extra push</span>
+W = W - learning_rate * dW               <span class="cm"># weight thoda decay hota</span></pre>
+            <h4>Overfitting kaise ghat-ta hai — do intuitions</h4>
+            <div class="compare-grid">
+              <div><b>Boundary smooth hoti</b>Bade weights model ko har chhoti noise ke around bend karwa dete hain. L2 boundary ko “thoda shaant” rakhta hai.</div>
+              <div><b>Neurons kam dramatic</b>Weights chhote honge to z values moderate rahenge. Network har input pe extreme confidence nahi dikhayega.</div>
+            </div>
+            <p>Ek aur view: λ bahut bada kar diya to weights almost zero. Network ke layers weak signal bhejenge, aur model simple ho jayega. Simple model overfit kam karega, par zyada simple hua to underfit.</p>
+            <div class="visual-flow"><span>λ chhota<br><small>flexible, overfit risk</small></span><b>→</b><span class="flow-highlight">λ sahi<br><small>dev error low</small></span><b>→</b><span>λ bahut bada<br><small>underfit</small></span></div>
+            <h4>Debug: cost plot mein regularization term bhi jodo</h4>
+            <p>Agar tum training cost print kar rahe ho, to same cost print karo jisko model optimize kar raha hai. L2 use kar rahe ho aur plot mein regularization term bhool gaye, to graph misleading ho sakta hai. Loss wala part kabhi-kabhi down ja raha, par total objective different behave kar raha hoga.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Regularization lagate waqt dev/test cost report karne ka tareeka consistent rakho. Training ke optimizer objective mein L2 hota hai; model performance compare karte waqt aksar raw prediction loss/metric bhi alag se dekhte hain.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> L2 model ko “pattern seekho, par weights ko hero mat banao” wali gentle warning deta hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>λ ka best value kaise choose karun?</summary><p>Dev set pe try karo: 0, 0.01, 0.03, 0.1, 0.3, 1... Log scale pe. Train pe nahi, dev pe decide.</p></details>
+            <details class="qa"><summary>Bias b ko regularize kyu nahi karte?</summary><p>b poori boundary ko shift karta hai, complexity zyada nahi badhata. Regularize kar bhi do to usually farak chhota, par standard practice b ko chhodna hai.</p></details>
+            <details class="qa"><summary>L2 aur dropout saath use kar sakte hain?</summary><p>Haan, par pehle simple rakho. L2 se start karo, phir zaroorat ho to dropout add karo. Har knob ek saath ghumaya to diagnosis mushkil ho jayega.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>m = 5, λ = 0.1, weights [2, −1, 3]. L2 extra cost?</summary><p>Σw² = 4 + 1 + 9 = 14. Extra = 0.1 ÷ (2×5) × 14 = 0.14. <b>final answer: 0.14</b>.</p></details>
+              <details class="qa"><summary>λ bahut bada kar diya. Train error bhi badh gaya. Kya hua?</summary><p>Model ko bahut zyada simple bana diya. Ye <b>high bias / underfitting</b> ki taraf ja raha hai.</p></details>
+              <details class="qa"><summary>L1 kya special kar sakta hai?</summary><p>Kai weights exactly zero kar sakta hai, isliye kuch features effectively ignore ho jaate hain.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="i2"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-train-dev-test-bias-variance.html"><small>← Pichhla</small>Train/dev/test aur bias-variance</a>
+          <a class="pager-next" href="dl-dropout.html"><small>Agla →</small>Dropout</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

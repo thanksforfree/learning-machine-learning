@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Deep kyu? Building blocks, parameters aur hyperparameters: Poora network ek saath jodna. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Deep kyu? Building blocks, parameters aur hyperparameters (DL · 1) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-blue">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-neural-networks.html">DL · 1: Neural Networks and Deep Learning</a> › Topic 11 / 11</nav>
+        <p class="eyebrow">DL · 1 · TOPIC 11 · DEEP NETWORK</p>
+        <h1>Deep kyu? Building blocks, parameters aur hyperparameters</h1>
+        <p>Poora network ek saath jodna</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 1 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="n1" href="dl-what-is-deep-learning.html"><span>01</span>Deep learning kya hai, aur ab hi kyu chal pada?</a>
+            <a data-topic-link="n2" href="dl-binary-classification.html"><span>02</span>Binary classification aur notation</a>
+            <a data-topic-link="n3" href="dl-logistic-regression-neuron.html"><span>03</span>Logistic regression — ek neuron wala network</a>
+            <a data-topic-link="n4" href="dl-computation-graph.html"><span>04</span>Gradient descent aur computation graph</a>
+            <a data-topic-link="n5" href="dl-logistic-gradients.html"><span>05</span>Logistic regression ke gradients</a>
+            <a data-topic-link="n6" href="dl-vectorization.html"><span>06</span>Vectorization aur broadcasting</a>
+            <a data-topic-link="n7" href="dl-shallow-network.html"><span>07</span>Shallow neural network: ek hidden layer</a>
+            <a data-topic-link="n8" href="dl-activation-functions.html"><span>08</span>Activation functions aur unke derivatives</a>
+            <a data-topic-link="n9" href="dl-shallow-backprop.html"><span>09</span>Shallow network ka backprop aur random initialization</a>
+            <a data-topic-link="n10" href="dl-deep-network.html"><span>10</span>Deep L-layer network aur dimensions</a>
+            <a data-topic-link="n11" class="current" aria-current="page" href="dl-why-deep-building-blocks.html"><span>11</span>Deep kyu? Building blocks, parameters aur hyperparameters</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11"><span>DL · 1 progress</span><strong data-progress-label>0 / 11 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Course 1 ka final picture: deep network har layer ke forward-backward blocks se kaise banta hai, aur kaunsi cheezein tumhe khud chunni padti hain.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Deep representation: edges → parts → chehra; awaaz → sounds → shabd</li><li>Circuit theory wala intuition: gehra network kam neurons mein kaam karta hai</li><li>Forward aur backward blocks, cache ka role</li><li>Layer l ka backward: dZ, dW, db, dA[l−1]</li><li>Parameters (W, b) vs hyperparameters (α, iterations, L, n[l], activation)</li><li>Deep learning ek experiment wala process hai</li><li>Dimaag wali analogy — kitni sahi, kitni nahi</li></ul></details>
+        <article class="lesson-card single" id="n11">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Course 1 ke end pe mujhe big picture chahiye. Deep network actually fayda kyu deta hai?</p>
+              <p class="msg dost">Socho tum face pehchan rahe ho. Pehle lines, phir aankh-naak, phir poora chehra. Deep layers waise hierarchy bana sakti hain.</p>
+              <p class="msg me">Matlab har layer previous layer ki language pe build karti hai?</p>
+              <p class="msg dost">Exactly. Raw pixels se directly “Suraj bhai” bolna mushkil; edges aur parts ke through jaana easier ho sakta hai.</p>
+              <p class="msg me">Aur implementation mein har layer alag headache?</p>
+              <p class="msg dost">Nahi. Forward block, cache, backward block. Same lego brick baar-baar.</p>
+              <p class="msg me">Brain analogy kitni seriously leni hai?</p>
+              <p class="msg dost">Inspiration tak. Biology ka exact copy nahi. Hum maths wali machine samajh rahe hain, brain ka medical model nahi.</p>
+            </div>
+            <h4>Deep representation: chhote se bada</h4>
+            <p>Photo mein early layers edges ya colour blobs pakad sakti hain. Middle layers parts: aankh, wheel, handle. Later layers object: chehra, car, cup. Audio mein low-level sounds se syllables, phir words. Ye exact guarantee nahi, par useful intuition hai: layers raw data ko increasingly meaningful representation mein badalti hain.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 440 190" role="img" aria-label="Deep representation edges se parts se object tak banti hai">
+                <rect x="25" y="55" width="70" height="75" rx="12" fill="#edf3ff" stroke="#3567e8"/>
+                <rect x="135" y="55" width="70" height="75" rx="12" fill="#f2edff" stroke="#7653d6"/>
+                <rect x="245" y="55" width="70" height="75" rx="12" fill="#fff3ec" stroke="#e0703a"/>
+                <rect x="355" y="55" width="60" height="75" rx="12" fill="#e9f7f3" stroke="#159477"/>
+                <g stroke="#8a96aa" stroke-width="2" fill="none"><path d="M95,92 H135"/><path d="M205,92 H245"/><path d="M315,92 H355"/></g>
+                <g font-size="11" text-anchor="middle" fill="#273142"><text x="60" y="85">pixels</text><text x="60" y="105">raw</text><text x="170" y="85">edges</text><text x="170" y="105">lines</text><text x="280" y="85">parts</text><text x="280" y="105">eyes/wheel</text><text x="385" y="93">object</text></g>
+              </svg>
+              <div class="cap">Depth representation ko stages mein banane deti hai.</div>
+            </figure>
+            <h4>Circuit intuition: depth kab efficient hoti hai</h4>
+            <p>Kuch functions ko shallow network bahut saare neurons se approximate karega, par deep network repeated building blocks reuse karke kam units mein kar sakta hai. Jaise tournament winner nikaalna: pehle pairs compare, phir winners compare. Flat design mein sab comparisons ek saath messy ho jaate.</p>
+            <div class="lesson-callout"><b>Simple intuition:</b> Agar problem naturally steps mein toot sakti hai, depth us structure ko represent karne mein help kar sakti hai.</div>
+            <h4>Forward-backward blocks aur cache</h4>
+            <p>Deep network implementation ka clean style: har layer ka forward function Z, A banata hai aur cache store karta hai. Backward function upstream gradient dA leta hai, cache se Z/A previous values nikaalta hai, aur dZ, dW, db, dA_prev return karta hai.</p>
+            <div class="formula"><code>Forward l: A[l−1] → Z[l] → A[l]
+Backward l: dA[l] → dZ[l] → dW[l], db[l], dA[l−1]</code><ul>
+              <li><b>cache</b> = forward ki saved values, jaise A[l−1], W[l], b[l], Z[l]</li>
+              <li><b>dA[l−1]</b> = previous layer ko bhejne wala gradient</li>
+            </ul></div>
+            <div class="visual-flow"><span>Linear forward</span><b>→</b><span>Activation forward</span><b>↻</b><span class="flow-highlight">Activation backward</span><b>→</b><span>Linear backward</span></div>
+            <h4>Layer l ka backward kya deta hai?</h4>
+            <p>Backward block current layer ki zimmedari nikaalta hai: dZ, dW, db, aur previous layer ko bhejne ke liye dA[l−1].</p>
+            <pre class="code">def layer_backward(dA, cache):
+    A_prev, W, b, Z = cache
+    dZ = activation_backward(dA, Z)
+    dW = np.dot(dZ, A_prev.T) / m
+    db = np.sum(dZ, axis=1, keepdims=True) / m
+    dA_prev = np.dot(W.T, dZ)
+    return dA_prev, dW, db</pre>
+            <h4>Parameters vs hyperparameters</h4>
+            <p><strong>Parameters</strong> woh values hain jo training data se seekhi jaati hain: W aur b. <strong>Hyperparameters</strong> tum set karte ho: learning rate α, iterations, layers L, hidden units n[l], activation choice. Ye recipe ke knobs hain.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Type</th><th>Examples</th><th>Kaun choose karta?</th></tr>
+              <tr><td>Parameters</td><td>W[1], b[1], W[2], b[2]</td><td class="good">training algorithm</td></tr>
+              <tr><td>Hyperparameters</td><td>α, L, n[l], activation, iterations</td><td>tum / experiment</td></tr>
+            </table></div>
+            <h4>Parameter count mini example</h4>
+            <p>Network sizes [3, 4, 2, 1]. Count karo:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Layer</th><th>Weights</th><th>Biases</th><th>Total</th></tr>
+              <tr><td>1</td><td>4×3 = 12</td><td>4</td><td>16</td></tr>
+              <tr><td>2</td><td>2×4 = 8</td><td>2</td><td>10</td></tr>
+              <tr><td>3</td><td>1×2 = 2</td><td>1</td><td>3</td></tr>
+              <tr><td>Total</td><td>22</td><td>7</td><td class="good">29</td></tr>
+            </table></div>
+            <h4>Experiment wala process</h4>
+            <p>Deep learning mein pehli architecture perfect nahi hoti. Tum α try karte ho, hidden units badalte ho, layers adjust karte ho, dev set pe check karte ho. Ye jugaad nahi, professional workflow hai. Bas experiments disciplined hone chahiye: ek change, result note, next change.</p>
+            <h4>Dimaag wali analogy: kitni sahi?</h4>
+            <p>Neurons ka naam brain se inspired hai, par artificial neuron biological neuron ka tiny cartoon bhi nahi. Brain analogy motivation ke liye theek, technical reasoning ke liye math aur data pe bharosa karo. “Network ne socha” bolna casual hai; actually matrix operations aur learned parameters ka result hai.</p>
+            <h4>Experiment log rakhna bhi skill hai</h4>
+            <p>Deep learning random guessing nahi; disciplined experiments hai. Kya badla aur dev score kya aaya, ye note karo.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Run</th><th>Change</th><th>Dev error</th><th>Note</th></tr>
+              <tr><td>2</td><td>4 layers</td><td>10.5%</td><td class="good">better</td></tr>
+              <tr><td>3</td><td>α too high</td><td>unstable</td><td class="bad">loss uchhal raha</td></tr>
+            </table></div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Hyperparameter ko parameter mat bolo. Agar value gradient descent se update nahi ho rahi, woh usually hyperparameter hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Deep network reusable forward-backward blocks ka stack hai; training W,b seekhti hai, tum recipe ke knobs tune karte ho.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Cache memory zyada lega?</summary><p>Haan, training mein forward values store karni padti hain. Inference mein backward nahi hota, memory kam lag sakti hai.</p></details>
+            <details class="qa"><summary>Hyperparameters ka best value formula se milta hai?</summary><p>Aksar nahi. Good starting ranges hoti hain, phir dev set experiments se choose karte hain.</p></details>
+            <details class="qa"><summary>Cache inference time pe bhi chahiye?</summary><p>Nahi. Inference mein sirf forward pass hota hai. Cache mainly training ke backward pass ke liye hota hai.</p></details>
+            <details class="qa"><summary>Dimaag analogy harmful kab hoti hai?</summary><p>Jab hum assume kar lein ki network human jaise reason karta hai. Ise learned mathematical function samjho jo examples se patterns fit karta hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Network [5, 3, 1] mein total parameters?</summary><p>Layer 1: 3×5 + 3 = 18. Layer 2: 1×3 + 1 = 4. Total = <b>22</b>.</p></details>
+              <details class="qa"><summary>Learning rate α parameter hai ya hyperparameter?</summary><p><b>Hyperparameter</b>. Tum choose karte ho; gradient descent ise learn nahi karta.</p></details>
+              <details class="qa"><summary>Cache ka ek example kya store karega?</summary><p>A_prev, W, b, Z jaise forward values, taaki backward mein gradients nikal sakein.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="n11"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-deep-network.html"><small>← Pichhla</small>Deep L-layer network aur dimensions</a>
+          <a class="pager-next" href="dl-train-dev-test-bias-variance.html"><small>Agla · DL · 2 →</small>Train/dev/test aur bias-variance</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

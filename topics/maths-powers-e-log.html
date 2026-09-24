@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Power, e aur log: Sigmoid aur log loss ki chaabi. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Power, e aur log (Maths) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a class="active" href="../maths.html">Maths</a><a href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../maths.html">Maths: Maths — zero se deep learning tak</a> › Topic 4 / 16</nav>
+        <p class="eyebrow">MATHS · TOPIC 04 · LEVEL 1 · PEHLA KADAM</p>
+        <h1>Power, e aur log</h1>
+        <p>Sigmoid aur log loss ki chaabi</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>Maths ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="z1" href="maths-symbols.html"><span>01</span>Symbols aur formula padhna</a>
+            <a data-topic-link="z2" href="maths-graphs.html"><span>02</span>Graph, line aur slope</a>
+            <a data-topic-link="z3" href="maths-functions.html"><span>03</span>Function = input-output machine</a>
+            <a data-topic-link="z4" class="current" aria-current="page" href="maths-powers-e-log.html"><span>04</span>Power, e aur log</a>
+            <a data-topic-link="z5" href="maths-average-probability.html"><span>05</span>Average, phailaav aur probability</a>
+            <a data-topic-link="z6" href="maths-vectors-matrices.html"><span>06</span>Vectors, matrices aur dot product</a>
+            <a data-topic-link="z7" href="maths-slope-derivative.html"><span>07</span>Slope, derivative aur chain rule</a>
+            <a data-topic-link="z8" href="maths-python-numpy.html"><span>08</span>Python aur NumPy crash course</a>
+            <a data-topic-link="z9" href="maths-broadcasting-shapes.html"><span>09</span>Broadcasting, shapes aur reshape</a>
+            <a data-topic-link="z10" href="maths-computation-graph.html"><span>10</span>Computation graph aur activation ke derivatives</a>
+            <a data-topic-link="z11" href="maths-matrix-gradients.html"><span>11</span>Matrix gradients aur dimensions ka hisaab</a>
+            <a data-topic-link="z12" href="maths-norms-similarity.html"><span>12</span>Norms, distance aur cosine similarity</a>
+            <a data-topic-link="z13" href="maths-moving-average.html"><span>13</span>Exponentially weighted (moving) average</a>
+            <a data-topic-link="z14" href="maths-probability-2.html"><span>14</span>Probability level 2: conditional, likelihood, cross-entropy</a>
+            <a data-topic-link="z15" href="maths-randomness-scale.html"><span>15</span>Randomness, variance aur scale</a>
+            <a data-topic-link="z16" href="maths-convolution.html"><span>16</span>Convolution: sliding dot product</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="z1,z2,z3,z4,z5,z6,z7,z8,z9,z10,z11,z12,z13,z14,z15,z16"><span>Maths progress</span><strong data-progress-label>0 / 16 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Sigmoid (logistic regression), softmax (multiclass) aur log loss (classification cost) — teeno e aur log pe chalte hain. Shape samajh gaye to formulas apne aap samajh aayenge.</div>
+        
+        
+        <article class="lesson-card single" id="z4">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Sigmoid mein e aur log loss mein log aaya. Ye dono kya bala hain?</p>
+              <p class="msg dost">Dono ek hi parivaar ke hain — <strong>power</strong> (ghaat) wale. Pehle power samjho, baaki apne aap samajh aayega.</p>
+              <p class="msg me">e dekh ke thoda alien jaisa feel aa raha hai.</p>
+              <p class="msg dost">Normal hai. e ko abhi bas “growth ka special number” treat karo. Naam ajeeb hai, kaam seedha hai.</p>
+            </div>
+            <h4>Power = baar baar multiply</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Likha</th><th>Matlab</th><th>Answer</th></tr>
+              <tr><td>2³</td><td>2 × 2 × 2</td><td>8</td></tr>
+              <tr><td>10²</td><td>10 × 10</td><td>100</td></tr>
+              <tr><td>5¹</td><td>bas 5</td><td>5</td></tr>
+              <tr><td>7⁰</td><td>kisi bhi (non-zero) number ki power 0</td><td>1</td></tr>
+              <tr><td>2⁻¹</td><td>ulta: 1 ÷ 2</td><td>0.5</td></tr>
+              <tr><td>10⁻³</td><td>1 ÷ 1000</td><td>0.001</td></tr>
+            </table></div>
+            <p><strong>Negative power = divide</strong>. Ye yaad rakho, sigmoid mein e<sup>−z</sup> aata hai. Code mein <strong>1e-3</strong> dikhe to ghabrana nahi: matlab 1 × 10⁻³ = 0.001 (jaise learning_rate=1e-3). Programmer log shortcut pasand karte hain, bas.</p>
+            <h4>Power kitni tezi se badhti hai — ye mehsoos karo</h4>
+            <div class="chat">
+              <p class="msg dost">Ek kahani: tumhe roz paisa double milega, pehle din ₹1. Din 10 pe ₹512. Din 20 pe ₹5 lakh+. Din 30 pe ₹53 crore+! Isko <strong>exponential growth</strong> kehte hain — shuru mein dheere, phir rocket.</p>
+            </div>
+            <h4>e — ek khaas number</h4>
+            <p><strong>e ≈ 2.718</strong>. Jaise π ≈ 3.14 ek khaas number hai (circle ke liye), waise e ek khaas number hai (growth ke liye). Tumhe iski value yaad nahi rakhni — bas iska behaviour:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>z</th><th>−4</th><th>−2</th><th>0</th><th>1</th><th>2</th><th>4</th></tr>
+              <tr><td>e<sup>z</sup></td><td>0.018</td><td>0.14</td><td>1</td><td>2.72</td><td>7.39</td><td>54.6</td></tr>
+            </table></div>
+            <div class="compare-grid">
+              <div><b>e<sup>z</sup> hamesha positive</b>Kabhi 0 ya negative nahi. Isliye softmax isse sab scores ko positive banata hai.</div>
+              <div><b>z bada → e<sup>z</sup> bahut bada</b>z negative → e<sup>z</sup> 0 ke paas. Isi se sigmoid 0 aur 1 ke beech rehta hai.</div>
+            </div>
+            <h4>Sigmoid ab samajh aayega</h4>
+            <div class="formula"><code>sigmoid(z) = 1 / (1 + e⁻ᶻ)</code><ul>
+              <li>z = 4: e⁻⁴ = 0.018 → 1 / 1.018 = <b>0.98</b></li>
+              <li>z = 0: e⁰ = 1 → 1 / 2 = <b>0.5</b></li>
+              <li>z = −4: e⁴ = 54.6 → 1 / 55.6 = <b>0.018</b></li>
+              <li>Neeche hamesha 1 + (positive number) → answer kabhi 1 se zyada nahi, kabhi 0 se kam nahi. Isliye probability ke liye perfect!</li>
+            </ul></div>
+            <h4>log — power ka ulta sawaal</h4>
+            <div class="chat">
+              <p class="msg me">Aur log?</p>
+              <p class="msg dost">Power puchhta hai: “2 ko 3 baar multiply karo to kya aayega?” → 8. Log <em>ulta</em> puchhta hai: “8 banane ke liye 2 ko kitni baar multiply karna padega?” → 3. Bas. log₂(8) = 3.</p>
+            </div>
+            <p>ML mein aam taur pe <strong>natural log</strong> (ln ya log) use hota hai jo e ke base pe hai. Tumhe shape yaad rakhni hai:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Number</th><th>1</th><th>0.5</th><th>0.1</th><th>0.01</th></tr>
+              <tr><td>log (natural)</td><td>0</td><td>−0.69</td><td>−2.30</td><td>−4.61</td></tr>
+              <tr><td>−log (ulta sign)</td><td class="good">0</td><td>0.69</td><td>2.30</td><td class="bad">4.61</td></tr>
+            </table></div>
+            <p>Dekho: number jitna <strong>0 ke paas</strong>, −log utna <strong>bada</strong>. Yahi log loss ka dil hai: sahi answer ko model ne bahut kam chance diya (0.01) → saza bahut badi (4.61).</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Power = baar-baar multiply. e<sup>z</sup> = hamesha positive growth. log = ulta sawaal; chhote chance pe −log bada ho jaata hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Calculator mein e aur log kaise?</summary><p>Python: <code>np.exp(2)</code> = 7.39, <code>np.log(0.5)</code> = −0.69. Haath se kabhi calculate nahi karna padega.</p></details>
+            <details class="qa"><summary>log(0) kya hai?</summary><p>Defined nahi — minus infinity ki taraf jaata hai. Isliye code mein kabhi-kabhi chhota sa number (1e-15) jod dete hain taaki log(0) na ho. TensorFlow ye khud sambhalta hai.</p></details>
+            <details class="qa"><summary>log se multiply wala kaam jodna ban jaata hai — ye kya hai?</summary><p>Ek property: log(a × b) = log(a) + log(b). Bahut chhote numbers ko multiply karne ki jagah unke log jodna computer ke liye zyada safe hai. Abhi bas jaan lo, zaroorat pe kaam aayega.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>10⁻² kitna hai?</summary><p>1 ÷ 100 = <b>0.01</b>.</p></details>
+              <details class="qa"><summary>sigmoid(0) kitna aur kyu?</summary><p>e⁰ = 1, to 1 ÷ (1 + 1) = <b>0.5</b>.</p></details>
+              <details class="qa"><summary>Sahi answer ko 0.9 chance diya vs 0.2 — kisme −log zyada?</summary><p>0.2 wale mein (≈ 1.61 vs ≈ 0.11). Kam chance = zyada saza.</p></details>
+            </div>
+            <div class="used-box"><h4>Ye maths aage kahan kaam aayegi</h4><div class="chips"><a class="chip" data-topic-link="s8" href="logistic-regression.html"><small>ML · 1</small>Logistic regression aur sigmoid</a><a class="chip" data-topic-link="s10" href="logistic-cost.html"><small>ML · 1</small>Logistic cost (log loss)</a><a class="chip" data-topic-link="a5" href="softmax-multiclass.html"><small>ML · 2</small>Multiclass aur softmax</a><a class="chip" data-topic-link="a11" href="decision-trees.html"><small>ML · 2</small>Decision tree, entropy aur information gain</a><a class="chip" data-topic-link="u11" href="reinforcement-learning-basics.html"><small>ML · 3</small>Reinforcement learning basics</a><a class="chip" data-topic-link="n3" href="dl-logistic-regression-neuron.html"><small>DL · 1</small>Logistic regression — ek neuron wala network</a><a class="chip" data-topic-link="i11" href="dl-learning-rate-decay-local-optima.html"><small>DL · 2</small>Learning rate decay aur local optima ka sach</a><a class="chip" data-topic-link="i14" href="dl-softmax-regression.html"><small>DL · 2</small>Softmax regression</a><a class="chip" data-topic-link="q8" href="dl-word2vec-negative-sampling.html"><small>DL · 5</small>Embedding matrix, Word2Vec aur negative sampling</a><a class="chip" data-topic-link="q11" href="dl-beam-refinements-bleu.html"><small>DL · 5</small>Beam search refinements, error analysis aur BLEU</a><a class="chip" data-topic-link="q12" href="dl-attention-model.html"><small>DL · 5</small>Attention model</a></div></div>
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="z4"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="maths-functions.html"><small>← Pichhla</small>Function = input-output machine</a>
+          <a class="pager-next" href="maths-average-probability.html"><small>Agla →</small>Average, phailaav aur probability</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

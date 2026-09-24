@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Network ban gaya — ab usko achha banana. Bias/variance, L2 aur dropout, initialization, gradient checking, mini-batches, momentum-RMSprop-Adam, hyperparameter search, batch norm, softmax aur TensorFlow.">
+  <title>DL · 2: Improving Deep Neural Networks — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="index.html">Learning map</a><a href="maths.html">Maths</a><a href="ml.html">ML</a><a class="active" href="dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="module-hero">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Learning map</a> › <a href="dl.html">Deep Learning Specialization</a></nav>
+      <p class="eyebrow">DL COURSE 2 • TUNING, REGULARIZATION, OPTIMIZATION</p>
+      <h1>Improving Deep Neural Networks</h1>
+      <p>Network ban gaya — ab usko achha banana. Bias/variance, L2 aur dropout, initialization, gradient checking, mini-batches, momentum-RMSprop-Adam, hyperparameter search, batch norm, softmax aur TensorFlow.</p>
+      <div class="module-path"><span>Diagnose</span> → <span>Regularize</span> → <span>Setup sahi karo</span> → <span>Tez optimize karo</span> → <span>Tune karo</span></div>
+      <div class="hero-actions"><a class="button button-primary" href="topics/dl-train-dev-test-bias-variance.html">Topic 01 se shuru karo →</a>
+      <div class="progress-box inline" data-module-topics="i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15"><span>Progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div></div>
+    </section>
+    <div class="module-overview">
+      <section class="lesson-group"><p class="eyebrow">SETUP AUR DIAGNOSIS</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="i1" href="topics/dl-train-dev-test-bias-variance.html">
+          <span class="topic-index">01</span>
+          <span class="topic-card-text"><b>Train/dev/test aur bias-variance</b><small>Big data ke zamane ke naye rules</small><em>Har sudhar se pehle pata hona chahiye ki problem kya hai. Ye page tumhe network ka doctor banata hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">REGULARIZATION</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="i2" href="topics/dl-l2-regularization.html">
+          <span class="topic-index">02</span>
+          <span class="topic-card-text"><b>L2 regularization</b><small>Weights ko chhota rakhne ki saza</small><em>Overfitting ka sabse standard ilaaj. Dropout ya kuch bhi fancy try karne se pehle ye aata hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="i3" href="topics/dl-dropout.html">
+          <span class="topic-index">03</span>
+          <span class="topic-card-text"><b>Dropout</b><small>Har baar kuch neurons ko chhutti</small><em>Computer vision jaise kaamon mein overfitting rokne ka bahut popular tareeka.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="i4" href="topics/dl-augmentation-early-stopping.html">
+          <span class="topic-index">04</span>
+          <span class="topic-card-text"><b>Data augmentation aur early stopping</b><small>Muft ka data aur sahi waqt pe rukna</small><em>Do aur hathiyaar overfitting ke khilaaf — ek sasta aur asardaar, doosra aasan par ek chhupi kamzori ke saath.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">OPTIMIZATION SETUP</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="i5" href="topics/dl-normalizing-inputs.html">
+          <span class="topic-index">05</span>
+          <span class="topic-card-text"><b>Inputs normalize karna</b><small>Training ko gol katori do</small><em>Ek chhota sa preprocessing step jo training ko kai guna tez kar sakta hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="i6" href="topics/dl-vanishing-exploding-init.html">
+          <span class="topic-index">06</span>
+          <span class="topic-card-text"><b>Vanishing/exploding gradients aur weight initialization</b><small>Gehre network ka sabse purana dushman</small><em>Jitna gehra network, utna ye problem. Sahi initialization se training shuru hi theek jagah se hoti hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="i7" href="topics/dl-gradient-checking.html">
+          <span class="topic-index">07</span>
+          <span class="topic-card-text"><b>Gradient checking</b><small>Apne backprop pe shak karo, aur check karo</small><em>Backprop mein chhota sa bug network ko chupchaap kharab train karta hai. Ye technique us bug ko pakadti hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">OPTIMIZATION ALGORITHMS</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="i8" href="topics/dl-mini-batch.html">
+          <span class="topic-index">08</span>
+          <span class="topic-card-text"><b>Mini-batch gradient descent</b><small>Poore data ka intezaar mat karo</small><em>Bade dataset pe training ka default tareeka. Har aage wala optimizer mini-batches pe hi chalta hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="i9" href="topics/dl-exponentially-weighted-averages.html">
+          <span class="topic-index">09</span>
+          <span class="topic-card-text"><b>Exponentially weighted averages</b><small>Momentum aur Adam ki neev</small><em>Aage ke teen optimizers isi ek idea pe khade hain.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="i10" href="topics/dl-momentum-rmsprop-adam.html">
+          <span class="topic-index">10</span>
+          <span class="topic-card-text"><b>Momentum, RMSprop aur Adam</b><small>Seedha gaddhe ki taraf, bina zig-zag</small><em>Adam aaj deep learning ka default optimizer hai. Ye page batata hai ki woh andar kya kar raha hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="i11" href="topics/dl-learning-rate-decay-local-optima.html">
+          <span class="topic-index">11</span>
+          <span class="topic-card-text"><b>Learning rate decay aur local optima ka sach</b><small>Kadam dheere-dheere chhote karo</small><em>Training ke end mein finesse, aur ek purana darr (local minimum) jo high dimensions mein utna bada nahi hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">HYPERPARAMETER TUNING</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="i12" href="topics/dl-hyperparameter-tuning.html">
+          <span class="topic-index">12</span>
+          <span class="topic-card-text"><b>Hyperparameter tuning ka tareeka</b><small>Grid nahi, random. Aur sahi scale pe.</small><em>Achha network aur average network mein aksar sirf sahi hyperparameters ka farak hota hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="i13" href="topics/dl-batch-normalization.html">
+          <span class="topic-index">13</span>
+          <span class="topic-card-text"><b>Batch normalization</b><small>Har layer ke andar bhi normalize karo</small><em>Batch norm se gehre networks tez aur stable train hote hain, aur hyperparameters ka chunaav kam nazuk ho jaata hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">MULTICLASS</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="i14" href="topics/dl-softmax-regression.html">
+          <span class="topic-index">14</span>
+          <span class="topic-card-text"><b>Softmax regression</b><small>C classes mein se ek</small><em>Binary se aage — digits, animals, kuch bhi. Deep learning ka standard multiclass output.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="i15" href="topics/dl-frameworks-tensorflow.html">
+          <span class="topic-index">15</span>
+          <span class="topic-card-text"><b>Deep learning frameworks aur TensorFlow</b><small>Backprop library ko karne do</small><em>Ab tak sab haath se kiya. Asli projects mein framework chahiye — aur uske andar kya ho raha hai, woh tum ab jaante ho.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <div class="next-module"><div><p class="eyebrow">IS COURSE KE BAAD</p><h2>Structuring Machine Learning Projects</h2><p>Code nahi, soch. Kaunsa idea pehle try karein, metric kaise chunein, human-level se tulna, error analysis, alag distribution ka data, transfer aur multi-task learning, aur end-to-end kab.</p></div><a class="button button-primary" href="dl-structuring-projects.html">DL · 3 dekho →</a></div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

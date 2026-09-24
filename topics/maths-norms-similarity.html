@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Norms, distance aur cosine similarity: Vector kitna bada hai, do vectors kitne milte-julte hain. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Norms, distance aur cosine similarity (Maths) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a class="active" href="../maths.html">Maths</a><a href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../maths.html">Maths: Maths — zero se deep learning tak</a> › Topic 12 / 16</nav>
+        <p class="eyebrow">MATHS · TOPIC 12 · LEVEL 3 · DEEP LEARNING KI MATHS</p>
+        <h1>Norms, distance aur cosine similarity</h1>
+        <p>Vector kitna bada hai, do vectors kitne milte-julte hain</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>Maths ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="z1" href="maths-symbols.html"><span>01</span>Symbols aur formula padhna</a>
+            <a data-topic-link="z2" href="maths-graphs.html"><span>02</span>Graph, line aur slope</a>
+            <a data-topic-link="z3" href="maths-functions.html"><span>03</span>Function = input-output machine</a>
+            <a data-topic-link="z4" href="maths-powers-e-log.html"><span>04</span>Power, e aur log</a>
+            <a data-topic-link="z5" href="maths-average-probability.html"><span>05</span>Average, phailaav aur probability</a>
+            <a data-topic-link="z6" href="maths-vectors-matrices.html"><span>06</span>Vectors, matrices aur dot product</a>
+            <a data-topic-link="z7" href="maths-slope-derivative.html"><span>07</span>Slope, derivative aur chain rule</a>
+            <a data-topic-link="z8" href="maths-python-numpy.html"><span>08</span>Python aur NumPy crash course</a>
+            <a data-topic-link="z9" href="maths-broadcasting-shapes.html"><span>09</span>Broadcasting, shapes aur reshape</a>
+            <a data-topic-link="z10" href="maths-computation-graph.html"><span>10</span>Computation graph aur activation ke derivatives</a>
+            <a data-topic-link="z11" href="maths-matrix-gradients.html"><span>11</span>Matrix gradients aur dimensions ka hisaab</a>
+            <a data-topic-link="z12" class="current" aria-current="page" href="maths-norms-similarity.html"><span>12</span>Norms, distance aur cosine similarity</a>
+            <a data-topic-link="z13" href="maths-moving-average.html"><span>13</span>Exponentially weighted (moving) average</a>
+            <a data-topic-link="z14" href="maths-probability-2.html"><span>14</span>Probability level 2: conditional, likelihood, cross-entropy</a>
+            <a data-topic-link="z15" href="maths-randomness-scale.html"><span>15</span>Randomness, variance aur scale</a>
+            <a data-topic-link="z16" href="maths-convolution.html"><span>16</span>Convolution: sliding dot product</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="z1,z2,z3,z4,z5,z6,z7,z8,z9,z10,z11,z12,z13,z14,z15,z16"><span>Maths progress</span><strong data-progress-label>0 / 16 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>L2 regularization, gradient checking, face recognition aur word embeddings — chaaron jagah vectors ki lambai ya unki doori naapni padti hai.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>L2 norm (lambai), L1 norm, squared L2</li><li>Frobenius norm — matrix ki “lambai”</li><li>Do vectors ke beech Euclidean distance</li><li>Cosine similarity: angle se similarity, −1 se 1 tak, numbers ke saath</li><li>Vector ko unit length pe normalize karna</li><li>Ye sab DL mein kahan-kahan aata hai</li></ul></details>
+        <article class="lesson-card single" id="z12">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Vector ki “lambai” ka kya matlab? Vector to list hai.</p>
+              <p class="msg dost">Map pe ek arrow socho. Right 3 kadam, up 4 kadam. Arrow ki seedhi lambai 5 hoti hai. Wahi vector norm.</p>
+              <p class="msg me">Aur similarity?</p>
+              <p class="msg dost">Do arrows same direction mein dekh rahe hain ya ulte? Cosine similarity angle se yahi batati hai.</p>
+            </div>
+            <h4>L2 norm, L1 norm, squared L2</h4>
+            <p>Vector <code>v = [3, −4]</code> lo. Ye ek chhota route hai: 3 right, 4 down.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Naam</th><th>Formula</th><th>v = [3, −4]</th><th>Feel</th></tr>
+              <tr><td>L2 norm</td><td><code>√Σvᵢ²</code></td><td>√(9 + 16) = <b>5</b></td><td>Seedhi arrow lambai</td></tr>
+              <tr><td>L1 norm</td><td><code>Σ|vᵢ|</code></td><td>|3| + |−4| = <b>7</b></td><td>Galiyon se chalna: right + down</td></tr>
+              <tr><td>Squared L2</td><td><code>Σvᵢ²</code></td><td>9 + 16 = <b>25</b></td><td>Root nahi, calculation easy</td></tr>
+            </table></div>
+            <figure class="figure">
+              <svg viewBox="0 0 360 190" role="img" aria-label="3-4-5 triangle showing vector L2 norm">
+                <line x1="60" y1="150" x2="260" y2="150" stroke="#b8c2d3"/>
+                <line x1="60" y1="150" x2="60" y2="40" stroke="#b8c2d3"/>
+                <line x1="60" y1="150" x2="210" y2="70" stroke="#3567e8" stroke-width="4"/>
+                <line x1="210" y1="70" x2="210" y2="150" stroke="#c2410c" stroke-dasharray="4 3"/>
+                <line x1="60" y1="150" x2="210" y2="150" stroke="#159477" stroke-width="3"/>
+                <g font-size="11"><text x="125" y="168" fill="#159477">3</text><text x="218" y="112" fill="#c2410c">4</text><text x="135" y="95" fill="#3567e8">L2 = 5</text></g>
+              </svg>
+              <div class="cap">L2 norm Pythagoras wali seedhi distance hai.</div>
+            </figure>
+            <h4>Frobenius norm — matrix ki lambai</h4>
+            <p>Matrix ke liye same idea: saare numbers square karo, jodo, root lo. Matrix <code>[[1,2],[2,2]]</code> ka Frobenius norm = √(1 + 4 + 4 + 4) = √13 ≈ <strong>3.606</strong>.</p>
+            <div class="formula"><code>||A||_F = √(Σ over all rows and columns Aᵢⱼ²)</code><ul>
+              <li>Neural network mein W matrix hota hai.</li>
+              <li>L2 regularization aksar W ke squared Frobenius norm ko cost mein add karta hai.</li>
+            </ul></div>
+            <h4>Euclidean distance — do vectors kitne door</h4>
+            <p>Distance mein pehle difference vector banao, phir L2 norm lo.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Do points</th><th>Difference</th><th>Distance</th></tr>
+              <tr><td><code>a = [1,2]</code>, <code>b = [4,6]</code></td><td><code>a − b = [-3,-4]</code></td><td>√(9 + 16) = <b>5</b></td></tr>
+            </table></div>
+            <h4>Cosine similarity — direction same hai?</h4>
+            <p>Distance size se affect hoti hai. Cosine similarity direction dekhti hai. Agar dono arrows same direction mein hain to 1, seedhe opposite to −1, 90° pe 0.</p>
+            <div class="formula"><code>cosine_similarity(a,b) = (a · b) ÷ (||a||₂ × ||b||₂)</code><ul>
+              <li><b>a · b</b> = dot product.</li>
+              <li><b>||a||₂</b> aur <b>||b||₂</b> = dono vectors ki L2 lambai.</li>
+              <li>Answer −1 se 1 ke beech hota hai.</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>a</th><th>b</th><th>Dot</th><th>Norms</th><th>Cosine</th></tr>
+              <tr><td>[1,2]</td><td>[2,1]</td><td>1×2 + 2×1 = 4</td><td>√5 aur √5</td><td>4 ÷ 5 = <b>0.8</b></td></tr>
+              <tr><td>[1,0]</td><td>[−1,0]</td><td>−1</td><td>1 aur 1</td><td><b>−1</b></td></tr>
+            </table></div>
+            <h4>Unit length pe normalize karna</h4>
+            <p>Normalize = vector ko apni lambai se divide karo. <code>[3,4]</code> ki L2 lambai 5 hai, to unit vector <code>[3/5, 4/5] = [0.6, 0.8]</code>. Ab lambai 1 ho gayi.</p>
+<pre class="code">import numpy as np
+
+v = np.array([3, 4])
+norm = np.linalg.norm(v)        <span class="cm"># 5.0</span>
+unit = v / norm                 <span class="cm"># [0.6, 0.8]</span>
+
+a = np.array([1, 2])
+b = np.array([2, 1])
+cos = np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+print(cos)                      <span class="cm"># 0.8</span></pre>
+            <h4>Deep learning mein ye kahan milega?</h4>
+            <ul>
+              <li><b>L2 regularization:</b> weights ki lambai chhoti rakhna.</li>
+              <li><b>Gradient checking:</b> numerical gradient aur backprop gradient ki distance compare karna.</li>
+              <li><b>Face recognition:</b> do face encodings ki distance.</li>
+              <li><b>Word embeddings:</b> cosine similarity se “king” aur “queen” jaise vectors compare karna.</li>
+            </ul>
+            <div class="mistake"><b>Dhyan rakhna:</b> Cosine similarity calculate karte waqt zero vector se divide nahi kar sakte. Norm 0 ho to direction defined hi nahi.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Norm = vector ki size, distance = do vectors ke beech ka gap, cosine = direction ki similarity.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>L1 aur L2 mein kaunsa better?</summary><p>“Better” problem pe depend karta hai. L2 smooth hai aur deep learning mein common. L1 kuch weights ko exact zero ki taraf push karta hai, jo sparse models mein useful hota hai.</p></details>
+            <details class="qa"><summary>Squared L2 kyu use karte hain?</summary><p>Root avoid ho jaata hai, derivative clean hota hai, aur bade weights ko zyada saza milti hai. Regularization mein ye convenient hai.</p></details>
+            <details class="qa"><summary>Cosine similarity distance se kab better?</summary><p>Jab size nahi, direction matter kare. Text embeddings mein sentence lamba-chhota ho sakta hai, par meaning direction se pakadna hota hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary><code>[6,8]</code> ka L2 norm?</summary><p>√(36 + 64) = √100 = <b>10</b>.</p></details>
+              <details class="qa"><summary><code>[1,0]</code> aur <code>[0,1]</code> ka cosine?</summary><p>Dot = 0, norms 1 aur 1. Cosine = <b>0</b>, matlab 90°.</p></details>
+              <details class="qa"><summary><code>[6,8]</code> ko unit vector banao.</summary><p>Norm 10. Divide karo: <code>[0.6, 0.8]</code>. Final <b>[0.6, 0.8]</b>.</p></details>
+            </div>
+            
+            <div class="used-box"><h4>Ye maths aage kahan kaam aayegi</h4><div class="chips"><a class="chip" data-topic-link="u2" href="k-means.html"><small>ML · 3</small>K-means algorithm</a><a class="chip" data-topic-link="u9" href="content-based-filtering.html"><small>ML · 3</small>Content-based filtering aur deep learning</a><a class="chip" data-topic-link="i2" href="dl-l2-regularization.html"><small>DL · 2</small>L2 regularization</a><a class="chip" data-topic-link="i7" href="dl-gradient-checking.html"><small>DL · 2</small>Gradient checking</a><a class="chip" data-topic-link="c14" href="dl-face-recognition.html"><small>DL · 4</small>Face recognition: one-shot, Siamese, triplet loss</a><a class="chip" data-topic-link="q7" href="dl-word-embeddings.html"><small>DL · 5</small>Word embeddings: shabdon ko matlab wale numbers</a><a class="chip" data-topic-link="q14" href="dl-transformer-self-attention.html"><small>DL · 5</small>Transformer intuition aur self-attention</a></div></div>
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="z12"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="maths-matrix-gradients.html"><small>← Pichhla</small>Matrix gradients aur dimensions ka hisaab</a>
+          <a class="pager-next" href="maths-moving-average.html"><small>Agla →</small>Exponentially weighted (moving) average</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

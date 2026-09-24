@@ -1,0 +1,100 @@
+            <div class="chat">
+              <p class="msg me">Convolution se feature maps ban gaye. Par pooling kyu daalte hain?</p>
+              <p class="msg dost">Pooling ko photo ka “summary mode” samjho. Har chhote area se sabse strong signal rakho, baaki detail thodi chhod do.</p>
+              <p class="msg me">Jaise class notes ka short version?</p>
+              <p class="msg dost">Haan. Agar 2×2 area mein kahin bhi strong edge mila, max pooling bolega: “haan bhai, yahan feature hai.” Exact pixel thoda idhar-udhar ho to bhi chalega.</p>
+              <p class="msg me">Iske weights hote hain?</p>
+              <p class="msg dost">Nahi. Pooling fixed operation hai. Na weights, na bias, na learning. Bas rule follow karta hai.</p>
+            </div>
+
+            <h4>Max pooling f = 2, s = 2</h4>
+            <p>2×2 window lo, maximum value rakho, phir 2 pixels ka kadam. Input 4×4 hai:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><td>1</td><td>3</td><td>2</td><td>4</td></tr>
+              <tr><td>5</td><td>6</td><td>1</td><td>2</td></tr>
+              <tr><td>0</td><td>2</td><td>8</td><td>1</td></tr>
+              <tr><td>3</td><td>1</td><td>2</td><td>9</td></tr>
+            </table></div>
+            <p>Har 2×2 block ka max:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Block</th><th>Values</th><th>Max</th></tr>
+              <tr><td>Top-left</td><td>1, 3, 5, 6</td><td>6</td></tr>
+              <tr><td>Top-right</td><td>2, 4, 1, 2</td><td>4</td></tr>
+              <tr><td>Bottom-left</td><td>0, 2, 3, 1</td><td>3</td></tr>
+              <tr><td>Bottom-right</td><td>8, 1, 2, 9</td><td>9</td></tr>
+            </table></div>
+            <p>Output:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><td>6</td><td>4</td></tr>
+              <tr><td>3</td><td>9</td></tr>
+            </table></div>
+
+            <h4>Average pooling aur parameters ka sach</h4>
+            <p>Average pooling max ki jagah average leta hai. Same top-left block ka average = (1 + 3 + 5 + 6)/4 = 3.75. Modern CNNs mein max pooling common tha; aaj kal kuch architectures stride convolution ya global average pooling use karte hain.</p>
+            <div class="formula"><code>Pooling output size = ⌊(n + 2p − f) / s⌋ + 1
+Parameters = 0</code><ul>
+              <li><b>f</b> = pooling window size</li>
+              <li><b>s</b> = stride</li>
+              <li><b>channels</b> = input jaise hi rehte hain; har channel pe pooling separately hoti hai</li>
+            </ul></div>
+
+            <figure class="figure">
+              <svg viewBox="0 0 430 185" role="img" aria-label="Max pooling feature map ko chhota karta hai">
+                <rect x="35" y="28" width="120" height="120" fill="#edf3ff" stroke="#3567e8"/>
+                <line x1="95" y1="28" x2="95" y2="148" stroke="#b8c2d3"/><line x1="35" y1="88" x2="155" y2="88" stroke="#b8c2d3"/>
+                <text x="95" y="168" font-size="11" text-anchor="middle" fill="#4b5871">4×4 feature map</text>
+                <path d="M175,88 L255,88" stroke="#7653d6" stroke-width="2" marker-end="url(#poolm)"/>
+                <defs><marker id="poolm" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#7653d6"/></marker></defs>
+                <text x="215" y="72" font-size="11" text-anchor="middle" fill="#7653d6">max in each 2×2</text>
+                <rect x="275" y="58" width="70" height="70" fill="#e9f7f3" stroke="#159477"/>
+                <line x1="310" y1="58" x2="310" y2="128" stroke="#b8c2d3"/><line x1="275" y1="93" x2="345" y2="93" stroke="#b8c2d3"/>
+                <text x="310" y="150" font-size="11" text-anchor="middle" fill="#4b5871">2×2 output</text>
+              </svg>
+              <div class="cap">Pooling spatial size kam karta hai, channels same rakhta hai, aur parameters zero hote hain.</div>
+            </figure>
+
+            <h4>LeNet-jaisa poora CNN</h4>
+            <p>Ab ek classic pattern dekhte hain: conv, pool, conv, pool, phir fully connected layers. Input 30×30×1 grayscale image maan lo.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Layer</th><th>Setting</th><th>Output</th><th>Parameters</th></tr>
+              <tr><td>Input</td><td>grayscale</td><td>30×30×1</td><td>0</td></tr>
+              <tr><td>Conv1</td><td>8 filters, 3×3, same</td><td>30×30×8</td><td>8 × (3×3×1 + 1) = 80</td></tr>
+              <tr><td>Pool1</td><td>2×2, s=2</td><td>15×15×8</td><td>0</td></tr>
+              <tr><td>Conv2</td><td>18 filters, 3×3, same</td><td>15×15×18</td><td>18 × (3×3×8 + 1) = 1,314</td></tr>
+              <tr><td>Pool2</td><td>2×2, s=2</td><td>7×7×18</td><td>0</td></tr>
+              <tr><td>FC1</td><td>882 to 64</td><td>64</td><td>64 × (882 + 1) = 56,512</td></tr>
+              <tr><td>FC2</td><td>64 to 32</td><td>32</td><td>32 × (64 + 1) = 2,080</td></tr>
+              <tr><td>Softmax</td><td>32 to 5</td><td>5</td><td>5 × (32 + 1) = 165</td></tr>
+              <tr><td colspan="3"><b>Total</b></td><td><b>60,151</b></td></tr>
+            </table></div>
+            <p>Note karo: conv layers spatial size ghatati hain aur channels badhati hain. End mein flatten karke dense layers class choose karti hain.</p>
+
+            <h4>Convolution kyu efficient hai?</h4>
+            <div class="compare-grid">
+              <div><b>Parameter sharing</b>Ek 5×5 filter ke same weights poori image pe use hote hain. Shirt ka button left mein ho ya right mein, detector same reh sakta hai.</div>
+              <div><b>Sparse connections</b>Ek output pixel sirf nearby input patch dekhta hai, poori image nahi. Local pattern ke liye local connection enough hai.</div>
+            </div>
+            <p>Dense layer mein har input pixel har neuron se connected hota. CNN bolta hai: “pehle local clues pakdo; global decision baad mein.” Ye photos ke nature se match karta hai.</p>
+
+            <h4>Translation invariance: thoda khisak gaya to bhi chalega</h4>
+            <p>Socho traffic sign image mein 3 pixels right shift ho gaya. Dense network ke liye input vector bilkul alag positions mein values dega. CNN mein same filter har jagah ghoomta hai, to woh sign ka edge right side pe bhi pakad lega. Pooling thodi aur tolerance de deta hai.</p>
+            <pre class="code"># One common CNN block
+model.add(Conv2D(16, kernel_size=3, activation="relu"))
+model.add(MaxPool2D(pool_size=2, strides=2))
+model.add(Conv2D(32, kernel_size=3, activation="relu"))
+model.add(MaxPool2D(pool_size=2, strides=2))</pre>
+
+            <div class="mistake"><b>Dhyan rakhna:</b> Pooling parameters zero hain, par iska matlab ye “free” nahi. Output chhota karke information bhi chhodta hai. Bahut early aggressive pooling se chhote objects gayab ho sakte hain.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Conv features banata hai, pooling summary banata hai, FC/softmax final class choose karta hai.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Pooling har channel ko mix karta hai?</summary><p>Nahi. Pooling usually har channel pe separately hoti hai. 15×15×18 input pool ke baad 7×7×18 ho sakta hai; depth 18 hi rahegi.</p></details>
+            <details class="qa"><summary>Average pooling kab useful hai?</summary><p>Jab tum overall presence ka smooth summary chahte ho. Global average pooling final layers mein common hai, jahan har feature map ka average class score mein jaata hai.</p></details>
+            <details class="qa"><summary>FC layers mein parameters itne zyada kyu?</summary><p>Flatten ke baad har input number har output neuron se judta hai. 882 to 64 layer mein hi 56,000 se zyada weights aa gaye.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>8×8×3 input pe max pool f=2, s=2. Output?</summary><p>Spatial size 4×4, channels same. <b>4×4×3</b>.</p></details>
+              <details class="qa"><summary>Conv layer: 8 filters, 3×3×6, bias ke saath parameters?</summary><p>8 × (3×3×6 + 1) = 8 × 55 = <b>440</b>.</p></details>
+              <details class="qa"><summary>Parameter sharing ka ek line meaning?</summary><p>Same filter weights poori image pe reuse hote hain, isliye feature kahin bhi ho, detector kaam kar sakta hai.</p></details>
+            </div>

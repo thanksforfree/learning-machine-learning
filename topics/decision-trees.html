@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Decision tree, entropy aur information gain: “20 sawaal” wala game. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Decision tree, entropy aur information gain (ML · 2) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../advanced.html">ML · 2: Advanced Learning Algorithms</a> › Topic 11 / 12</nav>
+        <p class="eyebrow">ML · 2 · TOPIC 11 · DECISION TREES</p>
+        <h1>Decision tree, entropy aur information gain</h1>
+        <p>“20 sawaal” wala game</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 2 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="a1" href="neural-network-idea.html"><span>01</span>Neural network ka idea</a>
+            <a data-topic-link="a2" href="forward-propagation.html"><span>02</span>Forward propagation</a>
+            <a data-topic-link="a3" href="tensorflow.html"><span>03</span>TensorFlow mein network banana</a>
+            <a data-topic-link="a4" href="activation-functions.html"><span>04</span>Activation functions</a>
+            <a data-topic-link="a5" href="softmax-multiclass.html"><span>05</span>Multiclass aur softmax</a>
+            <a data-topic-link="a6" href="backprop-adam.html"><span>06</span>Backpropagation aur Adam</a>
+            <a data-topic-link="a7" href="train-cv-test.html"><span>07</span>Training, CV aur test set</a>
+            <a data-topic-link="a8" href="bias-variance.html"><span>08</span>Bias aur variance</a>
+            <a data-topic-link="a9" href="ml-development-cycle.html"><span>09</span>ML development cycle</a>
+            <a data-topic-link="a10" href="precision-recall.html"><span>10</span>Precision, recall aur F1</a>
+            <a data-topic-link="a11" class="current" aria-current="page" href="decision-trees.html"><span>11</span>Decision tree, entropy aur information gain</a>
+            <a data-topic-link="a12" href="random-forest-xgboost.html"><span>12</span>Random forest aur XGBoost</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12"><span>ML · 2 progress</span><strong data-progress-label>0 / 12 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Table jaise data (Excel) pe trees bahut powerful hain, aur chhote tree insaan padh bhi sakta hai.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z4" href="maths-powers-e-log.html"><small>Maths</small>Power, e aur log</a><a class="chip" data-topic-link="z5" href="maths-average-probability.html"><small>Maths</small>Average, phailaav aur probability</a></div></div>
+        
+        <article class="lesson-card single" id="a11">
+          <div class="lesson-body">
+
+            <div class="chat">
+              <p class="msg me">Decision tree naam se lagta hai jaise office ka flowchart. Ye karta kya hai?</p>
+              <p class="msg dost">Woh game yaad hai jisme dost kisi cheez ke baare mein sochta hai aur tum haan/na sawaal puchh ke guess karte ho? “Kya woh zinda hai?” “Kya woh ud sakta hai?” Tree bhi aise hi sawaal puchhta hai jab tak answer na mil jaye.</p>
+              <p class="msg me">Par pehla sawaal kaunsa puchhe?</p>
+              <p class="msg dost">Wahi jo sabse zyada “safai” kare — matlab jiske baad dono groups zyada <strong>pure</strong> hon (ek group mein zyadatar aam, doosre mein zyadatar non-aam). Tree data se khud yeh chunta hai.</p>
+            </div>
+            <div class="tree-visual"><span class="tree-node">Rang peela?</span><div class="tree-branches"><div><small>Haan</small><span class="tree-node">Khushboo meethi?</span><div class="tree-branches"><span class="tree-leaf">Haan → Aam</span><span class="tree-leaf">Na → Aam nahi</span></div></div><div><small>Na</small><span class="tree-leaf">Aam nahi</span></div></div></div>
+            <h4>Entropy — group kitna “mixed” hai</h4>
+            <p>Entropy = <strong>confusion ka level</strong>. Group mein sab aam — koi confusion nahi — entropy 0. Aadhe aam, aadhe nahi — full confusion — entropy 1. Jaise dabbe mein sirf kaju katli ho to clear; aadha kaju, aadha soap ho to pehle smell check karni padegi.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Group</th><th>Aam ka hissa (p)</th><th>Entropy</th></tr>
+              <tr><td>6 mein 6 aam</td><td>1.0</td><td class="good">0 (bilkul pure)</td></tr>
+              <tr><td>6 mein 5 aam</td><td>0.83</td><td>0.65</td></tr>
+              <tr><td>6 mein 3 aam</td><td>0.5</td><td class="bad">1 (poora mix)</td></tr>
+            </table></div>
+            <h4>Information gain — kaunsa sawaal best?</h4>
+            <p>10 fruits hain, 5 aam (entropy = 1). Do sawaal compare karo:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Sawaal</th><th>Haan wala group</th><th>Na wala group</th><th>Split ke baad avg entropy</th><th>Gain = 1 − avg</th></tr>
+              <tr><td>Rang peela?</td><td>5 mein 4 aam (0.72)</td><td>5 mein 1 aam (0.72)</td><td>0.72</td><td class="good">0.28 ✓</td></tr>
+              <tr><td>Shape oval?</td><td>7 mein 4 aam (0.99)</td><td>3 mein 1 aam (0.92)</td><td>0.7×0.99 + 0.3×0.92 = 0.97</td><td>0.03</td></tr>
+            </table></div>
+            <p>“Rang peela?” confusion zyada ghatata hai → pehla sawaal wahi. Phir har branch pe yahi process dobara. Average <strong>weighted</strong> hota hai — bade group ka zyada wazan.</p>
+            <h4>Kab rukna hai?</h4>
+            <ul><li>Group pure ho gaya (sab ek hi type)</li><li>Tree ki depth limit aa gayi</li><li>Gain bahut chhota hai</li><li>Group mein bahut kam examples bache</li></ul>
+            <p>Ye limits <strong>overfitting</strong> rokti hain. Warna tree har ek example ke liye alag sawaal bana ke ratta maar lega — school ke “ye answer exactly yahi likhna” mode mein.</p>
+            <div class="compare-grid">
+              <div><b>Kai options wala feature</b>“Kaan ki shape: nukila / gol / latka” → <strong>one-hot encoding</strong>: teen alag haan/na features bana do (nukila? gol? latka?).</div>
+              <div><b>Number wala feature</b>Weight jaisa → kai cut-points try karo (“weight ≤ 200g?”, “≤ 250g?”…) aur jo best gain de woh chuno.</div>
+            </div>
+            <p><strong>Regression tree:</strong> number predict karna ho (jaise fruit ka weight), to purity ki jagah dekhte hain ki group ke andar numbers kitne phaile hain (variance). Leaf ka answer = us group ka average.</p>
+
+            <h4>Number feature pe split kaise chunta hai?</h4>
+            <div class="chat"><p class="msg me">Colour jaise feature pe sawaal easy hai. Par weight number hai — tree kya poochhega?</p><p class="msg dost">Tree possible cut-points try karta hai: weight ≤ 150? weight ≤ 200? weight ≤ 250? Jo confusion sabse zyada ghataye, woh split.</p></div>
+            <p>Maan lo 6 fruits hain. Target: aam hai ya nahi.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Fruit</th><th>Weight</th><th>Aam?</th></tr><tr><td>1</td><td>120g</td><td>Na</td></tr><tr><td>2</td><td>150g</td><td>Na</td></tr><tr><td>3</td><td>180g</td><td>Haan</td></tr><tr><td>4</td><td>220g</td><td>Haan</td></tr><tr><td>5</td><td>260g</td><td>Haan</td></tr><tr><td>6</td><td>300g</td><td>Na</td></tr></table></div>
+            <div class="table-wrap"><table class="calc"><tr><th>Split</th><th>Left group</th><th>Right group</th><th>Reading</th></tr><tr><td>weight ≤ 160</td><td>2 Na, 0 Haan → pure</td><td>3 Haan, 1 Na → mixed</td><td class="good">Kaafi achha</td></tr><tr><td>weight ≤ 240</td><td>2 Na, 2 Haan → mixed</td><td>1 Haan, 1 Na → mixed</td><td class="bad">Kam fayda</td></tr></table></div>
+            <p>Library entropy/information gain calculate karke exact best cut choose karti hai. Tumhe intuition rakhni hai: split ke baad groups jitne pure, split utna useful.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Tree har step pe woh sawaal puchhta hai jo confusion (entropy) sabse zyada ghataye.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>“Information gain” mein naya information kahan se aaya?</summary><p>Koi naya data nahi aaya. Matlab: sawaal ke baad confusion kitna kam hua. Confusion ghata = kuch “jaan” liya.</p></details>
+            <details class="qa"><summary>Entropy ka formula yaad rakhna hai?</summary><p>Abhi shape yaad rakho: pure group → 0, 50-50 → 1 (sabse zyada). Formula library sambhalti hai. Interview ya exam ho to formula dekh lena, intuition yahin kaam aati hai.</p></details>
+
+            <details class="qa"><summary>Decision tree feature scaling maangta hai?</summary><p>Aksar nahi. Tree sirf comparisons karta hai jaise weight ≤ 160. Salary rupees mein ho ya lakhs mein, ordering same rahegi.</p></details>
+            <details class="qa"><summary>Tree missing values handle kar sakta hai?</summary><p>Library pe depend karta hai. Kabhi missing ko alag category banate hain, kabhi median se fill karte hain, kabhi advanced tree methods khud route decide karte hain.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>4 mein 4 aam ki entropy? 4 mein 2 aam ki?</summary><p><b>0</b> aur <b>1</b>.</p></details>
+              <details class="qa"><summary>Colour feature (laal/hara/peela) tree mein kaise daalein?</summary><p><b>One-hot</b>: teen alag haan/na features.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="a11"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="precision-recall.html"><small>← Pichhla</small>Precision, recall aur F1</a>
+          <a class="pager-next" href="random-forest-xgboost.html"><small>Agla →</small>Random forest aur XGBoost</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

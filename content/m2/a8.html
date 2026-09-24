@@ -1,0 +1,50 @@
+
+            <div class="chat">
+              <p class="msg me">Model theek nahi chal raha. Ab kya — data laun, bada network banaun, ya chai peene chala jaun?</p>
+              <p class="msg dost">Chai zaroor, par pehle diagnosis. Doctor bina check kiye dawai nahi deta. Teen numbers dekho: <strong>baseline</strong> (jaise insaan kitni galti karta hai), <strong>training error</strong>, aur <strong>CV error</strong>. Inke beech ka gap bimaari batata hai.</p>
+            </div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Case</th><th>Baseline</th><th>Training</th><th>CV</th><th>Diagnosis</th></tr>
+              <tr><td>A</td><td>2%</td><td>10%</td><td>11%</td><td class="bad">High bias — training pe hi kharab (underfit)</td></tr>
+              <tr><td>B</td><td>2%</td><td>2.5%</td><td>12%</td><td class="bad">High variance — training achha, naye pe kharab (overfit)</td></tr>
+              <tr><td>C</td><td>2%</td><td>9%</td><td>18%</td><td class="bad">Dono problems</td></tr>
+              <tr><td>D</td><td>2%</td><td>2.5%</td><td>3%</td><td class="good">Badhiya ✓</td></tr>
+            </table></div>
+            <div class="compare-grid">
+              <div><b>Gap 1: baseline → training</b>Bada gap = <strong>bias</strong> problem. Model pattern seekh hi nahi pa raha.</div>
+              <div><b>Gap 2: training → CV</b>Bada gap = <strong>variance</strong> problem. Model ratt raha hai.</div>
+            </div>
+            <h4>Kaunsi dawai kis bimaari ki?</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>High bias (underfit) ke liye</th><th>High variance (overfit) ke liye</th></tr>
+              <tr><td>Zyada / better features</td><td>Zyada training data</td></tr>
+              <tr><td>Polynomial features</td><td>Kam features</td></tr>
+              <tr><td>λ kam karo</td><td>λ badhao</td></tr>
+              <tr><td>Bada neural network</td><td>Regularization / zyada data</td></tr>
+            </table></div>
+            <div class="mistake"><b>Ye galti mat karna:</b> High bias mein data jama karne mein 6 mahine laga dena. Rohan (Module 1) ko aur practice papers dene se kuch nahi hoga agar usko chapter hi samajh nahi aaya. Model ko zyada powerful banao, features better karo, ya λ kam karo.</div>
+            <h4>λ ka asar — ek graph mein poori kahani</h4>
+            <p>λ ko chhote se bade tak badlo aur har λ pe training error aur CV error dekho:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>λ</th><th>Training error</th><th>CV error</th><th>Haalat</th></tr>
+              <tr><td>0 (bahut chhota)</td><td>Bahut kam</td><td>Zyada</td><td class="bad">Overfit (high variance)</td></tr>
+              <tr><td>Beech ka</td><td>Thoda badha</td><td class="good">Sabse kam ✓</td><td class="good">Just right — ye chuno</td></tr>
+              <tr><td>Bahut bada</td><td>Zyada</td><td>Zyada</td><td class="bad">Underfit (high bias)</td></tr>
+            </table></div>
+            <p>Ye polynomial degree wale graph ka <em>mirror</em> hai: degree badhane se model complex hota hai, λ badhane se simple. Dono mein <strong>CV error ka sabse neecha point</strong> chuno.</p>
+            <h4>Learning curve — data badhane se fayda hoga?</h4>
+            <p>x-axis pe training examples ki ginti, y-axis pe error. <strong>High bias:</strong> dono curves jaldi flat ho jaate hain aur baseline se upar atak jaate hain → aur data bekaar. <strong>High variance:</strong> training aur CV ke beech bada gap jo data badhne pe dheere dheere kam hota hai → aur data se fayda.</p>
+            <div class="lesson-callout"><b>Neural network ka shortcut:</b> Training error zyada? → network bada karo. Training theek par CV kharab? → aur data laao. Dono theek? → done! Bada network sahi regularization ke saath aam taur pe nuksaan nahi karta, bas computation mehenga hota hai.</div>
+
+            <h4>Gap ko numbers mein padho</h4>
+            <div class="chat"><p class="msg me">Baseline, training, CV — teen numbers dekh ke confuse ho jaata hoon. Pehle kis gap ko dekhu?</p><p class="msg dost">Pehle baseline se training ka gap. Agar training hi baseline se kaafi door hai, model seekh nahi pa raha. Phir training se CV gap — agar ye bada hai, model training data yaad kar raha hai.</p></div>
+            <div class="table-wrap"><table class="calc"><tr><th>Baseline</th><th>Training</th><th>CV</th><th>Bias gap</th><th>Variance gap</th><th>Reading</th></tr><tr><td>5%</td><td>14%</td><td>16%</td><td>14−5 = <b>9%</b></td><td>16−14 = <b>2%</b></td><td class="bad">High bias main issue</td></tr><tr><td>5%</td><td>6%</td><td>17%</td><td>1%</td><td>11%</td><td class="bad">High variance main issue</td></tr><tr><td>5%</td><td>7%</td><td>8%</td><td>2%</td><td>1%</td><td class="good">Healthy</td></tr></table></div>
+            <p>Real life mein exact cutoff fixed nahi hota. Domain samjho: medical diagnosis mein 2% bhi huge ho sakta hai; movie recommendation mein 2% maybe acceptable.</p>
+            <div class="compare-grid"><div><b>Bias fix ka feel</b>Model ko zyada expressive banao: features, polynomial terms, bigger network, λ kam.</div><div><b>Variance fix ka feel</b>Model ko disciplined banao: zyada data, regularization, simpler features, augmentation.</div></div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Baseline → training gap bias batata hai; training → CV gap variance batata hai. Pehle diagnosis, phir dawai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Baseline kaise pata karun?</summary><p>Insaan kitni galti karta hai (jaise dhundhli awaaz pehchanne mein insaan bhi galti karte hain), ya koi purana/competitor model, ya experience se andaaza.</p></details>
+            <details class="qa"><summary>Training error 10% hai, kya ye bura hai?</summary><p>Akele number dekh ke judgement mat do. Agar insaan bhi 9.5% galti karte hain to 10% bahut achha hai. Agar insaan 1% galti karte hain, to 10% problem hai. Isliye baseline zaroori hai.</p></details>
+
+            <details class="qa"><summary>Bias aur variance dono high ho sakte hain?</summary><p>Haan. Training baseline se kaafi worse ho aur CV training se bhi kaafi worse ho, to dono problem hain. Pehle bias reduce karo, phir variance pe kaam karo.</p></details>
+            <details class="qa"><summary>Bada neural network variance nahi badha dega?</summary><p>Badha sakta hai, par neural networks mein bigger model + regularization + zyada data often strong combo hota hai. CV set se check karna zaroori hai.</p></details>

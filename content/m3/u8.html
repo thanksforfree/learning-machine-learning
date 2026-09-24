@@ -1,0 +1,46 @@
+            <div class="chat">
+              <p class="msg me">Naya user aaya, usne ek bhi movie rate nahi ki. Usko kya dikhaayenge — blank screen?</p>
+              <p class="msg dost">Agar kuch na karein to problem hai. Uski cost mein koi rating nahi, sirf regularization hai — jo weights ko 0 ki taraf dhakelta hai. To w = 0, b = 0 → har movie ka predicted rating <strong>0 star</strong>! Matlab “isse kuch pasand nahi” — bilkul bekaar.</p>
+              <p class="msg me">To?</p>
+              <p class="msg dost"><strong>Mean normalization.</strong> Pehle har movie ka average rating nikaalo aur ratings mein se ghata do. Model “average se kitna upar/neeche” seekhe. Predict karte waqt average wapas jod do. Naye user ke liye w = 0 → prediction = <strong>movie ka average</strong>. Kaafi samajhdaar default!</p>
+            </div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Movie</th><th>Ratings</th><th>Average μ</th><th>Normalized (rating − μ)</th><th>Naye user ka prediction</th></tr>
+              <tr><td>Pyaar Ka Safar</td><td>5, 5, 0</td><td>3.33</td><td>1.67, 1.67, −3.33</td><td class="good">3.33</td></tr>
+              <tr><td>Chase 2</td><td>0, 0, 5, 4</td><td>2.25</td><td>−2.25, −2.25, 2.75, 1.75</td><td class="good">2.25</td></tr>
+            </table></div>
+            <p>Bonus: numbers center ho jaate hain, isliye algorithm thoda fast bhi chal sakta hai. Chhoti cheez, par production mein chhoti cheezein bhi kaam aati hain.</p>
+            <h4>TensorFlow mein — custom training loop</h4>
+            <p>Yahan cost function khud likhte hain aur TensorFlow ka <strong>GradientTape</strong> slopes nikaalta hai (auto-diff):</p>
+<pre class="code">optimizer = tf.keras.optimizers.Adam(learning_rate=0.1)
+for step in range(200):
+    with tf.GradientTape() as tape:
+        cost = cofi_cost(X, W, b, Y_norm, R, lam)   <span class="cm"># apna cost function</span>
+    grads = tape.gradient(cost, [X, W, b])          <span class="cm"># slopes automatic</span>
+    optimizer.apply_gradients(zip(grads, [X, W, b]))</pre>
+            <p>(R = kaunse table cells rated hain, 1/0. Y_norm = mean-normalized ratings.) Isse ek cool baat samajh aati hai: TensorFlow sirf neural networks ke liye nahi — <strong>koi bhi cost</strong> likho, woh gradient nikaal sakta hai.</p>
+            <h4>Milti-julti movies dhundhna</h4>
+            <p>Seekhe gaye features x ab movie ki “personality” hain. Movie A jaisi movie chahiye? Woh movie dhundho jiska x, A ke x ke <strong>sabse paas</strong> ho: doori = Σ (xₖᴬ − xₖᴮ)². “Isko dekhne walon ne ye bhi dekha.”</p>
+            <h4>Collaborative filtering ki kamzoriyan</h4>
+            <div class="compare-grid">
+              <div><b>Cold start</b>Nayi movie (kisi ne rate nahi ki) ya naya user (kuch nahi dekha) — achhi recommendation mushkil.</div>
+              <div><b>Side info use nahi hoti</b>Genre, actor, user ki umar, desh — ye sab information seedhe use nahi hoti. Agla topic (content-based) ye solve karta hai.</div>
+            </div>
+
+            <h4>Similar items ka worked distance</h4>
+            <div class="chat"><p class="msg me">Seekhe features se similar movies bol rahe ho. Similar ka number kaise?</p><p class="msg dost">Movie vectors ke beech distance. Door kam, taste personality similar. Jaise Google Maps mein paas restaurants.</p></div>
+            <p>Maan lo learned features 2D hain. Movie A = [1, 2]. Teen candidates compare karo.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Movie</th><th>x</th><th>Squared distance from A</th><th>Reading</th></tr><tr><td>B</td><td>[1.2, 2.1]</td><td>(0.2)² + (0.1)² = <b>0.05</b></td><td class="good">Very similar</td></tr><tr><td>C</td><td>[3, 4]</td><td>2² + 2² = <b>8</b></td><td>Far</td></tr><tr><td>D</td><td>[0.5, 1.8]</td><td>(−0.5)² + (−0.2)² = <b>0.29</b></td><td>Similar-ish</td></tr></table></div>
+            <p>Recommendation mein ye “related items” feature ban jaata hai: “ye movie pasand aayi? B bhi try karo.”</p>
+            <div class="compare-grid"><div><b>Mean normalization</b>Naye user ko average rating ka sensible default.</div><div><b>Similar item distance</b>Existing item se nearby vectors dhundho.</div></div>
+            <h4>Naye user ke liye average bhi baseline hai</h4>
+            <p>Mean normalization se new user ko movie average milta hai. Par product mein tum aur signals jod sakte ho:</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Signal</th><th>Use</th><th>Example</th></tr><tr><td>Popular overall</td><td>Safe start</td><td>Top rated movies</td></tr><tr><td>Country/language</td><td>Better relevance</td><td>Hindi movies in India</td></tr><tr><td>Onboarding choices</td><td>Fast personalization</td><td>User picks 3 genres</td></tr></table></div>
+            <p>Cold start ka answer usually hybrid hota hai, ek formula nahi.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Mean normalization se naye user ko average milta hai; seekhe features se similar items dhundh sakte ho; cold start kamzori hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Movie ke average se normalize karein ya user ke?</summary><p>Naye <em>user</em> problem ke liye movie (row) ka average. Agar nayi <em>movie</em> ki problem zyada important ho to user (column) ka average bhi le sakte ho.</p></details>
+            <details class="qa"><summary>model.fit kyu nahi use kiya?</summary><p>Ye standard neural network layers wala model nahi hai, isliye apna cost aur apna loop likha. GradientTape isi custom kaam ke liye hai — jab ready-made dabba fit na aaye, apna dabba banao.</p></details>
+
+            <details class="qa"><summary>Mean normalization ke baad rating negative kyu ho sakti hai?</summary><p>Negative ka matlab “movie average se neeche”. Ye final star rating nahi, centered signal hai. Prediction ke waqt average wapas jod dete hain.</p></details>
+            <details class="qa"><summary>Related items mein user taste use hota hai?</summary><p>Basic similar-items search sirf item vectors use karta hai. Personalized recommendation mein user vector/weights bhi include hote hain.</p></details>

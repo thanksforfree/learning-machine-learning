@@ -1,0 +1,76 @@
+            <div class="chat">
+              <p class="msg me">L-layer network dekh ke lagta hai ab har layer ka alag formula hoga.</p>
+              <p class="msg dost">Good news: nahi. Same block repeat hota hai: Z = WA + b, phir activation.</p>
+              <p class="msg me">To depth ka code copy-paste nahi, loop?</p>
+              <p class="msg dost">Bilkul. Layers pe loop bilkul normal hai. Hum bas examples/features pe slow loops avoid karte hain.</p>
+              <p class="msg me">Mera main bug shapes hota hai. Kabhi W ulta, kabhi A ulta.</p>
+              <p class="msg dost">Aaj shapes ko train timetable ki tarah padhenge. Platform galat hua to train nahi milegi. Shape galat hua to dot product nahi chalega.</p>
+              <p class="msg me">Ek rule yaad rahe to?</p>
+              <p class="msg dost">W[l] current layer ki rows aur previous layer ke columns: (n[l], n[l−1]). Isko pakad lo, aadhe bugs gaye.</p>
+            </div>
+            <h4>Notation: L, n[l], a[l]</h4>
+            <p><strong>L</strong> total layers count hai, input layer ko chhod ke. <strong>n[l]</strong> layer l mein units ki ginti. <strong>a[l]</strong> layer l ka activation. Aur <strong>a[0] = x</strong>. Last activation <strong>a[L] = ŷ</strong>.</p>
+            <div class="formula"><code>Z[l] = W[l] A[l−1] + b[l]
+A[l] = g[l](Z[l])</code><ul>
+              <li><b>l</b> = 1 se L tak</li>
+              <li><b>g[l]</b> = layer l ki activation; last layer mein sigmoid ho sakta hai</li>
+              <li><b>A[l−1]</b> = previous layer ka output, current layer ka input</li>
+            </ul></div>
+            <figure class="figure">
+              <svg viewBox="0 0 440 180" role="img" aria-label="Deep network mein repeated linear activation blocks layer by layer">
+                <rect x="20" y="55" width="70" height="70" rx="12" fill="#edf3ff" stroke="#3567e8"/>
+                <rect x="125" y="35" width="80" height="110" rx="12" fill="#f2edff" stroke="#7653d6"/>
+                <rect x="240" y="35" width="80" height="110" rx="12" fill="#f2edff" stroke="#7653d6"/>
+                <rect x="355" y="60" width="65" height="60" rx="12" fill="#e9f7f3" stroke="#159477"/>
+                <g stroke="#8a96aa" stroke-width="2" fill="none"><path d="M90,90 H125"/><path d="M205,90 H240"/><path d="M320,90 H355"/></g>
+                <g font-size="11" text-anchor="middle" fill="#273142"><text x="55" y="95">A[0]</text><text x="165" y="80">Layer 1</text><text x="165" y="100">W[1],b[1]</text><text x="280" y="80">Layer 2</text><text x="280" y="100">W[2],b[2]</text><text x="388" y="95">A[L]</text></g>
+              </svg>
+              <div class="cap">Same forward block repeat hota hai.</div>
+            </figure>
+            <h4>Shapes ka rule</h4>
+            <p>Dimensions deep network debugging ka seatbelt hai. Agar layer l mein n[l] units aur previous layer mein n[l−1] units, to W[l] shape (n[l], n[l−1]) hota hai. Bias b[l] (n[l], 1). m examples ke liye Z[l] aur A[l] shape (n[l], m).</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Cheez</th><th>Shape</th><th>Reason</th></tr>
+              <tr><td>W[l]</td><td>(n[l], n[l−1])</td><td>har current unit previous activations dekhta hai</td></tr>
+              <tr><td>b[l]</td><td>(n[l], 1)</td><td>har current unit ka bias</td></tr>
+              <tr><td>Z[l], A[l]</td><td>(n[l], m)</td><td>rows units, columns examples</td></tr>
+              <tr><td>dW[l]</td><td>W[l] jaisa</td><td>gradient parameter ke same shape ka</td></tr>
+              <tr><td>db[l]</td><td>b[l] jaisa</td><td>bias gradient bias jaisa</td></tr>
+            </table></div>
+            <h4>Worked dimensions: [3072, 16, 8, 1]</h4>
+            <p>Is network mein L = 3. Input features 3072 (32×32×3 image), phir 16 aur 8 hidden units, last 1 binary output. Agar m = 12 examples hain:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Layer</th><th>W shape</th><th>b shape</th><th>A shape</th></tr>
+              <tr><td>1</td><td>(16, 3072)</td><td>(16, 1)</td><td>(16, 12)</td></tr>
+              <tr><td>2</td><td>(8, 16)</td><td>(8, 1)</td><td>(8, 12)</td></tr>
+              <tr><td>3</td><td>(1, 8)</td><td>(1, 1)</td><td class="good">(1, 12)</td></tr>
+            </table></div>
+            <h4>Layers pe for-loop theek hai</h4>
+            <p>Forward propagation mein hidden layers ke liye loop lagana clean hai. Har layer previous A leti hai. Last layer sigmoid, beech mein ReLU. Ye loop examples pe nahi, architecture pe hai.</p>
+            <pre class="code">A = X
+for l in range(1, L):
+    Z = np.dot(W[l], A) + b[l]
+    A = relu(Z)
+ZL = np.dot(W[L], A) + b[L]
+AL = sigmoid(ZL)          <span class="cm"># final probability</span></pre>
+            <h4>Backward shapes bhi same logic</h4>
+            <p>Jo parameter update hoga, gradient usi shape ka. dW[l] W[l] jaisa, db[l] b[l] jaisa. dA[l−1] previous activation A[l−1] jaisa. Agar shape match nahi, formula ya transpose galat hai.</p>
+            <h4>Dimension debugging habit</h4>
+            <p>Har layer ke forward ke baad assert lagana boring lag sakta hai, par ye tumhe hours bachata hai. Especially jab L layers ho, ek transpose galat hua to error 4 layers baad dikhega. Assert wahi pe pakad leta hai jahan bug paida hua.</p>
+            <pre class="code">assert W[l].shape == (layer_dims[l], layer_dims[l-1])
+assert b[l].shape == (layer_dims[l], 1)
+assert A[l].shape == (layer_dims[l], m)</pre>
+            <div class="mistake"><b>Dhyan rakhna:</b> W[l] ko (n[l−1], n[l]) bana doge to forward mein transpose ka jungle shuru ho jayega. Course convention pakka rakho: current units rows mein.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Deep network koi naya monster nahi; same Z = WA + b block L baar repeat hota hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>L mein input layer count hoti hai?</summary><p>Nahi. Agar 3 hidden aur 1 output layer hai, L = 4.</p></details>
+            <details class="qa"><summary>Har hidden layer same activation use kare?</summary><p>Usually ReLU hidden layers mein default start. Kabhi tanh ya leaky ReLU try kar sakte ho.</p></details>
+            <details class="qa"><summary>Dimensions yaad kaise rahein?</summary><p>W[l] maps A[l−1] to A[l]. Output rows n[l], input rows n[l−1]. Isliye W[l] = (n[l], n[l−1]).</p></details>
+            <details class="qa"><summary>Layers pe loop slow nahi hoga?</summary><p>Layers ki count usually dozens hoti hai, examples lakhon. Big speed gain examples/features vectorize karne se aata hai. Layers loop readable aur practical hai.</p></details>
+            <details class="qa"><summary>b[l] ko (n[l], m) kyu nahi rakhte?</summary><p>Bias har neuron ka ek shared offset hai, examples ke liye same. Shape (n[l],1) rakho, broadcasting use karke m columns mein add ho jaata hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>n[0]=4, n[1]=6, m=8. W[1], b[1], A[1] shapes?</summary><p>W[1]=<b>(6,4)</b>, b[1]=<b>(6,1)</b>, A[1]=<b>(6,8)</b>.</p></details>
+              <details class="qa"><summary>Layer 3 mein n[3]=2, n[2]=5. W[3] shape?</summary><p><b>(2,5)</b>.</p></details>
+              <details class="qa"><summary>dW[2] ka shape kis jaisa?</summary><p>Bilkul <b>W[2]</b> jaisa. Gradient parameter ke same shape ka hota hai.</p></details>
+            </div>

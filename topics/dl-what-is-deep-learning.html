@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Deep learning kya hai, aur ab hi kyu chal pada?: Neural network ka pehla idea aur scale ki kahani. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Deep learning kya hai, aur ab hi kyu chal pada? (DL · 1) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-blue">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-neural-networks.html">DL · 1: Neural Networks and Deep Learning</a> › Topic 1 / 11</nav>
+        <p class="eyebrow">DL · 1 · TOPIC 01 · SHURUAAT</p>
+        <h1>Deep learning kya hai, aur ab hi kyu chal pada?</h1>
+        <p>Neural network ka pehla idea aur scale ki kahani</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 1 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="n1" class="current" aria-current="page" href="dl-what-is-deep-learning.html"><span>01</span>Deep learning kya hai, aur ab hi kyu chal pada?</a>
+            <a data-topic-link="n2" href="dl-binary-classification.html"><span>02</span>Binary classification aur notation</a>
+            <a data-topic-link="n3" href="dl-logistic-regression-neuron.html"><span>03</span>Logistic regression — ek neuron wala network</a>
+            <a data-topic-link="n4" href="dl-computation-graph.html"><span>04</span>Gradient descent aur computation graph</a>
+            <a data-topic-link="n5" href="dl-logistic-gradients.html"><span>05</span>Logistic regression ke gradients</a>
+            <a data-topic-link="n6" href="dl-vectorization.html"><span>06</span>Vectorization aur broadcasting</a>
+            <a data-topic-link="n7" href="dl-shallow-network.html"><span>07</span>Shallow neural network: ek hidden layer</a>
+            <a data-topic-link="n8" href="dl-activation-functions.html"><span>08</span>Activation functions aur unke derivatives</a>
+            <a data-topic-link="n9" href="dl-shallow-backprop.html"><span>09</span>Shallow network ka backprop aur random initialization</a>
+            <a data-topic-link="n10" href="dl-deep-network.html"><span>10</span>Deep L-layer network aur dimensions</a>
+            <a data-topic-link="n11" href="dl-why-deep-building-blocks.html"><span>11</span>Deep kyu? Building blocks, parameters aur hyperparameters</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11"><span>DL · 1 progress</span><strong data-progress-label>0 / 11 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Poore specialization ka context: neural network kis kaam aata hai, kaunse data pe kaunsa network, aur pichhle kuch saalon mein ye achanak itna powerful kyu ho gaya.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Neural network ka idea ek apne rozmarra ke example se (ReLU jaisi shape)</li><li>Supervised learning mein NN kahan: ads, photos, awaaz, translation, self-driving</li><li>Structured vs unstructured data</li><li>Standard NN, CNN aur RNN — kaunsa kis data ke liye</li><li>Scale ki kahani: data, compute aur algorithms (sigmoid → ReLU)</li><li>Idea → code → experiment ka chakra fast kyu hona chahiye</li></ul></details>
+        <article class="lesson-card single" id="n1">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Dost, kal cousin ne bola “AI sab kar lega”. Mujhe laga main course start karne se pehle hi late ho gaya.</p>
+              <p class="msg dost">Arre nahi yaar, late nahi ho. Deep learning koi magic club nahi hai. Ye bas patterns seekhne wali flexible machine hai.</p>
+              <p class="msg me">Par neural network sunte hi brain, neurons, research paper... sab ek saath dimaag pe girta hai.</p>
+              <p class="msg dost">Normal feeling hai. Hum isko flat-price wali simple kahani se start karenge. Pehle ek neuron, phir neurons ki team.</p>
+              <p class="msg me">Aur ye abhi itna famous kyu hua? Idea to purana tha na?</p>
+              <p class="msg dost">Bilkul purana. Bas ab data ka bhandar, GPUs ka speed, aur ReLU jaise training-friendly tricks ek saath aa gaye. Jaise purani recipe ko finally sahi gas aur fresh samaan mil gaya.</p>
+              <p class="msg me">Theek, matlab pehle hawa nikaalte hain, phir maths?</p>
+              <p class="msg dost">Exactly. Aaj ka goal: “deep learning ka map” ban jaaye. Formula kam, intuition zyada.</p>
+            </div>
+            <h4>Ek neuron: price ka rough andaaza</h4>
+            <p>Socho flat ka price predict karna hai. Size badhe to price badhe, par chhota ghar ho to price zero se neeche nahi ja sakta. Isliye ek neuron pehle weighted sum banata hai, phir negative value ko 0 pe rok sakta hai. Ye ReLU jaisi shape hai: left side flat, right side seedhi line.</p>
+            <div class="formula"><code>a = max(0, w₁x₁ + w₂x₂ + b)</code><ul>
+              <li><b>x₁</b> = area, <b>x₂</b> = bedrooms jaisi input clues</li>
+              <li><b>w</b> = har clue ki importance, <b>b</b> = base adjustment</li>
+              <li><b>max(0, ...)</b> = negative guess ko 0 bana do; yahi ReLU ka mood hai</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Quantity</th><th>Value</th><th>Hisaab</th></tr>
+              <tr><td>Area x₁</td><td>80</td><td>80 square meter</td></tr>
+              <tr><td>Bedrooms x₂</td><td>2</td><td>2 rooms</td></tr>
+              <tr><td>Weighted sum</td><td>5.4</td><td>0.08 × 80 + 1.5 × 2 − 4 = 6.4 + 3 − 4</td></tr>
+              <tr><td>ReLU output</td><td class="good">5.4</td><td>max(0, 5.4)</td></tr>
+            </table></div>
+            <figure class="figure">
+              <svg viewBox="0 0 420 210" role="img" aria-label="Neural network layers daily features ko useful signals mein badalte hain">
+                <rect x="20" y="40" width="80" height="120" rx="14" fill="#edf3ff" stroke="#3567e8"/>
+                <rect x="160" y="25" width="100" height="150" rx="14" fill="#f2edff" stroke="#7653d6"/>
+                <rect x="320" y="60" width="70" height="80" rx="14" fill="#e9f7f3" stroke="#159477"/>
+                <g font-size="11" text-anchor="middle" fill="#273142"><text x="60" y="80">raw data</text><text x="60" y="100">size, rooms</text><text x="210" y="65">hidden layer</text><text x="210" y="88">budget signal</text><text x="210" y="112">location signal</text><text x="355" y="95">output</text><text x="355" y="116">price</text></g>
+                <g stroke="#8a96aa" stroke-width="2" fill="none"><path d="M100,70 C130,70 130,55 160,55"/><path d="M100,110 C130,110 130,100 160,100"/><path d="M100,150 C130,150 130,145 160,145"/><path d="M260,65 C290,70 290,90 320,90"/><path d="M260,130 C290,125 290,112 320,112"/></g>
+              </svg>
+              <div class="cap">Network raw inputs ko dheere-dheere useful signals mein badalta hai.</div>
+            </figure>
+            <h4>Supervised learning mein NN kahan dikhta hai?</h4>
+            <p>Jahan input aur correct answer ke examples mil jaate hain, wahan neural network try ho sakta hai. Ads mein click hoga ya nahi, photo mein defect hai ya nahi, awaaz se words, English se Hindi translation, self-driving mein camera se road signals — sab mein input-output pairs hote hain. Bas data type badalta hai.</p>
+            <div class="compare-grid">
+              <div><b>Structured data</b>Excel jaisi table: age, city, salary, last purchase. Rows-columns clear. Ispe standard NN ya trees dono chal sakte hain.</div>
+              <div><b>Unstructured data</b>Photo, audio, text. Human ke liye natural, computer ke liye messy numbers. Deep learning yahan bahut chamakta hai.</div>
+            </div>
+            <h4>Standard NN, CNN, RNN — kaunsa kab?</h4>
+            <p><strong>Standard neural network</strong> table wale fixed features pe theek. <strong>CNN</strong> photo/video mein paas-paas pixels ka relation pakadta hai, jaise rangoli ke patterns. <strong>RNN</strong> sequence mein order pakadta hai: sentence, awaaz, stock ka time series. Aaj transformers bhi sequence ke liye common hain, par pehla map itna yaad rakho.</p>
+            <h4>Scale ki kahani: data, compute, algorithms</h4>
+            <p>Pehle data kam tha aur computers slow the, to bada network train karna mehenga tha. Phir phones, internet, sensors ne data badha diya. GPUs ne matrix multiplication fast kar diya. Aur algorithms ne training ko smooth banaya: sigmoid ke jagah hidden layers mein ReLU use karne se slope zyada der tak zinda rehta hai.</p>
+            <pre class="code">ideas = ["small model", "bigger model", "ReLU", "more data"]
+for idea in ideas:
+    train_model(idea)   <span class="cm"># run fast hona chahiye</span>
+    check_dev_score()   <span class="cm"># score bataega next kadam</span></pre>
+            <p>Deep learning mein “idea → code → experiment” chakra jitna fast, learning utni fast. Agar ek run 10 din le raha hai, tum kam ideas try kar paoge. Isliye tooling, vectorization, GPUs, clean data pipeline — ye sab boring nahi, asli accelerator hain.</p>
+            <h4>Fast experiment cycle ka practical matlab</h4>
+            <p>Deep learning mein pehla idea aksar final answer nahi hota. Kabhi data clean karna padta hai, kabhi network chhota-bada, kabhi activation change. Isliye experiment loop fast hona chahiye. Agar har run 2 din lega, tum 5 ideas bhi nahi try kar paoge. Agar run 20 minutes mein feedback de, tum same week mein dozens choices compare kar paoge.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Experiment speed</th><th>7 din mein approx runs</th><th>Learning feeling</th></tr>
+              <tr><td>2 din/run</td><td>3</td><td class="bad">guesswork zyada</td></tr>
+              <tr><td>20 min/run</td><td class="good">504</td><td class="good">ideas fast test</td></tr>
+            </table></div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Deep learning har problem ka automatic solution nahi. Chhoti table data problem mein simple model bhi jeet sakta hai. Pehle data type aur business goal dekho.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Neural network layers ki team hai; scale (data + compute + algorithms) ne is team ko finally practical bana diya.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Kya neural network sach mein brain jaisa hota hai?</summary><p>Thoda naam se inspiration hai, par actual brain se comparison limited hai. Isko maths wali flexible function machine samjho, biology ka exact copy nahi.</p></details>
+            <details class="qa"><summary>Deep ka matlab sirf zyada layers?</summary><p>Haan, broadly. Ek-do hidden layers shallow, bahut layers deep. Par quality sirf layer count se nahi, data aur training se aati hai.</p></details>
+            <details class="qa"><summary>Photos ke liye standard NN kyu nahi?</summary><p>Har pixel ko alag feature maanoge to parameters bahut badh jaate hain, aur nearby pixels ka pattern miss hota hai. CNN shared filters se ye better karta hai.</p></details>
+            <details class="qa"><summary>Agar data kam ho to deep learning try nahi karna chahiye?</summary><p>Try kar sakte ho, par expectations realistic rakho. Chhote data pe transfer learning, augmentation, ya simpler models better ho sakte hain. Deep network ko kaafi examples pasand aate hain.</p></details>
+            <details class="qa"><summary>Algorithms better hone ka simple example?</summary><p>Hidden layers mein sigmoid se ReLU shift ek simple example hai. ReLU ka positive side slope 1 rehta hai, isliye gradients deep layers tak zyada easily pahunch sakte hain.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Input 50 hai, weight 0.2, bias −8. ReLU output?</summary><p>Weighted sum = 0.2 × 50 − 8 = 2. ReLU = <b>2</b>.</p></details>
+              <details class="qa"><summary>Bank transaction table structured hai ya unstructured?</summary><p>Structured. Amount, city, merchant, time jaise columns clear hote hain.</p></details>
+              <details class="qa"><summary>Voice command ke liye standard NN, CNN, ya RNN family ka intuition?</summary><p>Voice time sequence hai, to RNN/sequence model family natural choice. Spectrogram image jaisa bana ke CNN bhi use ho sakta hai.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="n1"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="deep-q-network.html"><small>← Pichhla · ML · 3</small>Continuous states aur Deep Q-Network</a>
+          <a class="pager-next" href="dl-binary-classification.html"><small>Agla →</small>Binary classification aur notation</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

@@ -1,0 +1,51 @@
+            <div class="chat">
+              <p class="msg me">Derivative / calculus ka naam sunke hi bhaagne ka mann karta hai.</p>
+              <p class="msg dost">Ek sawaal: tum bike pe ho aur speedometer 40 dikha raha hai. Iska matlab?</p>
+              <p class="msg me">Us pal main 40 km per ghanta ki speed se chal raha hoon.</p>
+              <p class="msg dost">Mubarak ho, tumne derivative samajh liya! Derivative = <strong>us pal pe cheez kitni tezi se badal rahi hai</strong>. Speed = distance ka derivative. Bas yahi hai.</p>
+              <p class="msg me">Sach mein? Itna hi?</p>
+              <p class="msg dost">Intuition ke level pe haan. Formal maths baad mein aa sakti hai; pehle feel pakdo. Speedometer wali feel hi ML mein slope ban ke aati hai.</p>
+            </div>
+            <h4>Curve ka slope har jagah alag</h4>
+            <p>Seedhi line ka slope har jagah same. Par katori (y = x²) ka? Kahin tedhi, kahin flat. Kisi ek point pe <strong>curve ko chhoone wali chhoti si seedhi line</strong> ka slope = us point pe derivative.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 400 210" role="img" aria-label="Katori curve par teen points: left mein negative slope, neeche zero slope, right mein positive slope">
+                <path d="M40,30 Q200,330 360,30" fill="none" stroke="#3567e8" stroke-width="3"/>
+                <line x1="50" y1="70" x2="150" y2="160" stroke="#c2410c" stroke-width="2"/><circle cx="100" cy="115" r="5" fill="#c2410c"/>
+                <line x1="150" y1="180" x2="250" y2="180" stroke="#159477" stroke-width="2"/><circle cx="200" cy="180" r="5" fill="#159477"/>
+                <line x1="250" y1="160" x2="350" y2="70" stroke="#7653d6" stroke-width="2"/><circle cx="300" cy="115" r="5" fill="#7653d6"/>
+                <g font-size="11" text-anchor="middle"><text x="80" y="60" fill="#c2410c">slope negative</text><text x="200" y="200" fill="#159477">slope = 0 (sabse neeche)</text><text x="320" y="60" fill="#7653d6">slope positive</text></g>
+              </svg>
+              <div class="cap">Left: neeche ja rahi (slope −). Bottom: flat (slope 0). Right: upar ja rahi (slope +).</div>
+            </figure>
+            <h4>Derivative nikaalne ka “hila ke dekho” tareeka</h4>
+            <p>Formula yaad nahi? Koi baat nahi. Input ko <strong>thoda sa</strong> badlo aur dekho output kitna badla.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>y = x², point x = 3</th><th>Hisaab</th></tr>
+              <tr><td>x = 3</td><td>y = 9</td></tr>
+              <tr><td>x = 3.001 (0.001 badhaya)</td><td>y = 9.006001</td></tr>
+              <tr><td>y kitna badla ÷ x kitna badla</td><td>0.006 ÷ 0.001 ≈ <b>6</b></td></tr>
+            </table></div>
+            <p>To x = 3 pe slope ≈ 6. (Formula se: y = x² ka derivative = 2x = 2 × 3 = 6. Same!) Aise hi <strong>dJ/dw</strong> padho: “w thoda badhaaun to cost J kitna badlegi?”</p>
+            <p>Yahan numbers khud check karo: 9.006001 − 9 = 0.006001. 0.001 se divide karoge to lagbhag 6. Formula koi jaadu nahi kar raha.</p>
+            <h4>Kuch common derivatives (sirf jaan lo)</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Function</th><th>Derivative</th><th>Matlab</th></tr>
+              <tr><td>5 (constant)</td><td>0</td><td>Badalta hi nahi</td></tr>
+              <tr><td>3x</td><td>3</td><td>Har jagah same tedhapan</td></tr>
+              <tr><td>x²</td><td>2x</td><td>Jitna door, utna tedha</td></tr>
+              <tr><td>(w − 3)²</td><td>2(w − 3)</td><td>w = 3 pe 0 → minimum</td></tr>
+            </table></div>
+            <h4>Minimum dhundhna = slope 0 dhundhna</h4>
+            <div class="lesson-callout"><b>ML ka connection:</b> Cost katori ka sabse neecha point wahan hai jahan slope 0 hai. Gradient descent slope dekh ke ulti disha mein chalta hai: slope + ho to peeche, slope − ho to aage. Jab slope ~0, pahunch gaye.</div>
+            <h4>Chain rule — domino effect</h4>
+            <div class="chat">
+              <p class="msg dost">Petrol ka daam badha → auto ka kiraya badha → tumhara mahine ka kharcha badha. Agar petrol ₹1 badhne se kiraya ₹0.5 badhta hai, aur kiraya ₹1 badhne se kharcha ₹30 badhta hai — to petrol ₹1 badhne pe kharcha? 0.5 × 30 = <strong>₹15</strong>. Chain ke har link ka asar <strong>multiply</strong> karo. Yahi chain rule hai, aur yahi backpropagation ka dil hai.</p>
+            </div>
+            <div class="visual-flow"><span>Petrol</span><b>×0.5→</b><span>Kiraya</span><b>×30→</b><span class="flow-highlight">Kharcha: 0.5 × 30 = 15</span></div>
+            <p><strong>Partial derivative</strong> (∂): jab kai inputs ho (w aur b), to ek ko thoda hilao, baaki ko fixed rakho. ∂J/∂w = “sirf w hilaya to J kitna badla”. <strong>Gradient</strong> = saare partial derivatives ki list.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Derivative = “thoda hilaaun to kitna badlega?”. Minimum pe ye 0. Chain rule = chain ke asar multiply karo.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>d/dx, ∂, ∇ — ye sab kya hai?</summary><p>d/dx = “x ke hisaab se derivative”. ∂ = wahi, jab kai variables ho (partial). ∇ (nabla) = gradient, yaani saare partials ki list. Teeno ka sawaal same: “thoda hilaaun to kitna badlega?”</p></details>
+            <details class="qa"><summary>Kya mujhe derivative ke formulas practice karne padenge?</summary><p>Is course ke liye nahi. TensorFlow automatic nikaalta hai. Tumhe bas intuition chahiye: slope ka sign direction batata hai, size batata hai kitni tezi.</p></details>
+            <details class="qa"><summary>Kya hamesha minimum hi dhundhte hain?</summary><p>ML mein aam taur pe cost ka minimum. Kabhi kisi cheez ka maximum (jaise reward) — tab ulti disha mein chalo (gradient ascent).</p></details>

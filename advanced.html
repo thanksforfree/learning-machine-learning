@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Logistic regression ki team = neural network. Phir TensorFlow, activations, softmax, backprop — aur asli ML engineering: train/CV/test, bias-variance, error analysis, precision-recall. Aakhir mein decision trees, random forest aur XGBoost.">
+  <title>ML · 2: Advanced Learning Algorithms — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="index.html">Learning map</a><a href="maths.html">Maths</a><a class="active" href="ml.html">ML</a><a href="dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="module-hero">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Learning map</a> › <a href="ml.html">Machine Learning Specialization</a></nav>
+      <p class="eyebrow">ML COURSE 2 • COMPLEX PATTERNS + ASLI ENGINEERING</p>
+      <h1>Advanced Learning Algorithms</h1>
+      <p>Logistic regression ki team = neural network. Phir TensorFlow, activations, softmax, backprop — aur asli ML engineering: train/CV/test, bias-variance, error analysis, precision-recall. Aakhir mein decision trees, random forest aur XGBoost.</p>
+      <div class="module-path"><span>Neurons ki team</span> → <span>Train (backprop)</span> → <span>Check (train/CV/test)</span> → <span>Diagnose (bias/variance)</span> → <span>Trees bhi try karo</span></div>
+      <div class="hero-actions"><a class="button button-primary" href="topics/neural-network-idea.html">Topic 01 se shuru karo →</a>
+      <div class="progress-box inline" data-module-topics="a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12"><span>Progress</span><strong data-progress-label>0 / 12 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div></div>
+    </section>
+    <div class="module-overview">
+      <section class="lesson-group"><p class="eyebrow">NEURAL NETWORKS</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="a1" href="topics/neural-network-idea.html">
+          <span class="topic-index">01</span>
+          <span class="topic-card-text"><b>Neural network ka idea</b><small>Neuron = chhota logistic regression, network = unki team</small><em>Deep learning — jo aaj photos, awaaz, ChatGPT jaise systems ke peeche hai — isi building block se shuru hota hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="a2" href="topics/forward-propagation.html">
+          <span class="topic-index">02</span>
+          <span class="topic-card-text"><b>Forward propagation</b><small>Left se right chalte hue prediction</small><em>Network prediction kaise banata hai — ye samjhe bina debugging namumkin hai. Shapes ki galti yahin pakdi jaati hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="a3" href="topics/tensorflow.html">
+          <span class="topic-index">03</span>
+          <span class="topic-card-text"><b>TensorFlow mein network banana</b><small>Banao → compile → fit</small><em>Idea se asli working model tak ka pul. Industry mein neural networks isi tarah ki libraries se bante hain.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="a4" href="topics/activation-functions.html">
+          <span class="topic-index">04</span>
+          <span class="topic-card-text"><b>Activation functions</b><small>Sigmoid, ReLU, linear — kab kaunsa</small><em>Activation ke bina neural network sirf ek seedhi line hai. Sahi choice training speed aur output dono decide karti hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="a5" href="topics/softmax-multiclass.html">
+          <span class="topic-index">05</span>
+          <span class="topic-card-text"><b>Multiclass aur softmax</b><small>2 nahi, kai options mein se ek</small><em>Digit recognition, language models ka “agla shabd” — sab multiclass hai. Softmax unka standard output hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="a6" href="topics/backprop-adam.html">
+          <span class="topic-index">06</span>
+          <span class="topic-card-text"><b>Backpropagation aur Adam</b><small>Galti ki zimmedari peeche ki taraf baantna</small><em>Neural network seekhta kaise hai — iska asli jawab. Loss na gire to kya check karna hai, woh bhi yahin se aata hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">MODEL KO CHECK KARO</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="a7" href="topics/train-cv-test.html">
+          <span class="topic-index">07</span>
+          <span class="topic-card-text"><b>Training, CV aur test set</b><small>Practice, mock test, board exam</small><em>Bina honest evaluation ke tumhe pata hi nahi chalega ki model achha hai. Har ML project ka pehla engineering kadam.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="a8" href="topics/bias-variance.html">
+          <span class="topic-index">08</span>
+          <span class="topic-card-text"><b>Bias aur variance</b><small>Pehle bimaari pehchano, phir dawai</small><em>Ye diagnosis mahino ki galat mehnat bachata hai: data jama karein, bada model banayein, ya λ badlein?</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="a9" href="topics/ml-development-cycle.html">
+          <span class="topic-index">09</span>
+          <span class="topic-card-text"><b>ML development cycle</b><small>Error analysis, data, transfer learning, deployment, ethics</small><em>Asli ML engineer ka roz ka kaam: galtiyan dekhna, sahi data jodna, pre-trained models use karna, aur zimmedari se launch karna.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="a10" href="topics/precision-recall.html">
+          <span class="topic-index">10</span>
+          <span class="topic-card-text"><b>Precision, recall aur F1</b><small>Jab accuracy dhokha de</small><em>Fraud, bimaari, defects — jahan positive cases rare hain wahan yahi metrics sach batate hain.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">DECISION TREES</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="a11" href="topics/decision-trees.html">
+          <span class="topic-index">11</span>
+          <span class="topic-card-text"><b>Decision tree, entropy aur information gain</b><small>“20 sawaal” wala game</small><em>Table jaise data (Excel) pe trees bahut powerful hain, aur chhote tree insaan padh bhi sakta hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="a12" href="topics/random-forest-xgboost.html">
+          <span class="topic-index">12</span>
+          <span class="topic-card-text"><b>Random forest aur XGBoost</b><small>Ek tree ki jagah trees ki panchayat</small><em>Industry mein table data ke liye XGBoost aksar pehli pasand hai. Aur ye tay karna ki trees chunein ya neural network — engineer ka faisla.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <div class="next-module"><div><p class="eyebrow">IS COURSE KE BAAD</p><h2>Unsupervised Learning, Recommenders, RL</h2><p>Bina labels ke groups (K-means) aur ajeeb cases (anomaly detection) dhundhna, Netflix jaise recommendations banana, PCA se data ko chhota karna, aur reward se seekhne wala reinforcement learning.</p></div><a class="button button-primary" href="unsupervised.html">ML · 3 dekho →</a></div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

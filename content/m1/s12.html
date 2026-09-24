@@ -1,0 +1,50 @@
+
+            <div class="chat">
+              <p class="msg me">Regularization actually karta kya hai?</p>
+              <p class="msg dost">Overfit wala wiggly curve dekho — uske kuch weights bahut bade hote hain (jaise w₄ = 5000). Bade weights = curve ko pagal jaisa modne ki power.</p>
+              <p class="msg dost">Regularization bolta hai: “Saare features rakh lo, koi baat nahi. Par kisi weight ko bina wajah bada kiya to cost mein <strong>penalty</strong> lagegi.” Ab model khud balance karta hai — galti bhi kam, weights bhi chhote.</p>
+              <p class="msg me">Penalty kitni?</p>
+              <p class="msg dost">Woh <strong>λ (lambda)</strong> decide karta hai. Cricket coach socho: “Shots khelo, par har ball pe six maarne ki koshish mat karo.” λ = coach kitna strict hai.</p>
+              <p class="msg me">Agar coach bahut strict ho gaya?</p>
+              <p class="msg dost">Phir batter bas defend karega — model flat ho jayega, underfit. Regularization mein bhi balance chahiye, jaise chai mein chini.</p>
+            </div>
+            <div class="formula"><code>J = (purana galti wala cost) + (λ / 2m) × (w₁² + w₂² + … + wₙ²)</code><ul>
+              <li>Pehla hissa: data ko achhe se fit karo.</li>
+              <li>Doosra hissa: weights chhote rakho.</li>
+              <li>b ko usually is penalty mein nahi daalte.</li>
+            </ul></div>
+            <figure class="figure">
+              <svg viewBox="0 0 420 190" role="img" aria-label="Regularization balance: data fit aur weight penalty ke beech seesaw">
+                <line x1="70" y1="120" x2="350" y2="75" stroke="#17223b" stroke-width="5" stroke-linecap="round"/>
+                <circle cx="210" cy="105" r="14" fill="#7653d6" opacity="0.22"/><circle cx="210" cy="105" r="5" fill="#7653d6"/>
+                <rect x="45" y="105" width="90" height="38" rx="8" fill="#edf3ff"/><text x="90" y="128" font-size="11" text-anchor="middle" fill="#3567e8">fit data</text>
+                <rect x="290" y="45" width="95" height="38" rx="8" fill="#fff3ec"/><text x="337" y="68" font-size="11" text-anchor="middle" fill="#c2410c">small weights</text>
+                <text x="210" y="165" font-size="11" text-anchor="middle" fill="#7a879b">λ badhega to right side ka pressure badhega</text>
+              </svg>
+              <div class="cap">Regularization ek balance hai: data fit bhi karo, par weights ko bodybuilder mat banao.</div>
+            </figure>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>λ</th><th>Kya hota hai</th><th>Result</th></tr>
+              <tr><td>0</td><td>Koi penalty nahi</td><td class="bad">Overfit ho sakta hai</td></tr>
+              <tr><td>Sahi (jaise 1)</td><td>Weights controlled</td><td class="good">Smooth, achha curve ✓</td></tr>
+              <tr><td>Bahut bada (10¹⁰)</td><td>Saare w ≈ 0 → f ≈ b</td><td class="bad">Flat line → underfit</td></tr>
+            </table></div>
+            <h4>Penalty ka worked number</h4>
+            <p>Maan lo m = 5, λ = 1, aur weights [2, −1, 3]. Penalty:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Step</th><th>Hisaab</th><th>Value</th></tr>
+              <tr><td>Squares jodo</td><td>2² + (−1)² + 3²</td><td>4 + 1 + 9 = 14</td></tr>
+              <tr><td>Penalty</td><td>(1 ÷ (2×5)) × 14</td><td><b>1.4</b></td></tr>
+              <tr><td>Total cost</td><td>Purana cost 20 + 1.4</td><td><b>21.4</b></td></tr>
+            </table></div>
+            <p>Ab model ko sirf training galti nahi, bade weights ka rent bhi pay karna padta hai.</p>
+            <h4>Gradient descent pe iska asar</h4>
+            <div class="formula"><code>wⱼ = wⱼ × (1 − αλ/m) − α × (normal slope)</code><ul><li>(1 − αλ/m) jaise 0.9998 hota hai. Matlab har step pe weight ko <strong>thoda sa sikod</strong> do, phir normal update. Isliye isko “weight decay” bhi kehte hain.</li></ul></div>            <p>Chhota example: α = 0.01, λ = 1, m = 5, w = 10, normal slope = 3. Pehle weight 10 × 0.998 = 9.98 hua, phir 0.03 normal update ghata: naya w ≈ <b>9.95</b>. Dheere-dheere weight ki hawa nikalti rehti hai.</p>
+            <p>Yahi same penalty <strong>logistic regression</strong> pe bhi lagti hai — wiggly decision boundary ko smooth karne ke liye.</p>
+            <div class="lesson-callout"><b>Module 1 ki badi picture:</b> Problem dekho (number ya category?) → model chuno (linear ya logistic) → cost define karo (squared error ya log loss) → gradient descent se cost ghatao → overfitting pe nazar rakho (regularization, zyada data). Yahi flow aage har model mein repeat hoga.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Regularization model ko “fit karo, par drama mat karo” bolta hai — useful weights rakho, bekaar bade weights chhote karo.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>λ ki sahi value kaise choose karein?</summary><p>Kuch values try karo (0, 0.01, 0.1, 1, 10…) aur har ek ko alag rakhe validation data pe check karo. Jo best, woh lo. Module 2 mein ye detail mein hai.</p></details>
+            <details class="qa"><summary>Features hi hata dein, regularization ki kya zaroorat?</summary><p>Feature hataoge to uski information poori chali gayi. Regularization softly weight chhota karta hai — useful feature ka thoda asar bacha rehta hai.</p></details>
+            <details class="qa"><summary>b ko penalty mein kyu nahi daalte?</summary><p>b sirf poori line ko upar-neeche khiskata hai, curve ko wiggly nahi banata. Daal bhi do to zyada farak nahi padta.</p></details>            <details class="qa"><summary>L1 aur L2 regularization same hain?</summary><p>Nahi. Yahan L2 hai: squares add hote hain, weights smoothly chhote hote hain. L1 absolute values add karta hai aur kuch weights ko exact zero tak dhakel sakta hai.</p></details>
+            <details class="qa"><summary>Regularization lagane ke baad cost graph kaise dekhein?</summary><p>Training ke waqt jo cost optimize ho rahi hai usme penalty include karo. Sirf old error plot karoge to lag sakta hai model kharab ho raha hai, jabki woh weights control kar raha hota hai.</p></details>

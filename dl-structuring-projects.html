@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Code nahi, soch. Kaunsa idea pehle try karein, metric kaise chunein, human-level se tulna, error analysis, alag distribution ka data, transfer aur multi-task learning, aur end-to-end kab.">
+  <title>DL · 3: Structuring Machine Learning Projects — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="index.html">Learning map</a><a href="maths.html">Maths</a><a href="ml.html">ML</a><a class="active" href="dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="module-hero">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Learning map</a> › <a href="dl.html">Deep Learning Specialization</a></nav>
+      <p class="eyebrow">DL COURSE 3 • PROJECT KAISE CHALAYEIN</p>
+      <h1>Structuring Machine Learning Projects</h1>
+      <p>Code nahi, soch. Kaunsa idea pehle try karein, metric kaise chunein, human-level se tulna, error analysis, alag distribution ka data, transfer aur multi-task learning, aur end-to-end kab.</p>
+      <div class="module-path"><span>Ek metric</span> → <span>Sahi dev/test</span> → <span>Human se tulna</span> → <span>Galtiyan dekho</span> → <span>Sahi strategy</span></div>
+      <div class="hero-actions"><a class="button button-primary" href="topics/dl-ml-strategy-orthogonalization.html">Topic 01 se shuru karo →</a>
+      <div class="progress-box inline" data-module-topics="p1,p2,p3,p4,p5,p6,p7,p8,p9"><span>Progress</span><strong data-progress-label>0 / 9 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div></div>
+    </section>
+    <div class="module-overview">
+      <section class="lesson-group"><p class="eyebrow">SETUP</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="p1" href="topics/dl-ml-strategy-orthogonalization.html">
+          <span class="topic-index">01</span>
+          <span class="topic-card-text"><b>ML strategy aur orthogonalization</b><small>Har problem ka apna alag knob</small><em>Ek project mein das idea hote hain aur time ek ka. Ye soch batati hai ki kaunsa knob ghumana hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="p2" href="topics/dl-single-number-metric.html">
+          <span class="topic-index">02</span>
+          <span class="topic-card-text"><b>Ek number wala metric, satisficing aur optimizing</b><small>Faisla jaldi lena hai to ek score chahiye</small><em>Do models mein se kaunsa behtar hai — ek number ho to ye sawaal seconds mein solve hota hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="p3" href="topics/dl-dev-test-setup.html">
+          <span class="topic-index">03</span>
+          <span class="topic-card-text"><b>Dev/test set lagana, aur kab badalna</b><small>Nishaana sahi jagah lagao</small><em>Dev set aur metric team ka nishaana hain. Nishaana galat jagah laga to poori team galat disha mein daudti hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">HUMAN SE TULNA</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="p4" href="topics/dl-human-level-performance.html">
+          <span class="topic-index">04</span>
+          <span class="topic-card-text"><b>Human-level performance aur avoidable bias</b><small>Insaan kitna achha hai, is se pata chalta hai kya karna hai</small><em>Train error 8% achha hai ya bura? Jawab is baat pe tika hai ki insaan kitni galti karte hain.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">GALTIYON SE SEEKHNA</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="p5" href="topics/dl-error-analysis.html">
+          <span class="topic-index">05</span>
+          <span class="topic-card-text"><b>Error analysis aur galat labels</b><small>100 galtiyan dekho, mahine bachao</small><em>Sabse bada ROI wala kaam: galtiyon ko khud dekhna aur tay karna ki kahan mehnat karni hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">ALAG DISTRIBUTION KA DATA</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="p6" href="topics/dl-mismatched-distributions.html">
+          <span class="topic-index">06</span>
+          <span class="topic-card-text"><b>Training aur testing alag distributions pe</b><small>Web photos se train, mobile photos pe test</small><em>Aksar achha training data aur asli use ka data alag hota hai. Galat split kiya to galat nateeje nikaaloge.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="p7" href="topics/dl-fix-data-mismatch.html">
+          <span class="topic-index">07</span>
+          <span class="topic-card-text"><b>Data mismatch kaise theek karein</b><small>Training data ko asli jaisa banao</small><em>Data mismatch ka koi fixed formula nahi, par kuch practical tareeke hain jo aksar kaam karte hain.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">SEEKH KO AAGE BADHANA</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="p8" href="topics/dl-transfer-multitask.html">
+          <span class="topic-index">08</span>
+          <span class="topic-card-text"><b>Transfer learning aur multi-task learning</b><small>Ek kaam ki seekh doosre mein</small><em>Chhote data wale projects ke liye transfer learning sabse bada shortcut hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="p9" href="topics/dl-end-to-end.html">
+          <span class="topic-index">09</span>
+          <span class="topic-card-text"><b>End-to-end deep learning</b><small>Poori pipeline ki jagah ek network</small><em>Kabhi ek bada network sab kuch kar leta hai, kabhi chhote steps better hain. Ye faisla sahi lena bahut kaam ka hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <div class="next-module"><div><p class="eyebrow">IS COURSE KE BAAD</p><h2>Convolutional Neural Networks</h2><p>Photos ke liye bane networks. Edge detection aur convolution se shuru, phir ResNet, Inception, MobileNet, object detection (YOLO), segmentation (U-Net), face recognition aur neural style transfer.</p></div><a class="button button-primary" href="dl-convolutional-networks.html">DL · 4 dekho →</a></div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

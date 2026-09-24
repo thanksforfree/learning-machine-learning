@@ -1,0 +1,75 @@
+            <div class="chat">
+              <p class="msg me">Backprop code likh diya, loss bhi chal raha hai. Trust kar loon?</p>
+              <p class="msg dost">Backprop pe thoda healthy shak rakho. Ye Excel formula jaisa hai: ek cell galat, poori sheet confident jhooth bol sakti hai.</p>
+              <p class="msg me">To check kaise karun?</p>
+              <p class="msg dost">Parameter ko thoda plus karo, thoda minus karo, cost ka difference dekho. Numerical derivative se backprop gradient compare karo.</p>
+            </div>
+            <h4>Numerical derivative: center se naapna</h4>
+            <p>Agar θ ko thoda hilaane se cost kitna badalta hai, wahi gradient ka estimate hai. Better estimate ke liye θ+ε aur θ−ε dono use karte hain.</p>
+            <div class="formula"><code>gradapprox = (J(θ + ε) − J(θ − ε)) / (2ε)</code><ul>
+              <li><b>θ</b> = koi ek parameter, jaise W ka ek number</li>
+              <li><b>ε</b> = chhota number, often 10⁻⁷</li>
+              <li><b>gradapprox</b> = numerical slope</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>J(θ) = θ², θ = 3, ε = 0.0001</th><th>Value</th></tr>
+              <tr><td>J(3.0001)</td><td>9.00060001</td></tr>
+              <tr><td>J(2.9999)</td><td>8.99940001</td></tr>
+              <tr><td>Difference ÷ 0.0002</td><td>0.0012 ÷ 0.0002 = <b>6</b></td></tr>
+            </table></div>
+            <h4>Do-taraf wala one-taraf se accurate kyu</h4>
+            <p>One-sided estimate <code>(J(θ+ε)-J(θ))/ε</code> bhi slope deta hai, par usme curve ki tedhapan ka error zyada bachta hai. Two-sided estimate θ ke dono sides dekhta hai, errors ka kaafi hissa cancel ho jaata hai. Jaise gali ki width naapni ho to sirf left wall se nahi, dono walls ke beech naapoge.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 420 190" role="img" aria-label="Curve par theta minus epsilon aur theta plus epsilon ke beech centered slope">
+                <path d="M45,145 C130,35 260,35 365,145" fill="none" stroke="#3567e8" stroke-width="3"/>
+                <line x1="130" y1="100" x2="285" y2="78" stroke="#159477" stroke-width="3"/>
+                <circle cx="160" cy="88" r="5" fill="#e0703a"/><circle cx="250" cy="82" r="5" fill="#e0703a"/>
+                <text x="160" y="122" font-size="11" text-anchor="middle" fill="#e0703a">θ−ε</text>
+                <text x="250" y="115" font-size="11" text-anchor="middle" fill="#e0703a">θ+ε</text>
+                <text x="208" y="52" font-size="11" text-anchor="middle" fill="#159477">centered slope</text>
+              </svg>
+              <div class="cap">Dono sides use karne se numerical check zyada trustworthy hota hai.</div>
+            </figure>
+            <h4>Saare parameters ko ek bada θ vector banao</h4>
+            <p>Network mein W[1], b[1], W[2], b[2] alag shapes mein hote hain. Gradient checking ke liye sabko unroll karke ek long vector θ banao. Gradients dW/db ko bhi same order mein vector banao. Phir har index pe θᵢ ko plus/minus ε karke gradapproxᵢ nikalo.</p>
+            <div class="visual-flow"><span>W, b dictionaries</span><b>→</b><span>θ vector</span><b>→</b><span class="flow-highlight">grad vector compare</span><b>↻</b></div>
+            <pre class="code">for i in range(theta.size):
+    theta_plus = theta.copy()
+    theta_minus = theta.copy()
+    theta_plus[i] += epsilon
+    theta_minus[i] -= epsilon
+    gradapprox[i] = (J(theta_plus) - J(theta_minus)) / (2 * epsilon)</pre>
+            <h4>Compare formula aur thresholds</h4>
+            <p>Direct difference chhota ya bada scale pe depend karega. Isliye relative difference use karte hain.</p>
+            <div class="formula"><code>difference = ||grad − gradapprox||₂ / (||grad||₂ + ||gradapprox||₂)</code><ul>
+              <li><b>|| · ||₂</b> = L2 norm, vector ki length</li>
+              <li><b>10⁻⁷ ke aas-paas</b> = usually excellent</li>
+              <li><b>10⁻⁵</b> = maybe okay, components inspect karo</li>
+              <li><b>10⁻³ ya zyada</b> = strong bug smell</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Difference</th><th>Meaning</th><th>Action</th></tr>
+              <tr><td>10⁻⁷</td><td class="good">Backprop likely sahi</td><td>Proceed</td></tr>
+              <tr><td>10⁻⁵</td><td>Borderline</td><td>Layer-wise check</td></tr>
+              <tr><td>10⁻³</td><td class="bad">Bug likely</td><td>Stop and inspect</td></tr>
+            </table></div>
+            <h4>Practical tips: gradient check ko responsibly use karo</h4>
+            <ul>
+              <li><strong>Sirf debug mein:</strong> Har training iteration pe gradient checking bahut slow hai.</li>
+              <li><strong>Components dekho:</strong> Agar overall difference high hai, kaunsa layer/index fail kar raha, print karo.</li>
+              <li><strong>Regularization jodo:</strong> Agar cost mein L2 hai, numerical J mein bhi L2 term hona chahiye.</li>
+              <li><strong>Dropout band:</strong> Random masks numerical check ko unstable banayenge. keep_prob = 1 rakho.</li>
+              <li><strong>Random init aur thodi training ke baad:</strong> Kabhi bug sirf non-zero weights pe dikhta hai, isliye dono moments pe check useful.</li>
+            </ul>
+            <div class="mistake"><b>Dhyan rakhna:</b> Gradient checking pass hone ka matlab model design perfect nahi. Bas backprop formulas cost ke saath match kar rahe hain.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Backprop fast hai, numerical gradient slow hai; slow wale ko inspector bana ke fast wale ko verify karo.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>ε kitna rakhein?</summary><p>Common choice 10⁻⁷. Bahut bada hua to approximation rough, bahut chhota hua to floating point noise aa sakta hai.</p></details>
+            <details class="qa"><summary>Mini-batch pe gradient check kar sakte?</summary><p>Haan, chhote fixed mini-batch pe karo. Random shuffle/dropout off rakho taaki J repeatable ho.</p></details>
+            <details class="qa"><summary>Autograd frameworks mein zaroori hai?</summary><p>Agar custom backward likh rahe ho to useful. Pure TensorFlow/PyTorch standard ops mein usually framework gradients reliable hote hain.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>J(θ)=θ², θ=4. True gradient?</summary><p>Derivative 2θ hai, to 2×4 = 8. <b>final answer: 8</b>.</p></details>
+              <details class="qa"><summary>Gradient check difference 10⁻³ aa raha hai. Ignore karun?</summary><p>Nahi. Ye bug ka strong signal hai. Layer-wise components inspect karo.</p></details>
+              <details class="qa"><summary>Dropout on rakh ke gradient check kyu problematic?</summary><p>Har cost call mein random mask badal sakta hai, to J(θ+ε) aur J(θ−ε) same function ke values nahi rahenge.</p></details>
+            </div>

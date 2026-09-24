@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Machine learning asal mein hai kya?: Rules likhne ki jagah examples se seekhna. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Machine learning asal mein hai kya? (ML · 1) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-blue">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../supervised.html">ML · 1: Supervised Machine Learning</a> › Topic 1 / 12</nav>
+        <p class="eyebrow">ML · 1 · TOPIC 01 · BUNIYAAD</p>
+        <h1>Machine learning asal mein hai kya?</h1>
+        <p>Rules likhne ki jagah examples se seekhna</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 1 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="s1" class="current" aria-current="page" href="ml-kya-hai.html"><span>01</span>Machine learning asal mein hai kya?</a>
+            <a data-topic-link="s2" href="linear-regression.html"><span>02</span>Linear regression — seedhi line ka model</a>
+            <a data-topic-link="s3" href="cost-function.html"><span>03</span>Cost function — line ko marks dena</a>
+            <a data-topic-link="s4" href="gradient-descent.html"><span>04</span>Gradient descent — pahad se neeche utarna</a>
+            <a data-topic-link="s5" href="multiple-features.html"><span>05</span>Multiple features aur vectorization</a>
+            <a data-topic-link="s6" href="feature-scaling.html"><span>06</span>Feature scaling aur training check</a>
+            <a data-topic-link="s7" href="feature-engineering.html"><span>07</span>Feature engineering aur polynomial regression</a>
+            <a data-topic-link="s8" href="logistic-regression.html"><span>08</span>Logistic regression aur sigmoid</a>
+            <a data-topic-link="s9" href="decision-boundary.html"><span>09</span>Decision boundary</a>
+            <a data-topic-link="s10" href="logistic-cost.html"><span>10</span>Logistic cost (log loss)</a>
+            <a data-topic-link="s11" href="overfitting.html"><span>11</span>Underfitting aur overfitting</a>
+            <a data-topic-link="s12" href="regularization.html"><span>12</span>Regularization — weights pe lagaam</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12"><span>ML · 1 progress</span><strong data-progress-label>0 / 12 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Poore course ka naksha: supervised vs unsupervised, regression vs classification. Har naya topic in dabbon mein se kisi ek mein fit hoga.</div>
+        
+        
+        <article class="lesson-card single" id="s1">
+          <div class="lesson-body">
+
+            <div class="chat">
+              <p class="msg me">Yaar seedha batao, machine learning hai kya cheez? Har jagah yahi sunta hoon.</p>
+              <p class="msg dost">Ek kahani se samjhata hoon. Tumhari chhoti behen ko sikhana hai ki <strong>aam</strong> kaisa dikhta hai. Kya tum usse likh ke doge — “peela ya hara, oval shape, 8–12 cm, upar danthal”? Nahi na. Tum bas 20–30 aam dikhaoge aur bologe “ye aam hai”, kuch kele-seb dikhaoge “ye aam nahi hai”. Kuch din baad woh naya aam dekh ke khud bol degi.</p>
+              <p class="msg dost">Bas yahi machine learning hai. Computer ko rules likh ke nahi dete — <strong>examples</strong> dete hain, aur woh khud pattern pakad leta hai.</p>
+              <p class="msg me">Par normal programming mein bhi to computer kaam karta hai?</p>
+              <p class="msg dost">Haan, par wahan rules <em>tum</em> likhte ho. Spam email pakadna hai? Rule likha “lottery word ho to spam”. Agle din spammer ne “l0ttery” likh diya — rule fail. ML mein tum 10,000 emails dete ho jinpe pehle se likha hai spam/not spam, aur computer khud seekhta hai ki spam emails mein kya-kya common hota hai.</p>
+              <p class="msg me">To ML jaadu nahi, solved examples wali padhai hai?</p>
+              <p class="msg dost">Bilkul. Jaise tuition mein 50 solved questions dekh ke pattern pakadte ho. Bas yahan student computer hai, aur answer key data ke saath lagi hui hai.</p>
+            </div>
+            <div class="compare-grid">
+              <div><b>Normal programming</b>Rules (tumne likhe) + Data → <strong>Answer</strong></div>
+              <div><b>Machine learning</b>Data + Sahi answers → <strong>Rules / pattern</strong> (computer ne khud seekhe)</div>
+            </div>
+            <h4>Do bade types (teesra Module 3 mein)</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Type</th><th>Matlab</th><th>Example</th></tr>
+              <tr><td><b>Supervised</b></td><td>Har example ke saath <strong>sahi answer (label)</strong> bhi diya hai — jaise teacher answer key de</td><td>Email → spam?<br>Ghar → price</td></tr>
+              <tr><td><b>Unsupervised</b></td><td>Sirf data hai, answer key nahi. Computer khud groups ya pattern dhoondhe</td><td>Customers ke groups banana<br>Milti-julti news ek saath rakhna</td></tr>
+            </table></div>
+            <h4>Supervised ke andar do kaam</h4>
+            <div class="compare-grid">
+              <div><b>Regression = number batao</b>Answer koi bhi number ho sakta hai: 45.3 lakh, 27.8°C, 312 customers…</div>
+              <div><b>Classification = category chuno</b>Answer kuch fixed options mein se ek: spam / not spam, billi / kutta / ghoda</div>
+            </div>
+            <h4>Chalo test karo — ye kaunsa problem hai?</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Problem</th><th>Answer</th></tr>
+              <tr><td>Kal ka temperature kitna hoga?</td><td>Regression (number)</td></tr>
+              <tr><td>Photo mein billi hai ya nahi?</td><td>Classification (haan/na)</td></tr>
+              <tr><td>Customer is mahine kitne rupaye ka saamaan lega?</td><td>Regression</td></tr>
+              <tr><td>Tumor khatarnak hai ya nahi?</td><td>Classification</td></tr>
+              <tr><td>Shoppers ko unke shopping style se groups mein baanto (koi label nahi diya)</td><td>Unsupervised</td></tr>
+            </table></div>
+            <div class="formula"><code>Course ki bhasha — symbols se darna nahi hai</code><ul>
+              <li><b>x</b> = input / feature (jaise ghar ka size)</li>
+              <li><b>y</b> = sahi answer / target (jaise asli price)</li>
+              <li><b>ŷ</b> (“y-hat”) = model ka andaaza</li>
+              <li><b>m</b> = kitne training examples hain (table mein kitni rows)</li>
+              <li><b>(x<sup>(i)</sup>, y<sup>(i)</sup>)</b> = i-th example. (x<sup>(2)</sup>, y<sup>(2)</sup>) = table ki doosri row. Upar bracket wala number power nahi hai, bas row number hai!</li>
+            </ul></div>
+            <div class="oneliner"><b>Yaad rakhna:</b> ML = examples dikhao → computer pattern seekhe → naye case pe andaaza lagaye.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>“Regression” ka matlab to “peeche jaana” hota hai. Yahan number kyu?</summary><p>Naam purane statistics se aaya hai, uska history mein lamba kissa hai. ML mein bas itna yaad rakho: <strong>regression = number predict karna</strong>. Isse zyada dimaag lagane ki zaroorat nahi.</p></details>
+            <details class="qa"><summary>Classification mein sirf 2 hi options hote hain?</summary><p>Nahi. 2 options ho to “binary classification” (haan/na). 3 ya zyada ho to “multiclass” (billi/kutta/ghoda). Shart bas itni hai ki options <strong>gine-chune aur pehle se fixed</strong> hon. Agar answer 0 se infinity tak kuch bhi ho sakta hai, to woh regression hai.</p></details>
+            <details class="qa"><summary>Apna problem kaunsa type hai, kaise pehchanu?</summary><p>Khud se do sawaal pucho. <strong>(1)</strong> Kya mere paas har example ka sahi answer hai? Haan → supervised. Nahi → unsupervised. <strong>(2)</strong> Answer number hai ya category? Number → regression. Category → classification.</p></details>
+            <details class="qa"><summary>AI, ML aur Deep Learning — teeno same hain?</summary><p>Nahi, ek ke andar ek hain — jaise India &gt; Maharashtra &gt; Mumbai. <strong>AI</strong> = machine ko smart banane ka poora field. <strong>ML</strong> = AI ka woh hissa jahan machine data se seekhti hai. <strong>Deep learning</strong> = ML ka woh hissa jo bade neural networks use karta hai (Module 2).</p></details>
+            <details class="qa"><summary>Kitna data chahiye ML ke liye?</summary><p>Koi fixed number nahi. Simple pattern (size → price) ke liye kuch sau examples bhi chal sakte hain. Photo, awaaz, language jaise mushkil kaam ke liye hazaaron-laakhon. Module 2 mein “learning curve” se judge karna seekhoge ki aur data se fayda hoga ya nahi.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>“Kal Sensex kitne points pe band hoga?” — kaunsa type?</summary><p>Supervised → <b>regression</b> (answer ek number).</p></details>
+              <details class="qa"><summary>“Photos ko bina labels ke milte-julte groups mein baanto” — kaunsa type?</summary><p><b>Unsupervised</b> → clustering.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="s1"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="maths-convolution.html"><small>← Pichhla · Maths</small>Convolution: sliding dot product</a>
+          <a class="pager-next" href="linear-regression.html"><small>Agla →</small>Linear regression — seedhi line ka model</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

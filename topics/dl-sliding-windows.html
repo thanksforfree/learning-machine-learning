@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sliding windows aur uska convolutional version: Khidki ghumao, par smart tarike se. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Sliding windows aur uska convolutional version (DL · 4) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-convolutional-networks.html">DL · 4: Convolutional Neural Networks</a> › Topic 11 / 15</nav>
+        <p class="eyebrow">DL · 4 · TOPIC 11 · OBJECT DETECTION</p>
+        <h1>Sliding windows aur uska convolutional version</h1>
+        <p>Khidki ghumao, par smart tarike se</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 4 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="c1" href="dl-cv-edge-detection.html"><span>01</span>Computer vision aur edge detection</a>
+            <a data-topic-link="c2" href="dl-padding-stride.html"><span>02</span>Padding aur strided convolution</a>
+            <a data-topic-link="c3" href="dl-conv-volumes-layer.html"><span>03</span>Volumes pe convolution aur ek conv layer</a>
+            <a data-topic-link="c4" href="dl-pooling-cnn-example.html"><span>04</span>Pooling, poora CNN example aur convolution kyu</a>
+            <a data-topic-link="c5" href="dl-classic-networks.html"><span>05</span>Classic networks: LeNet-5, AlexNet, VGG-16</a>
+            <a data-topic-link="c6" href="dl-resnets.html"><span>06</span>ResNets</a>
+            <a data-topic-link="c7" href="dl-inception.html"><span>07</span>1×1 convolution aur Inception network</a>
+            <a data-topic-link="c8" href="dl-mobilenet-efficientnet.html"><span>08</span>MobileNet aur EfficientNet</a>
+            <a data-topic-link="c9" href="dl-cnn-practical-advice.html"><span>09</span>CNN practical advice</a>
+            <a data-topic-link="c10" href="dl-localization-landmarks.html"><span>10</span>Object localization aur landmark detection</a>
+            <a data-topic-link="c11" class="current" aria-current="page" href="dl-sliding-windows.html"><span>11</span>Sliding windows aur uska convolutional version</a>
+            <a data-topic-link="c12" href="dl-yolo.html"><span>12</span>YOLO: IoU, non-max suppression, anchor boxes</a>
+            <a data-topic-link="c13" href="dl-region-proposals-unet.html"><span>13</span>Region proposals aur semantic segmentation (U-Net)</a>
+            <a data-topic-link="c14" href="dl-face-recognition.html"><span>14</span>Face recognition: one-shot, Siamese, triplet loss</a>
+            <a data-topic-link="c15" href="dl-neural-style-transfer.html"><span>15</span>Neural style transfer aur ConvNet andar kya seekhta hai</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15"><span>DL · 4 progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Detection ka seedha tareeka bahut slow hai. Convolution se usko tez karne ki trick YOLO tak le jaati hai.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Kasi hui (cropped) gaadi ki photos se classifier</li><li>Sliding window aur uska computation cost</li><li>FC layer ko conv layer banana</li><li>Ek hi pass mein saari windows — apne sizes ke saath worked</li><li>Kamzori: box ki jagah accurate nahi</li></ul></details>
+        <article class="lesson-card single" id="c11">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Localization ek object ke liye theek hai. Par road photo mein cars alag-alag jagah hongi. Model ko kahan-kahan dekhna chahiye?</p>
+              <p class="msg dost">Sabse seedha jugaad: ek chhoti khidki lo, image pe ghumaao, har jagah classifier chalao. Jaise security guard torch leke parking lot scan karta hai.</p>
+              <p class="msg me">Sounds simple. Problem?</p>
+              <p class="msg dost">Torch wali walking bahut slow ho sakti hai. Isi liye sliding windows ka convolutional version aaya — same kaam, par repeated calculation bachake.</p>
+            </div>
+
+            <h4>Pehle ek cropped classifier train karo</h4>
+            <p>Shuru mein classifier ko clean training examples do: tightly cropped car images aur non-car images. Matlab photo ka center mostly object ho. Ye model bolega: “is 20×20 ya 72×72 patch mein car hai ya nahi.”</p>
+            <div class="compare-grid">
+              <div><b>Positive crop</b>Car frame ke andar fit. Label = 1.</div>
+              <div><b>Negative crop</b>Road, tree, wall, sky. Label = 0.</div>
+            </div>
+            <p>Ab classifier trained hai. Lekin real image mein crop ready nahi milta. To window ko image pe slide karte hain.</p>
+
+            <h4>Sliding window: khidki ghumaao, classifier chalao</h4>
+            <figure class="figure">
+              <svg viewBox="0 0 430 230" role="img" aria-label="Image par sliding window grid">
+                <rect x="40" y="25" width="280" height="170" rx="10" fill="#edf3ff" stroke="#b8c2d3" stroke-width="2"/>
+                <g stroke="#b8c2d3" stroke-width="1">
+                  <line x1="80" y1="25" x2="80" y2="195"/><line x1="120" y1="25" x2="120" y2="195"/><line x1="160" y1="25" x2="160" y2="195"/><line x1="200" y1="25" x2="200" y2="195"/><line x1="240" y1="25" x2="240" y2="195"/><line x1="280" y1="25" x2="280" y2="195"/>
+                  <line x1="40" y1="65" x2="320" y2="65"/><line x1="40" y1="105" x2="320" y2="105"/><line x1="40" y1="145" x2="320" y2="145"/>
+                </g>
+                <rect x="120" y="65" width="80" height="80" fill="none" stroke="#e0703a" stroke-width="4"/>
+                <rect x="185" y="92" width="70" height="26" rx="6" fill="#3567e8"/>
+                <circle cx="202" cy="121" r="9" fill="#4b5871"/><circle cx="238" cy="121" r="9" fill="#4b5871"/>
+                <g font-size="11" fill="#4b5871"><text x="335" y="75">window</text><text x="335" y="93">classifier</text><text x="335" y="111">chalao</text></g>
+              </svg>
+              <div class="cap">Window left-to-right, top-to-bottom slide hoti hai. Har location pe same classifier.</div>
+            </figure>
+            <p>Computation jaldi badh jaata hai. Example: 90×90 image, 30×30 window, stride 10. Ek direction mein positions = ⌊(90−30)/10⌋+1 = 7. Total positions = 7×7 = 49. Agar 3 window sizes try kar rahe ho, <strong>147 classifier runs</strong>.</p>
+
+            <h4>FC layer ko convolution mein badalna</h4>
+            <p>Old-style CNN classifier ke end mein fully connected layer hoti thi. Par agar previous activation 6×6×12 hai aur FC layer 96 units ki hai, to use <strong>6×6 convolution with 96 filters</strong> ki tarah likh sakte ho.</p>
+            <div class="formula"><code>6×6×12 input patch → 1×1×96 output</code><ul>
+              <li><b>FC view</b> = 6×6×12 = 432 numbers flatten, phir 96 units</li>
+              <li><b>Conv view</b> = 6×6 filter poore 6×6 area pe baithta hai, output 1×1×96</li>
+              <li>Dono ka math same, bas conv view large image pe repeat work share kar leta hai.</li>
+            </ul></div>
+            <p>Ye chhota sa rewrite important hai. Classifier ab kisi fixed crop pe hi nahi, larger image pe bhi convolution ki tarah chal sakta hai.</p>
+
+            <h4>Ek hi pass mein saari windows</h4>
+            <p>Maan lo toy classifier 20×20×3 crop pe final output 1×1×5 deta hai: pehle 5×5 stride-2 conv se 8×8 banta hai, phir 8×8 conv se 1×1. Agar tum 26×26×3 image doge, pehli layer 11×11 banayegi, aur final output 4×4×5 hoga. Ye 4×4 grid = solah sliding-window predictions, ek single forward pass mein.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Input</th><th>Old sliding windows</th><th>Convolutional version</th></tr>
+              <tr><td>20×20×3</td><td>1 crop run</td><td>1×1×5 output</td></tr>
+              <tr><td>26×26×3</td><td>16 overlapping crop runs</td><td class="good">4×4×5 output, ek pass</td></tr>
+            </table></div>
+            <div class="visual-flow"><span>Repeated crop</span><b>→</b><span>Same conv calculations baar-baar</span><b>→</b><span class="flow-highlight">Convolutional sliding window</span><b>→</b><span>Calculations share</span></div>
+            <p>Intuition: overlapping windows mein image ka zyada hissa common hota hai. Normal sliding window us common part ka feature baar-baar nikalta hai. Conv version ek baar feature map bana ke sab locations ka result nikal deta hai.</p>
+
+            <h4>Par box exact nahi hota</h4>
+            <p>Weakness bhi samjho. Window ka size aur stride fixed hai. Agar car thodi beech mein hai, model sirf nearest grid/window location dega. Box “lagbhag” sahi ho sakta hai, par tight nahi.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Stride chhota karoge to location better hogi, par computation badhega. Stride bada karoge to fast, par object miss ya loose box ka chance badhega.</div>
+
+            <h4>Is idea ne YOLO ka raasta banaya</h4>
+            <p>Sliding windows bolta hai: “har jagah classifier chalao.” YOLO bolta hai: “ek hi network poori image dekhe, grid ke har cell ke liye box aur class predict kare.” Dono mein convolutional sharing wali soch common hai.</p>
+            <pre class="code"># Rough shape thinking
+image = (16, 16, 3)
+conv_classifier_output = (2, 2, 4)  <span class="cm"># 4 grid locations, 4 class scores</span>
+# crop-by-crop chalate to 4 forward passes lagte</pre>
+
+            <div class="oneliner"><b>Yaad rakhna:</b> Sliding windows simple hai par slow; FC ko conv mein badalke overlapping windows ke predictions ek forward pass mein mil sakte hain.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Window sizes multiple kyu?</summary><p>Object kabhi paas hoga, kabhi door. Paas wali car badi dikhegi, door wali chhoti. Different window sizes scales ko cover karte hain.</p></details>
+            <details class="qa"><summary>FC ko conv banana sirf trick hai ya weights change hote hain?</summary><p>Weights ka meaning same rehta hai. Bas matrix multiply ko convolution ke form mein reshape kar dete hain, taaki wahi operation spatial locations pe repeat ho sake.</p></details>
+            <details class="qa"><summary>Convolutional sliding windows perfect detection hai?</summary><p>Nahi. Fast hai, par box location grid/stride se bandhi hai. YOLO jaise methods box coordinates directly predict karke is weakness ko improve karte hain.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>128×128 image, 32×32 window, stride 16. Ek scale pe kitni window positions?</summary><p>Ek direction mein ⌊(128−32)/16⌋+1 = 6+1 = 7. Total 7×7 = <b>49 windows</b>.</p></details>
+              <details class="qa"><summary>6×6×12 activation ko 1×1×96 banane ke liye conv filter shape kya hoga?</summary><p>Filter spatial size 6×6, depth 12, number of filters 96. Shape <b>6×6×12×96</b>.</p></details>
+              <details class="qa"><summary>Stride bahut bada rakhne ka risk?</summary><p>Object do window positions ke beech reh sakta hai. Model usko miss kar sakta hai ya loose box de sakta hai.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="c11"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-localization-landmarks.html"><small>← Pichhla</small>Object localization aur landmark detection</a>
+          <a class="pager-next" href="dl-yolo.html"><small>Agla →</small>YOLO: IoU, non-max suppression, anchor boxes</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

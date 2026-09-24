@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Function = input-output machine: f(x) ka asli matlab. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Function = input-output machine (Maths) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a class="active" href="../maths.html">Maths</a><a href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../maths.html">Maths: Maths — zero se deep learning tak</a> › Topic 3 / 16</nav>
+        <p class="eyebrow">MATHS · TOPIC 03 · LEVEL 1 · PEHLA KADAM</p>
+        <h1>Function = input-output machine</h1>
+        <p>f(x) ka asli matlab</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>Maths ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="z1" href="maths-symbols.html"><span>01</span>Symbols aur formula padhna</a>
+            <a data-topic-link="z2" href="maths-graphs.html"><span>02</span>Graph, line aur slope</a>
+            <a data-topic-link="z3" class="current" aria-current="page" href="maths-functions.html"><span>03</span>Function = input-output machine</a>
+            <a data-topic-link="z4" href="maths-powers-e-log.html"><span>04</span>Power, e aur log</a>
+            <a data-topic-link="z5" href="maths-average-probability.html"><span>05</span>Average, phailaav aur probability</a>
+            <a data-topic-link="z6" href="maths-vectors-matrices.html"><span>06</span>Vectors, matrices aur dot product</a>
+            <a data-topic-link="z7" href="maths-slope-derivative.html"><span>07</span>Slope, derivative aur chain rule</a>
+            <a data-topic-link="z8" href="maths-python-numpy.html"><span>08</span>Python aur NumPy crash course</a>
+            <a data-topic-link="z9" href="maths-broadcasting-shapes.html"><span>09</span>Broadcasting, shapes aur reshape</a>
+            <a data-topic-link="z10" href="maths-computation-graph.html"><span>10</span>Computation graph aur activation ke derivatives</a>
+            <a data-topic-link="z11" href="maths-matrix-gradients.html"><span>11</span>Matrix gradients aur dimensions ka hisaab</a>
+            <a data-topic-link="z12" href="maths-norms-similarity.html"><span>12</span>Norms, distance aur cosine similarity</a>
+            <a data-topic-link="z13" href="maths-moving-average.html"><span>13</span>Exponentially weighted (moving) average</a>
+            <a data-topic-link="z14" href="maths-probability-2.html"><span>14</span>Probability level 2: conditional, likelihood, cross-entropy</a>
+            <a data-topic-link="z15" href="maths-randomness-scale.html"><span>15</span>Randomness, variance aur scale</a>
+            <a data-topic-link="z16" href="maths-convolution.html"><span>16</span>Convolution: sliding dot product</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="z1,z2,z3,z4,z5,z6,z7,z8,z9,z10,z11,z12,z13,z14,z15,z16"><span>Maths progress</span><strong data-progress-label>0 / 16 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>ML model ek function hi hai. Training = us function ke knobs (w, b) ghumana. Ye idea poore course ki reedh ki haddi hai.</div>
+        
+        
+        <article class="lesson-card single" id="z3">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">f(x) matlab f multiply x?</p>
+              <p class="msg dost">Nahi! Ye sabse common confusion hai. <strong>f(x)</strong> padho: “f <em>of</em> x” — matlab “f naam ki machine mein x daala”. Juice machine socho: andar santra daalo (input), bahar juice aaye (output). Machine ka naam f hai.</p>
+              <p class="msg me">Aur machine ke andar kya hota hai?</p>
+              <p class="msg dost">Uska recipe = formula. Jaise <strong>f(x) = 2x + 1</strong>: “jo bhi daalo, usko double karo, 1 jodo”. f(3) = 2·3 + 1 = 7. f(10) = 21. Recipe same, input badla to output badla.</p>
+              <p class="msg me">f(3) likha dekh ke lagta hai maths wale log secret code bol rahe hain.</p>
+              <p class="msg dost">Haan, pehli baar ajeeb lagta hai. Par padhne ka tareeka simple hai: “f machine ko 3 diya”. Bas bracket input ka dabba hai.</p>
+            </div>
+            <div class="visual-flow"><span>Input x = 3</span><b>→</b><span class="flow-highlight">Machine f<br><small>“double karo, +1”</small></span><b>→</b><span>Output f(3) = 7</span></div>
+            <h4>Function ki ek hi shart</h4>
+            <p>Same input daalo to <strong>hamesha same output</strong>. Juice machine mein ek santra kabhi juice, kabhi doodh nahi de sakti. Agar output badal raha hai, ya to input sach mein badla hai, ya machine ke knobs badle hain.</p>
+            <h4>Kai inputs wali machine</h4>
+            <p>Machine ek se zyada input bhi le sakti hai: <strong>f(size, bedrooms) = 0.04·size + 3·bedrooms + 10</strong>. f(1000, 2) = 40 + 6 + 10 = 56. Ghar ka price machine!</p>
+            <h4>Machine ke andar machine</h4>
+            <div class="chat">
+              <p class="msg dost">Ek machine ka output doosri ka input ban sakta hai — jaise pehle santre ka juice, phir juice se ice-lolly. g(f(x)) padho “pehle f, phir g”.</p>
+            </div>
+            <div class="visual-flow"><span>x = 3</span><b>→</b><span>f: 2x + 1 = 7</span><b>→</b><span class="flow-highlight">g: square karo = 49</span></div>
+            <p>ML mein ye bahut aata hai: <strong>logistic regression = sigmoid(line(x))</strong>. Neural network = machine ke andar machine ke andar machine… har layer ek machine.</p>
+            <h4>ML ka sabse bada idea</h4>
+            <div class="lesson-callout"><b>Poora ML ek line mein:</b> Hum ek machine f dhundhna chahte hain jo x (input) dekh ke y (sahi answer) ke bahut kareeb output de. Machine ki recipe mein kuch <em>knobs</em> hote hain (w, b). Training = knobs ko ghumana jab tak output sahi na aane lage.</div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Cheez</th><th>Function ki bhasha</th></tr>
+              <tr><td>Model</td><td>Machine f(x)</td></tr>
+              <tr><td>Parameters (w, b)</td><td>Machine ke knobs</td></tr>
+              <tr><td>Prediction ŷ</td><td>Machine ka output</td></tr>
+              <tr><td>Cost function J(w, b)</td><td>Ek aur machine: knobs daalo → “kitna galat” bahar</td></tr>
+            </table></div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Function = input leke fixed recipe se output dene wali machine. ML = sahi recipe ke knobs dhundhna.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>f hi kyu? g, h bhi use hote hain?</summary><p>Koi bhi naam chalega. f, g, h tradition hai. ML mein sigmoid ko aksar g bolte hain, model ko f.</p></details>
+            <details class="qa"><summary>f<sub>w,b</sub>(x) mein neeche w,b kyu likha?</summary><p>Bas yaad dilane ke liye ki is machine ke knobs w aur b hain. Output x pe bhi depend karta hai aur knobs pe bhi.</p></details>
+            <details class="qa"><summary>Programming wala function aur ye same?</summary><p>Idea same: <code>def f(x): return 2*x + 1</code>. Input do, output lo. Page 08 pe Python dekhoge.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>f(x) = x² − 1. f(3) kitna?</summary><p>9 − 1 = <b>8</b>.</p></details>
+              <details class="qa"><summary>f(x) = 2x, g(x) = x + 5. g(f(4))?</summary><p>Pehle f(4) = 8, phir g(8) = <b>13</b>.</p></details>
+            </div>
+            <div class="used-box"><h4>Ye maths aage kahan kaam aayegi</h4><div class="chips"><a class="chip" data-topic-link="s2" href="linear-regression.html"><small>ML · 1</small>Linear regression — seedhi line ka model</a><a class="chip" data-topic-link="a1" href="neural-network-idea.html"><small>ML · 2</small>Neural network ka idea</a></div></div>
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="z3"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="maths-graphs.html"><small>← Pichhla</small>Graph, line aur slope</a>
+          <a class="pager-next" href="maths-powers-e-log.html"><small>Agla →</small>Power, e aur log</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

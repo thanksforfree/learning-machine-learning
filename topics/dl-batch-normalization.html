@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Batch normalization: Har layer ke andar bhi normalize karo. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Batch normalization (DL · 2) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-improving-networks.html">DL · 2: Improving Deep Neural Networks</a> › Topic 13 / 15</nav>
+        <p class="eyebrow">DL · 2 · TOPIC 13 · HYPERPARAMETER TUNING</p>
+        <h1>Batch normalization</h1>
+        <p>Har layer ke andar bhi normalize karo</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 2 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="i1" href="dl-train-dev-test-bias-variance.html"><span>01</span>Train/dev/test aur bias-variance</a>
+            <a data-topic-link="i2" href="dl-l2-regularization.html"><span>02</span>L2 regularization</a>
+            <a data-topic-link="i3" href="dl-dropout.html"><span>03</span>Dropout</a>
+            <a data-topic-link="i4" href="dl-augmentation-early-stopping.html"><span>04</span>Data augmentation aur early stopping</a>
+            <a data-topic-link="i5" href="dl-normalizing-inputs.html"><span>05</span>Inputs normalize karna</a>
+            <a data-topic-link="i6" href="dl-vanishing-exploding-init.html"><span>06</span>Vanishing/exploding gradients aur weight initialization</a>
+            <a data-topic-link="i7" href="dl-gradient-checking.html"><span>07</span>Gradient checking</a>
+            <a data-topic-link="i8" href="dl-mini-batch.html"><span>08</span>Mini-batch gradient descent</a>
+            <a data-topic-link="i9" href="dl-exponentially-weighted-averages.html"><span>09</span>Exponentially weighted averages</a>
+            <a data-topic-link="i10" href="dl-momentum-rmsprop-adam.html"><span>10</span>Momentum, RMSprop aur Adam</a>
+            <a data-topic-link="i11" href="dl-learning-rate-decay-local-optima.html"><span>11</span>Learning rate decay aur local optima ka sach</a>
+            <a data-topic-link="i12" href="dl-hyperparameter-tuning.html"><span>12</span>Hyperparameter tuning ka tareeka</a>
+            <a data-topic-link="i13" class="current" aria-current="page" href="dl-batch-normalization.html"><span>13</span>Batch normalization</a>
+            <a data-topic-link="i14" href="dl-softmax-regression.html"><span>14</span>Softmax regression</a>
+            <a data-topic-link="i15" href="dl-frameworks-tensorflow.html"><span>15</span>Deep learning frameworks aur TensorFlow</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15"><span>DL · 2 progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Batch norm se gehre networks tez aur stable train hote hain, aur hyperparameters ka chunaav kam nazuk ho jaata hai.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z5" href="maths-average-probability.html"><small>Maths</small>Average, phailaav aur probability</a><a class="chip" data-topic-link="z13" href="maths-moving-average.html"><small>Maths</small>Exponentially weighted (moving) average</a></div></div>
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Hidden layer ke Z ko normalize karna</li><li>γ aur β — network khud mean aur variance chune</li><li>Network mein kaise fit hota hai (mini-batch pe), b bekaar kyu</li><li>Kaam kyu karta hai: covariate shift, baad ki layers stable, thoda regularization</li><li>Test time pe: training ke μ, σ² ka moving average</li></ul></details>
+        <article class="lesson-card single" id="i13">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Inputs normalize karna samajh aaya. Par hidden layer ke andar bhi normalize? Network khud manage nahi kar sakta?</p>
+              <p class="msg dost">Kar sakta hai, par har layer ka input training ke dauraan badalta rehta hai. Jaise tum cricket practice kar rahe ho aur bowler har over pitch hi badal de.</p>
+              <p class="msg me">To har layer ko stable pitch deni hai?</p>
+              <p class="msg dost">Bilkul. Batch normalization hidden layer ke numbers ko standard range mein laata hai, phir network ko permission deta hai ki “agar chaho to scale/shift khud choose kar lo.”</p>
+              <p class="msg me">Normalize karke phir change karne ki permission? Thoda ulta nahi?</p>
+              <p class="msg dost">Pehli baar sabko ulta lagta hai. Normalize stability ke liye, γ aur β flexibility ke liye.</p>
+            </div>
+            <h4>Hidden layer ke Z ko normalize karna</h4>
+            <p>Batch norm aam taur pe activation se pehle wale Z values pe lagaya jaata hai. Ek mini-batch lo, us batch mein har neuron ka mean aur variance nikaalo, phir normalize.</p>
+            <div class="formula"><code>μ = average(Z)
+σ² = average((Z − μ)²)
+Z_norm = (Z − μ) / √(σ² + ε)
+Z_tilde = γZ_norm + β</code><ul>
+              <li><b>μ, σ²</b> mini-batch se nikle mean aur variance</li>
+              <li><b>ε</b> tiny safety number</li>
+              <li><b>γ</b> scale parameter, network seekhta hai</li>
+              <li><b>β</b> shift parameter, network seekhta hai</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Z values</th><th>μ</th><th>σ²</th><th>Z_norm</th><th>γ = 2, β = 0.5 ke baad</th></tr>
+              <tr><td>2</td><td>5</td><td>5</td><td>−1.34</td><td>−2.18</td></tr>
+              <tr><td>4</td><td>5</td><td>5</td><td>−0.45</td><td>−0.39</td></tr>
+              <tr><td>6</td><td>5</td><td>5</td><td>0.45</td><td>1.39</td></tr>
+              <tr><td>8</td><td>5</td><td>5</td><td>1.34</td><td>3.18</td></tr>
+            </table></div>
+            <p>Normalize ke baad values mean 0 aur variance 1 ke aas-paas. Phir γ, β se network decide kar sakta hai ki is neuron ko actually kis scale pe rakhna hai.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 420 210" role="img" aria-label="Batch normalization layer between linear Z and activation">
+                <rect x="35" y="75" width="80" height="55" rx="10" fill="#edf3ff" stroke="#3567e8"/>
+                <rect x="165" y="75" width="90" height="55" rx="10" fill="#e9f7f3" stroke="#159477"/>
+                <rect x="305" y="75" width="80" height="55" rx="10" fill="#f2edff" stroke="#7653d6"/>
+                <text x="75" y="98" font-size="11" text-anchor="middle" fill="#3567e8">Z = WA</text><text x="75" y="115" font-size="11" text-anchor="middle" fill="#3567e8">+ b</text>
+                <text x="210" y="98" font-size="11" text-anchor="middle" fill="#159477">Batch norm</text><text x="210" y="115" font-size="11" text-anchor="middle" fill="#159477">μ, σ², γ, β</text>
+                <text x="345" y="106" font-size="11" text-anchor="middle" fill="#7653d6">activation</text>
+                <path d="M115,102 L165,102" stroke="#8a96aa" stroke-width="2"/><path d="M255,102 L305,102" stroke="#8a96aa" stroke-width="2"/>
+              </svg>
+              <div class="cap">Linear step ke baad batch norm, phir activation. Har mini-batch pe stats nikalte hain.</div>
+            </figure>
+            <h4>γ aur β: network ko freedom</h4>
+            <p>Agar hum sirf normalize kar dein to har layer ko mean 0, variance 1 pe force kar denge. Kabhi network ko different scale chahiye hota hai. γ aur β learnable knobs hain. Agar original distribution useful hai, network γ aur β se uske paas wapas bhi ja sakta hai.</p>
+            <h4>Network mein kaise fit hota hai, aur b bekaar kyu</h4>
+            <p>Layer mein pehle Z = WA + b. Batch norm Z ka mean subtract karta hai. b har example mein same shift add karta hai, aur mean subtract hote hi woh shift cancel ho jaata hai. Isliye batch norm wali layer mein b ko omit karna common hai; β shift ka kaam kar leta hai.</p>
+            <pre class="code">Z = W @ A_prev              <span class="cm"># b optional, batch norm shift hata dega</span>
+mu = np.mean(Z, axis=1, keepdims=True)
+var = np.mean((Z - mu) ** 2, axis=1, keepdims=True)
+Z_norm = (Z - mu) / np.sqrt(var + 1e-8)
+Z_tilde = gamma * Z_norm + beta
+A = relu(Z_tilde)</pre>
+            <h4>Kaam kyu karta hai?</h4>
+            <div class="compare-grid">
+              <div><b>Covariate shift kam</b>Pichhli layers badalti hain to baad ki layer ka input distribution hilta hai. Batch norm is hilaav ko control karta hai.</div>
+              <div><b>Stable training</b>Activations extreme zone mein kam jaate hain. Gradients zyada manageable.</div>
+              <div><b>Hyperparameters forgiving</b>Learning rate aur initialization ke liye model thoda kam nakhre karta hai.</div>
+              <div><b>Thoda regularization</b>Mini-batch stats noisy hote hain, isliye har example ko halka random environment milta hai. Dropout ka replacement nahi, par help karta hai.</div>
+            </div>
+            <h4>Test time pe mini-batch stats nahi</h4>
+            <p>Training mein batch ke μ, σ² use hote hain. Test time pe single example aa sakta hai; uska batch mean nikaalna weird hoga. Isliye training ke dauraan μ aur σ² ke moving averages maintain karte hain, aur test time pe wahi use karte hain.</p>
+            <div class="visual-flow"><span>Training mini-batch<br><small>μ, σ² nikalo</small></span><b>→</b><span>Moving average<br><small>store karo</small></span><b>→</b><span class="flow-highlight">Test time<br><small>stored μ, σ² use</small></span></div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Training mode aur inference mode mix mat karo. Test/prediction ke waqt current batch stats use kar liye to output batch ke doosre examples pe depend karega — bahut annoying bug.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Batch norm hidden Z ko normalize karta hai, γ/β se flexibility deta hai, aur test time pe stored moving averages use karta hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Batch norm dropout ki jagah le sakta hai?</summary><p>Kabhi-kabhi overfitting thoda kam karta hai, par iska main kaam optimization stable karna hai. Strong overfitting ho to L2, dropout, data augmentation alag se socho.</p></details>
+            <details class="qa"><summary>Activation se pehle ya baad?</summary><p>Common choice Z pe, activation se pehle. Kuch architectures activation ke baad bhi variants use karte hain. Beginner mental model: Z normalize, phir activation.</p></details>
+            <details class="qa"><summary>Mini-batch size bahut chhota ho to?</summary><p>Stats noisy ho jaate hain. Batch norm ka benefit kam ho sakta hai. Tab layer norm/group norm jaise alternatives bhi use hote hain, par abhi batch norm ka core idea pakdo.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Z = [1, 3, 5] ka mean kya?</summary><p>(1 + 3 + 5)/3 = <b>3</b>.</p></details>
+              <details class="qa"><summary>Normalize ke baad γ = 1, β = 0 ho to Z_tilde kya hota hai?</summary><p><b>Z_norm</b> hi. Scale 1 aur shift 0 kuch change nahi karte.</p></details>
+              <details class="qa"><summary>Batch norm wali layer mein b kyu often remove kar dete hain?</summary><p>Mean subtraction b ka constant shift cancel kar deta hai. Learnable β shift ka kaam kar leta hai.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="i13"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-hyperparameter-tuning.html"><small>← Pichhla</small>Hyperparameter tuning ka tareeka</a>
+          <a class="pager-next" href="dl-softmax-regression.html"><small>Agla →</small>Softmax regression</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

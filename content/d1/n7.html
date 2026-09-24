@@ -1,0 +1,81 @@
+            <div class="chat">
+              <p class="msg me">Ek neuron se probability aa gayi. Phir hidden layer ka drama kyu?</p>
+              <p class="msg dost">Ek dost se advice mil sakti hai, par group discussion mein alag angles aate hain. Hidden neurons wahi alag angles hain.</p>
+              <p class="msg me">Par unko kaun batata hai ki tum edge pakdo, tum colour pakdo?</p>
+              <p class="msg dost">Koi nahi. Training ke pressure se neurons khud useful patterns dhoondte hain. Isliye hidden naam: unke target labels humein nahi milte.</p>
+              <p class="msg me">Layer count mein input ko kyu ignore karte hain? Thoda unfair hai.</p>
+              <p class="msg dost">Haha, input layer ka kaam sirf data hold karna hai. Learnable kaam hidden/output layers karti hain, isliye count wahi.</p>
+              <p class="msg me">Matrix W[1] mein rows neurons hain, ye yaad rahega?</p>
+              <p class="msg dost">Socho classroom attendance: har row ek student. W[1] ki har row ek hidden neuron ka weight-list.</p>
+            </div>
+            <h4>2-layer network ka dhaancha</h4>
+            <p>Input layer ko aam taur pe layer count mein nahi ginte. Agar ek hidden layer aur ek output layer hai, to ise 2-layer neural network bolte hain. Input activations ko <strong>a[0] = x</strong> likhte hain.</p>
+            <div class="visual-flow"><span>Input<br><small>a[0]=x</small></span><b>→</b><span class="flow-highlight">Hidden<br><small>a[1]</small></span><b>→</b><span>Output<br><small>a[2]=ŷ</small></span></div>
+            <div class="formula"><code>z[1] = W[1]x + b[1]
+a[1] = g(z[1])
+z[2] = W[2]a[1] + b[2]
+a[2] = σ(z[2])</code><ul>
+              <li><b>[1]</b> hidden layer ki cheezein</li>
+              <li><b>[2]</b> output layer ki cheezein</li>
+              <li><b>g</b> hidden activation, jaise tanh ya ReLU</li>
+            </ul></div>
+            <figure class="figure">
+              <svg viewBox="0 0 430 220" role="img" aria-label="Input layer se hidden layer ke chaar neurons aur output neuron tak network">
+                <g fill="#edf3ff" stroke="#3567e8"><circle cx="55" cy="60" r="18"/><circle cx="55" cy="110" r="18"/><circle cx="55" cy="160" r="18"/></g>
+                <g fill="#f2edff" stroke="#7653d6"><circle cx="205" cy="45" r="18"/><circle cx="205" cy="90" r="18"/><circle cx="205" cy="135" r="18"/><circle cx="205" cy="180" r="18"/></g>
+                <circle cx="360" cy="110" r="22" fill="#e9f7f3" stroke="#159477"/>
+                <g stroke="#b8c2d3" stroke-width="1.5" fill="none">
+                  <path d="M73,60 L187,45"/><path d="M73,60 L187,90"/><path d="M73,60 L187,135"/><path d="M73,60 L187,180"/>
+                  <path d="M73,110 L187,45"/><path d="M73,110 L187,90"/><path d="M73,110 L187,135"/><path d="M73,110 L187,180"/>
+                  <path d="M73,160 L187,45"/><path d="M73,160 L187,90"/><path d="M73,160 L187,135"/><path d="M73,160 L187,180"/>
+                  <path d="M223,45 L338,110"/><path d="M223,90 L338,110"/><path d="M223,135 L338,110"/><path d="M223,180 L338,110"/>
+                </g>
+                <g font-size="11" text-anchor="middle" fill="#273142"><text x="55" y="205">input</text><text x="205" y="205">hidden</text><text x="360" y="145">output</text></g>
+              </svg>
+              <div class="cap">Har hidden neuron same input se apna weighted pattern banata hai.</div>
+            </figure>
+            <h4>Ek hidden neuron ka hisaab</h4>
+            <p>Ek neuron ke liye z wahi old friend hai: wᵀx + b. Bas ab hidden layer mein aise kai neurons hain.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Input/parameter</th><th>Value</th></tr>
+              <tr><td>x</td><td>[2, 3]</td></tr>
+              <tr><td>w</td><td>[0.5, −1]</td></tr>
+              <tr><td>b</td><td>0.2</td></tr>
+              <tr><td>z</td><td>0.5×2 − 1×3 + 0.2 = <b>−1.8</b></td></tr>
+              <tr><td>a = tanh(z)</td><td>≈ <b>−0.947</b></td></tr>
+            </table></div>
+            <h4>Weights ko W[1] matrix mein stack karna</h4>
+            <p>Agar hidden layer mein 4 neurons hain aur input features 3 hain, har neuron ke paas 3 weights. Un 4 weight-vectors ko rows mein stack karo: W[1] shape (4, 3). Bias b[1] shape (4, 1).</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Cheez</th><th>Shape when nₓ=3, n[1]=4, m=5</th><th>Meaning</th></tr>
+              <tr><td>W[1]</td><td>(4, 3)</td><td>4 neurons, har ek 3 weights</td></tr>
+              <tr><td>b[1]</td><td>(4, 1)</td><td>har hidden neuron ka bias</td></tr>
+              <tr><td>Z[1], A[1]</td><td>(4, 5)</td><td>rows neurons, columns examples</td></tr>
+              <tr><td>W[2]</td><td>(1, 4)</td><td>output neuron hidden outputs dekhta hai</td></tr>
+            </table></div>
+            <p>Kai examples ek saath aayenge to A[1] ki rows hidden neurons hain aur columns examples. A[1] ka column 3 matlab example 3 ke liye saare hidden neuron activations.</p>
+            <pre class="code">Z1 = np.dot(W1, X) + b1      <span class="cm"># (n_h, m)</span>
+A1 = np.tanh(Z1)
+Z2 = np.dot(W2, A1) + b2     <span class="cm"># (1, m)</span>
+A2 = sigmoid(Z2)</pre>
+            <h4>Rows = neurons, columns = examples</h4>
+            <p>Hidden layer output A[1] ko classroom register samjho. Row 1 = neuron 1 ke answers for all examples. Column 2 = example 2 ke liye saare neurons ke answers. Dono views useful hain. Backprop mein rows neuron-wise gradients ko tidy rakhti hain.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>A[1]</th><th>Example 1</th><th>Example 2</th><th>Example 3</th></tr>
+              <tr><td>Neuron 1</td><td>0.2</td><td>0.7</td><td>0.1</td></tr>
+              <tr><td>Neuron 2</td><td>−0.5</td><td>0.3</td><td>0.9</td></tr>
+            </table></div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Layers ginne mein input layer ko count nahi karte, par notation mein a[0] zaroor use hota hai. Isi chhoti baat pe beginners confuse hote hain.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Hidden layer = neurons ki row-wise stack; W[1] ki har row ek neuron ka dimaag hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Hidden neuron kya feature pakadta hai?</summary><p>Hum manually naam nahi dete. Kabhi edge, curve, tone, pattern jaisi cheezein seekh sakta hai. Training decide karti hai.</p></details>
+            <details class="qa"><summary>A[1] capital kyu, a[1] small kyu?</summary><p>Small a ek example ke activations. Capital A saare m examples ka matrix.</p></details>
+            <details class="qa"><summary>Output layer mein sigmoid hi kyu?</summary><p>Binary classification mein final output probability chahiye, sigmoid uske liye natural hai.</p></details>
+            <details class="qa"><summary>Hidden layer ke neurons same feature seekh sakte hain?</summary><p>Ho sakta hai kuch redundancy aaye, par random initialization aur training pressure usually neurons ko different useful directions mein push karta hai. Perfect human labels unke liye nahi hote.</p></details>
+            <details class="qa"><summary>Hidden units zyada rakhne se hamesha better?</summary><p>Nahi. Capacity badhti hai, par overfitting aur computation bhi badh sakte hain. Dev set pe check karna padta hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>nₓ=5, hidden neurons=7. W[1] aur b[1] shapes?</summary><p>W[1] = <b>(7,5)</b>, b[1] = <b>(7,1)</b>.</p></details>
+              <details class="qa"><summary>m=20 ho to A[1] shape kya?</summary><p>Hidden neurons 7 hain, so A[1] = <b>(7,20)</b>.</p></details>
+              <details class="qa"><summary>Input layer ko count karte hain?</summary><p>Layer count mein nahi. Par usko a[0] = x notation se represent karte hain.</p></details>
+            </div>

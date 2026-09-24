@@ -1,0 +1,40 @@
+            <div class="chat">
+              <p class="msg me">Agar movie ke features pata hi na hon? Har movie ko “romance 0.9” kaun tag karega?</p>
+              <p class="msg dost">Exactly, manually tag karna dard hai. Ulta socho. Pichle page pe features se user weights seekhe. Agar <strong>users ke weights</strong> pata hote, to ratings dekh ke movie ke features ka andaaza laga sakte the! Riya (romance-lover) ne 5 diya, Neha (action-lover) ne 0 — movie romance wali hogi.</p>
+              <p class="msg me">Par dono hi nahi pata!</p>
+              <p class="msg dost">Yahi jaadu hai: <strong>dono ko ek saath seekho</strong>. User weights w, b aur movie features x — sab random se shuru, aur gradient descent sabko ek saath sudhare. Bahut saare users ki ratings milke har movie ki “personality” bana deti hain. Isliye naam hai <strong>collaborative</strong> filtering — sab users milke (collaborate karke) ek doosre ki madad karte hain.</p>
+            </div>
+            <div class="formula"><code>Cost = (1/2) Σ (jahan rating hai) (wᵘ·xᵐ + bᵘ − rating)²  +  (λ/2) Σ w²  +  (λ/2) Σ x²</code><ul>
+              <li>u = user, m = movie. Galti sirf rated khaanon pe.</li>
+              <li>Ab gradient descent w, b <em>aur</em> x — teeno ko update karta hai.</li>
+              <li>Seekhe hue features ka naam nahi hota (“romance” wagairah) — bas numbers jo prediction mein kaam karte hain. Thoda mysterious, par useful.</li>
+            </ul></div>
+            <div class="visual-flow"><span>Random w, b, x</span><b>→</b><span>Predicted ratings</span><b>→</b><span>Asli ratings se galti</span><b>→</b><span class="flow-highlight">w, b, x teeno sudharo</span><b>↻</b></div>
+            <h4>Binary labels — star nahi, sirf “pasand/nahi”</h4>
+            <p>Aksar star ratings nahi hoti, bas behaviour hota hai:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Platform</th><th>1 (engaged)</th><th>0 (not engaged)</th><th>? </th></tr>
+              <tr><td>Online shop</td><td>Kharida</td><td>Dikhaya, nahi kharida</td><td>Dikhaya hi nahi</td></tr>
+              <tr><td>Video app</td><td>30 sec se zyada dekha</td><td>Turant skip</td><td>Dikhaya hi nahi</td></tr>
+              <tr><td>Social media</td><td>Like / click</td><td>Scroll kar diya</td><td>Dikhaya hi nahi</td></tr>
+            </table></div>
+            <p>Tab Module 1 ki tarah hi: linear se <strong>logistic</strong> pe jao. Chance = sigmoid(w·x + b), aur cost = <strong>log loss</strong>. Idea wahi, bas output rating ke bajay 0–1 ka chance: “ye user engage karega?”</p>
+
+            <h4>Dono side seekhne ka tiny example</h4>
+            <div class="chat"><p class="msg me">Dono random se shuru honge to system ko pata kaise chalega kaun romance hai?</p><p class="msg dost">Ek rating akeli weak signal hai. Par bahut users ki ratings ek pattern banati hain. Jo users same movies ko high rate karte hain, unke taste vectors paas aate hain; jo movies same users ko pasand aati hain, unke item vectors paas aate hain.</p></div>
+            <p>Suppose sirf 1 feature seekhna hai. Prediction = wᵘ × xᵐ + bᵘ, b abhi 0.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>User/Movie</th><th>Current wᵘ</th><th>Current xᵐ</th><th>Prediction</th><th>Rating</th><th>Signal</th></tr><tr><td>Riya / Romance film</td><td>1.0</td><td>2.0</td><td>2.0</td><td>5</td><td class="good">w ya x badhao</td></tr><tr><td>Neha / Romance film</td><td>−1.0</td><td>2.0</td><td>−2.0</td><td>0</td><td>Direction sensible</td></tr><tr><td>Neha / Action film</td><td>−1.0</td><td>−2.0</td><td>2.0</td><td>5</td><td class="good">Neha aur action align</td></tr></table></div>
+            <p>Numbers ka naam “romance/action” nahi diya gaya. But gradient descent aise values dhundhta hai jahan observed ratings match ho jaayein. Hidden pattern khud emerge hota hai.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Learned features ko human names dena tempting hai, par guarantee nahi. Kabhi feature 7 “romance + old movies + Hindi” ka mix ho sakta hai.</div>
+            <h4>Implicit feedback mein negative ka matlab careful</h4>
+            <p>Video app mein 0 ka matlab hamesha “nafrat” nahi. Kabhi user busy tha, network slow tha, thumbnail unclear tha.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Signal</th><th>Label</th><th>Confidence</th></tr><tr><td>Video 80% dekha</td><td>1</td><td class="good">Strong positive</td></tr><tr><td>2 sec mein skip</td><td>0</td><td>Medium negative</td></tr><tr><td>Dikhaya hi nahi</td><td>?</td><td>No signal</td></tr></table></div>
+            <p>Real recommenders labels ke saath confidence bhi sochte hain. Behaviour noisy hota hai, exam answer key nahi.</p>
+            <div class="lesson-callout"><b>Beginner checkpoint:</b> Collaborative filtering tab shine karta hai jab users aur items ke beech enough interactions hon. Bahut sparse table mein cold start aur noise dono badh jaate hain.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Collaborative filtering = user tastes aur item features dono ratings se ek saath seekhna.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Kitne features (x ki length) rakhein?</summary><p>Ye tumhara choice hai — jaise 10, 50, 100. Zyada = zyada detail pakad sakta hai par zyada data chahiye. CV set pe try karke chuno.</p></details>
+            <details class="qa"><summary>Kya ye linear regression hi hai?</summary><p>Har ek user ke liye dikhne mein haan, par farak ye hai ki features x bhi seekhe ja rahe hain. Normal linear regression mein features fixed hote hain; yahan user taste aur movie personality dono ban rahe hain.</p></details>
+
+            <details class="qa"><summary>Bias bᵘ kyu chahiye?</summary><p>Kuch users naturally high ratings dete hain, kuch strict hote hain. bᵘ user ka personal rating level pakadta hai, taaki w aur x taste pattern pe focus karein.</p></details>
+            <details class="qa"><summary>Collaborative filtering privacy sensitive hai?</summary><p>Haan. Ratings/clicks user behaviour hote hain. Real systems ko privacy, consent, retention aur misuse pe serious hona padta hai.</p></details>

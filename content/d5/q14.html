@@ -1,0 +1,95 @@
+            <div class="chat">
+              <p class="msg me">RNN, LSTM, attention sab theek. Phir Transformer ka hype kyu?</p>
+              <p class="msg dost">RNN sentence ko line mein khade students jaisa process karta hai: pehle first, phir second, phir third. Slow. Transformer classroom mein sabko ek saath baat karne deta hai — controlled tarike se.</p>
+              <p class="msg me">Sab shabd ek saath? Phir order ka kya?</p>
+              <p class="msg dost">Order ke liye positional encoding aayega next topic mein. Pehle engine samjho: <strong>self-attention</strong>. Har word baaki words se poochta hai, “mere meaning ke liye tum kitne useful ho?”</p>
+            </div>
+
+            <h4>RNN/LSTM sequential hain, isliye bottleneck</h4>
+            <p>RNN ko x⟨1⟩ se a⟨1⟩ banana hai, phir x⟨2⟩ se a⟨2⟩, aise line-by-line. GPU ko parallel kaam pasand hai, par RNN ke steps dependent hain. Long sentence mein early information hidden state bottle mein ghus ke travel karti hai.</p>
+            <div class="compare-grid">
+              <div><b>RNN style</b>Word 5 process karne se pehle word 1 se 4 ho chuke hone chahiye.</div>
+              <div><b>Transformer style</b>Layer ke andar saare words attention calculations parallel kar sakte hain.</div>
+            </div>
+
+            <h4>Transformer: attention + CNN jaisi parallel feeling</h4>
+            <p>CNN image ke patches pe same time filters laga sakta hai. Transformer text mein har token ke liye attention same layer mein parallel calculate karta hai. Sequential generation decoder mein still one-by-one hoti hai, par training aur encoder-side bahut parallel-friendly ban jaate hain.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 460 180" role="img" aria-label="Transformer self-attention mein tokens ek dusre ko dekhte hain">
+                <rect x="40" y="70" width="70" height="34" rx="10" fill="#edf3ff" stroke="#3567e8"/>
+                <rect x="145" y="70" width="70" height="34" rx="10" fill="#f2edff" stroke="#7653d6"/>
+                <rect x="250" y="70" width="70" height="34" rx="10" fill="#e9f7f3" stroke="#159477"/>
+                <rect x="355" y="70" width="70" height="34" rx="10" fill="#fff3ec" stroke="#e0703a"/>
+                <text x="60" y="91" font-size="11" fill="#3567e8">main</text>
+                <text x="165" y="91" font-size="11" fill="#7653d6">bank</text>
+                <text x="270" y="91" font-size="11" fill="#159477">gaya</text>
+                <text x="372" y="91" font-size="11" fill="#c2410c">loan</text>
+                <path d="M180,68 C205,25 365,25 390,68" stroke="#e0703a" stroke-width="3" fill="none"/>
+                <path d="M180,106 C205,145 270,145 285,106" stroke="#159477" stroke-width="2" fill="none"/>
+                <path d="M180,68 C145,38 90,38 75,68" stroke="#8a96aa" stroke-width="1.5" fill="none"/>
+              </svg>
+              <div class="cap">“bank” ka meaning samajhne ke liye “loan” useful ho sakta hai; self-attention ye relation directly dekh sakta hai.</div>
+            </figure>
+
+            <h4>Query, Key, Value: teen roles</h4>
+            <p>Har token embedding se teen vectors bante hain: query, key, value. Ye learned matrices se nikalte hain: W<sup>Q</sup>, W<sup>K</sup>, W<sup>V</sup>.</p>
+            <ul>
+              <li><b>Query (q):</b> “Mujhe kya dhoondhna hai?”</li>
+              <li><b>Key (k):</b> “Mere paas kis type ki info hai?”</li>
+              <li><b>Value (v):</b> “Agar tumne mujhe attend kiya, main ye content dunga.”</li>
+            </ul>
+            <div class="formula"><code>q = W<sup>Q</sup>x, k = W<sup>K</sup>x, v = W<sup>V</sup>x</code><ul>
+              <li><b>x</b> = token embedding</li>
+              <li><b>W</b> matrices training se learn hoti hain</li>
+            </ul></div>
+
+            <h4>Single-query attention: q·k se relevance</h4>
+            <p>Ek token ki query q ko sab tokens ki keys se dot product karao. Dot product high matlab key query se match karti hai. Softmax se weights, phir values ka weighted sum.</p>
+            <div class="formula"><code>A(q, K, V) = Σᵢ softmax(q · kᵢ) vᵢ</code><ul>
+              <li><b>q · kᵢ</b> = query aur i-th key ka match score</li>
+              <li><b>softmax</b> = scores ko weights banata hai</li>
+              <li><b>vᵢ</b> = i-th token ka value vector</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Token</th><th>q·k score</th><th>softmax weight</th><th>value v</th></tr>
+              <tr><td>main</td><td>1</td><td>0.245</td><td>[1, 0]</td></tr>
+              <tr><td class="good">loan</td><td>2</td><td class="good">0.665</td><td>[0, 2]</td></tr>
+              <tr><td>gaya</td><td>0</td><td>0.090</td><td>[2, 1]</td></tr>
+            </table></div>
+            <p>Output = 0.245[1,0] + 0.665[0,2] + 0.090[2,1] = [0.425, 1.420]. “loan” ne sabse zyada contribution diya.</p>
+
+            <h4>Matrix form aur √d<sub>k</sub> scaling</h4>
+            <p>Ek-ek query alag calculate karna explanation ke liye achha hai. Real Transformer saari queries ek matrix Q mein rakhta hai, keys K mein, values V mein.</p>
+            <div class="formula"><code>Attention(Q, K, V) = softmax(QKᵀ / √d<sub>k</sub>) V</code><ul>
+              <li><b>QKᵀ</b> = har query ka har key se score</li>
+              <li><b>d<sub>k</sub></b> = key/query vector ki dimension</li>
+              <li><b>√d<sub>k</sub></b> se divide = scores ko bahut bade hone se bachana</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Raw scores q·k</th><th>d<sub>k</sub></th><th>Scaled scores</th><th>Softmax weights</th></tr>
+              <tr><td>[2, 1, 0]</td><td>4</td><td>[1.00, 0.50, 0.00]</td><td>[0.506, 0.307, 0.186]</td></tr>
+              <tr><td>[2, 1, 0] without scaling</td><td>—</td><td>[2, 1, 0]</td><td class="bad">[0.665, 0.245, 0.090]</td></tr>
+            </table></div>
+            <p>Without scaling softmax zyada peaky ho gaya. High dimension mein dot products aur bade ho sakte hain, gradients awkward ho sakte hain. Scaling softmax ko calmer rakhti hai.</p>
+            <pre class="code">import numpy as np
+Q = np.array([[1, 1, 0, 0]])
+K = np.array([[1, 1, 0, 0], [1, 0, 0, 0], [0, 0, 0, 0]])
+V = np.array([[1, 0], [0, 2], [2, 1]])
+scores = Q @ K.T / np.sqrt(4)
+w = np.exp(scores) / np.exp(scores).sum(axis=1, keepdims=True)
+print(w @ V)  <span class="cm"># scaled dot-product attention</span></pre>
+
+            <div class="mistake"><b>Dhyan rakhna:</b> Self-attention “sab words equal dekhta hai” nahi. Sab words ko option deta hai, phir softmax weights decide karte hain kaun zyada useful hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Transformer ka engine self-attention hai: har token query poochta hai, keys se match karta hai, values ka weighted mix leta hai — parallel-friendly tarike se.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Query, key, value teen alag vectors kyu? Ek embedding se kaam nahi?</summary><p>Alag projections model ko alag roles seekhne dete hain. Same word “bank” kabhi query mein location dhoondh sakta hai, key mein finance signal de sakta hai, value mein content carry kar sakta hai.</p></details>
+            <details class="qa"><summary>Self-attention mein word khud ko bhi attend karta hai?</summary><p>Haan, encoder self-attention mein usually karta hai. Khud ki information bhi useful hoti hai. Masked decoder mein future tokens ko block kiya jaata hai, khud aur past allowed hote hain.</p></details>
+            <details class="qa"><summary>√d<sub>k</sub> scaling skip kar diya to model fail?</summary><p>Har toy case mein nahi, par large dimensions mein training unstable/peaky ho sakti hai. Standard scaled dot-product attention isliye use hota hai.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>q·k scores [4, 2], d<sub>k</sub> = 4. Scaled scores kya?</summary><p>√4 = 2. [4, 2] / 2 = <b>[2, 1]</b>.</p></details>
+              <details class="qa"><summary>Softmax weights ka sum kya hota hai?</summary><p>Always <b>1</b>. Isliye attention weighted average jaisa behave karta hai.</p></details>
+              <details class="qa"><summary>RNN ke comparison mein Transformer training fast kyu ho sakta?</summary><p>Kyuki layer ke andar tokens parallel process ho sakte hain; har time step ko previous hidden state ka wait nahi karna padta.</p></details>
+            </div>

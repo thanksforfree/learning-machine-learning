@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Vanishing/exploding gradients aur weight initialization: Gehre network ka sabse purana dushman. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Vanishing/exploding gradients aur weight initialization (DL · 2) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-improving-networks.html">DL · 2: Improving Deep Neural Networks</a> › Topic 6 / 15</nav>
+        <p class="eyebrow">DL · 2 · TOPIC 06 · OPTIMIZATION SETUP</p>
+        <h1>Vanishing/exploding gradients aur weight initialization</h1>
+        <p>Gehre network ka sabse purana dushman</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 2 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="i1" href="dl-train-dev-test-bias-variance.html"><span>01</span>Train/dev/test aur bias-variance</a>
+            <a data-topic-link="i2" href="dl-l2-regularization.html"><span>02</span>L2 regularization</a>
+            <a data-topic-link="i3" href="dl-dropout.html"><span>03</span>Dropout</a>
+            <a data-topic-link="i4" href="dl-augmentation-early-stopping.html"><span>04</span>Data augmentation aur early stopping</a>
+            <a data-topic-link="i5" href="dl-normalizing-inputs.html"><span>05</span>Inputs normalize karna</a>
+            <a data-topic-link="i6" class="current" aria-current="page" href="dl-vanishing-exploding-init.html"><span>06</span>Vanishing/exploding gradients aur weight initialization</a>
+            <a data-topic-link="i7" href="dl-gradient-checking.html"><span>07</span>Gradient checking</a>
+            <a data-topic-link="i8" href="dl-mini-batch.html"><span>08</span>Mini-batch gradient descent</a>
+            <a data-topic-link="i9" href="dl-exponentially-weighted-averages.html"><span>09</span>Exponentially weighted averages</a>
+            <a data-topic-link="i10" href="dl-momentum-rmsprop-adam.html"><span>10</span>Momentum, RMSprop aur Adam</a>
+            <a data-topic-link="i11" href="dl-learning-rate-decay-local-optima.html"><span>11</span>Learning rate decay aur local optima ka sach</a>
+            <a data-topic-link="i12" href="dl-hyperparameter-tuning.html"><span>12</span>Hyperparameter tuning ka tareeka</a>
+            <a data-topic-link="i13" href="dl-batch-normalization.html"><span>13</span>Batch normalization</a>
+            <a data-topic-link="i14" href="dl-softmax-regression.html"><span>14</span>Softmax regression</a>
+            <a data-topic-link="i15" href="dl-frameworks-tensorflow.html"><span>15</span>Deep learning frameworks aur TensorFlow</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15"><span>DL · 2 progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Jitna gehra network, utna ye problem. Sahi initialization se training shuru hi theek jagah se hoti hai.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z15" href="maths-randomness-scale.html"><small>Maths</small>Randomness, variance aur scale</a></div></div>
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Gehri linear network ka example apne numbers se (1 se thoda bada vs thoda chhota, L baar multiply)</li><li>Gradients pe iska asar</li><li>Ek neuron ke inputs jitne zyada, weights utne chhote</li><li>Var(w) = 2/n (He, ReLU ke liye), 1/n (Xavier, tanh ke liye)</li><li>Code: np.random.randn(shape) * np.sqrt(2 / n_prev)</li></ul></details>
+        <article class="lesson-card single" id="i6">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Deep network mein training kabhi start hi nahi hoti, kabhi loss blast ho jaata hai. Ye mood swings kyu?</p>
+              <p class="msg dost">Gehri chain mein same cheez baar-baar multiply hoti hai. Thoda sa 1 se bada number rocket ban sakta hai, thoda sa 1 se chhota number zero jaisa.</p>
+              <p class="msg me">Matlab gradients bhi multiply hote-hote gayab ya explode?</p>
+              <p class="msg dost">Exactly. Isliye weights ko start mein sahi scale pe initialize karna bahut important hai.</p>
+            </div>
+            <h4>Gehri linear network ka toy example</h4>
+            <p>Real networks non-linear hote hain, par intuition ke liye simple chain lo. Agar har layer output ko 1.2 se multiply kare, 10 layers ke baad signal 1.2¹⁰ ≈ 6.19 ho jaata hai. Agar har layer 0.8 se multiply kare, 0.8¹⁰ ≈ 0.107. Dono directions depth badhne par training ko mushkil bana sakti hain.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Per layer multiply</th><th>10 layers ke baad</th><th>20 layers ke baad</th><th>Effect</th></tr>
+              <tr><td>1.2</td><td>6.19</td><td>38.34</td><td class="bad">Exploding side</td></tr>
+              <tr><td>0.8</td><td>0.107</td><td>0.0115</td><td class="bad">Vanishing side</td></tr>
+              <tr><td>~1 balanced</td><td>manageable</td><td>manageable</td><td class="good">Trainable</td></tr>
+            </table></div>
+            <div class="formula"><code>Signal after L layers ≈ cᴸ × input</code><ul>
+              <li><b>c &gt; 1</b> = values badh sakti hain, explosion ka risk</li>
+              <li><b>c &lt; 1</b> = values chhoti hoti jaati hain, vanish ka risk</li>
+              <li><b>L</b> = depth; depth badhi to effect dramatic</li>
+            </ul></div>
+            <h4>Gradients pe bhi wahi asar</h4>
+            <p>Backprop right se left aata hai. Har layer local slope se multiply karta hai. Agar slopes baar-baar 0.2, 0.3 jaise aaye, pehle layers tak gradient almost zero. Network ke early layers seekhenge hi nahi. Agar slopes/weights large aaye, updates huge ho sakte hain, loss NaN tak ja sakta hai.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 430 190" role="img" aria-label="Backward gradient deep network mein left jaate-jaate vanish ya explode ho sakta hai">
+                <g fill="#edf3ff" stroke="#3567e8">
+                  <rect x="45" y="70" width="55" height="45" rx="8"/><rect x="125" y="70" width="55" height="45" rx="8"/><rect x="205" y="70" width="55" height="45" rx="8"/><rect x="285" y="70" width="55" height="45" rx="8"/>
+                </g>
+                <path d="M340,92 L285,92 L260,92 L205,92 L180,92 L125,92 L100,92 L45,92" fill="none" stroke="#c2410c" stroke-width="3" stroke-dasharray="5 4"/>
+                <g font-size="11" text-anchor="middle" fill="#24324a">
+                  <text x="72" y="98">L1</text><text x="152" y="98">L2</text><text x="232" y="98">L3</text><text x="312" y="98">L4</text>
+                  <text x="215" y="145" fill="#c2410c">gradient peeche travel karta hai</text>
+                </g>
+              </svg>
+              <div class="cap">Backprop ki chain lambi ho to scale sambhalna zaroori ho jaata hai.</div>
+            </figure>
+            <h4>Inputs zyada, weights chhote</h4>
+            <p>Ek neuron ke paas n inputs hain. Agar n bada hai aur weights bhi bade random hain, to z = w₁x₁ + w₂x₂ + ... bahut bada ho sakta hai. z bahut bada hua to sigmoid/tanh saturation, gradients chhote. Isliye n_prev badhe to initial weights ka scale chhota karte hain.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>n_prev</th><th>He scale √(2/n_prev)</th><th>Xavier scale √(1/n_prev)</th></tr>
+              <tr><td>100</td><td>√0.02 ≈ 0.141</td><td>√0.01 = 0.100</td></tr>
+              <tr><td>400</td><td>√0.005 ≈ 0.071</td><td>√0.0025 = 0.050</td></tr>
+            </table></div>
+            <h4>He vs Xavier initialization</h4>
+            <p>ReLU aadhe negative values ko zero kar deta hai, isliye uske liye slightly larger variance useful hota hai: <strong>Var(w) = 2/n</strong>. Tanh/sigmoid zero-centered smooth activations ke liye common choice <strong>Var(w) = 1/n</strong>, often Xavier/Glorot style.</p>
+            <div class="formula"><code>ReLU layers: W = randn(shape) × √(2 / n_prev)
+tanh layers: W = randn(shape) × √(1 / n_prev)</code><ul>
+              <li><b>randn</b> = mean 0, variance 1 random numbers</li>
+              <li><b>n_prev</b> = previous layer ke units / inputs</li>
+              <li><b>shape</b> = (n_current, n_prev)</li>
+            </ul></div>
+            <pre class="code">def init_layer(n_current, n_prev):
+    W = np.random.randn(n_current, n_prev) * np.sqrt(2 / n_prev)
+    b = np.zeros((n_current, 1))
+    return W, b  <span class="cm"># ReLU hidden layer ke liye He init</span></pre>
+            <h4>Initialization se training start hi better jagah se</h4>
+            <p>Initialization perfect solution nahi dhoondhta. Bas starting point aisa rakhta hai jahan activations aur gradients ka scale sane ho. Uske baad optimizer learning karta hai. Galat init ka matlab car ko ya to dal-dal mein start karna, ya slope ke edge pe.</p>
+            <div class="visual-flow"><span>Bad init<br><small>vanish/explode</small></span><b>→</b><span class="flow-highlight">Good init<br><small>stable signals</small></span><b>→</b><span>Optimizer<br><small>actual learning</small></span></div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Saare weights zero se initialize mat karo. Same layer ke neurons identical rahenge, same gradient paayenge, aur same cheez seekhenge. Randomness symmetry todti hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Deep network mein numbers lambi relay race daudte hain; initialization unhe na behosh hone deta, na overexcited.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Bias b ko random initialize karna chahiye?</summary><p>Usually nahi. b = 0 theek hai, kyunki symmetry weights se break ho chuki hoti hai.</p></details>
+            <details class="qa"><summary>He initialization sirf ReLU ke liye?</summary><p>Mainly ReLU family ke liye popular hai. Tanh/sigmoid ke liye Xavier style common hai.</p></details>
+            <details class="qa"><summary>Batch norm ho to initialization matter nahi karta?</summary><p>Matter kam ho sakta hai, par khatam nahi. Achhi initialization ab bhi stable start deti hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>0.8¹⁰ approx kitna? Vanish ya explode?</summary><p>0.8¹⁰ ≈ 0.107. Signal shrink ho raha hai, to ye <b>vanishing</b> side hai.</p></details>
+              <details class="qa"><summary>ReLU layer mein n_prev = 200. He scale √(2/n_prev)?</summary><p>√(2/200) = √0.01 = 0.1. <b>final answer: 0.1</b>.</p></details>
+              <details class="qa"><summary>Weights zero, biases random — symmetry break hogi?</summary><p>Thodi ho sakti hai, par standard safe way weights random aur biases zero. Weights zero mat rakho.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="i6"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-normalizing-inputs.html"><small>← Pichhla</small>Inputs normalize karna</a>
+          <a class="pager-next" href="dl-gradient-checking.html"><small>Agla →</small>Gradient checking</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

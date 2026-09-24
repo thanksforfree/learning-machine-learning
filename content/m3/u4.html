@@ -1,0 +1,48 @@
+            <div class="chat">
+              <p class="msg me">Anomaly detection kya hota hai? Naam se detective series lag rahi.</p>
+              <p class="msg dost">Bilkul detective vibe hai. Mummy ko pata hai tum aam taur pe raat 9 baje ghar aate ho. Ek din 2 baje aaye — turant pakde gaye. Kyunki unhe “normal” pata tha, to “ajeeb” turant dikh gaya. <strong>Anomaly detection</strong> bhi pehle normal seekhta hai, phir bahut alag case ko flag karta hai.</p>
+              <p class="msg me">Real life mein kahan?</p>
+              <p class="msg dost">Factory mein motor: normal temperature aur vibration pata hai. Naya motor bahut garam aur bahut hil raha? Check karo, kharab ho sakta hai. Bank: tumhara card roz ₹500 kharch karta hai, achanak raat 3 baje doosre desh mein ₹2 lakh? Fraud alert. Website: ek account ek minute mein 500 baar login try kare? Ajeeb.</p>
+            </div>
+            <h4>Normal kaisa dikhta hai — bell curve se</h4>
+            <p>Maan lo 1000 achhe motors ka temperature record kiya. Average μ = 60°C, σ = 5°C. Zyadatar motors 50–70°C ke beech (μ ± 2σ). 80°C dekh ke system bolega: “bhai, ye aam nahi hai.”</p>
+            <figure class="figure">
+              <svg viewBox="0 0 400 200" role="img" aria-label="Bell curve jiske beech normal values aur door kinare par ek anomaly point">
+                <line x1="20" y1="170" x2="380" y2="170" stroke="#b8c2d3"/>
+                <path d="M20,169 C100,169 130,25 190,25 C250,25 280,169 360,169" fill="#e9f7f3" stroke="#159477" stroke-width="3"/>
+                <g fill="#159477"><circle cx="170" cy="170" r="4"/><circle cx="185" cy="170" r="4"/><circle cx="200" cy="170" r="4"/><circle cx="160" cy="170" r="4"/><circle cx="215" cy="170" r="4"/><circle cx="225" cy="170" r="4"/></g>
+                <circle cx="355" cy="170" r="7" fill="#c2410c"/><text x="355" y="155" font-size="11" text-anchor="middle" fill="#c2410c">80°C ?!</text>
+                <g font-size="11" text-anchor="middle" fill="#7a879b"><text x="190" y="188">60°C (μ)</text><text x="100" y="188">50</text><text x="280" y="188">70</text></g>
+              </svg>
+              <div class="cap">Hare = normal motors. 80°C wala 4σ door hai — bahut rare, isliye flag.</div>
+            </figure>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Naya motor temp</th><th>Average se kitne σ door</th><th>Kitna aam?</th><th>Faisla</th></tr>
+              <tr><td>62°C</td><td>0.4σ</td><td>Bahut aam</td><td class="good">Normal</td></tr>
+              <tr><td>69°C</td><td>1.8σ</td><td>Thoda kam aam</td><td class="good">Normal</td></tr>
+              <tr><td>80°C</td><td>4σ</td><td>Bahut hi rare</td><td class="bad">Anomaly — check karo</td></tr>
+            </table></div>
+            <h4>Gaussian (normal) distribution ke 2 knobs</h4>
+            <div class="compare-grid">
+              <div><b>μ (mean)</b>Ghanta kahan khada hai. μ badlo → poori curve left/right khisakti.</div>
+              <div><b>σ (std deviation)</b>Ghanta kitna chauda. σ chhota → patla aur uncha. σ bada → chauda aur neecha. (Total area hamesha 1.)</div>
+            </div>
+            <p><strong>p(x)</strong> = curve ki height us value pe = “ye value kitni aam hai”. Beech mein p(x) zyada, kinaaron pe bahut kam. Formula mein e aur σ aate hain; pehli baar formula dekh ke aankh thodi phadakti hai, but library (<code>scipy</code> ya NumPy) calculate kar degi.</p>
+
+            <h4>z-score se pehla doubt clear karo</h4>
+            <div class="chat"><p class="msg me">4σ door rare bol rahe ho. Ye σ door kaise nikaala?</p><p class="msg dost">Value se mean ghatao, phir σ se divide karo. Ye z-score hai: average se kitne standard deviations door.</p></div>
+            <div class="formula"><code>z-score = (x − μ) / σ</code><ul><li>μ = normal average, σ = normal spread.</li></ul></div>
+            <div class="table-wrap"><table class="calc"><tr><th>x</th><th>Hisaab</th><th>z-score</th><th>Feel</th></tr><tr><td>62°C</td><td>(62−60)/5</td><td>0.4</td><td class="good">Normal</td></tr><tr><td>45°C</td><td>(45−60)/5</td><td>−3</td><td class="bad">Low side rare</td></tr><tr><td>80°C</td><td>(80−60)/5</td><td>4</td><td class="bad">High side rare</td></tr></table></div>
+            <p>Bell curve mein dono side rare ho sakte hain. Motor bahut garam bhi problem, suspiciously thandi bhi sensor issue ho sakti hai.</p>
+            <div class="compare-grid"><div><b>Low p(x)</b>Value normal pattern se bahut door hai.</div><div><b>Human review</b>Flag ka matlab “check karo”, automatic punishment nahi.</div></div>
+            <h4>One-sided vs two-sided ajeeb</h4>
+            <p>Anomaly sirf zyada high nahi hota. Bahut low bhi suspicious ho sakta hai.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Feature</th><th>Too low</th><th>Too high</th></tr><tr><td>Temperature</td><td>Sensor dead?</td><td>Overheating?</td></tr><tr><td>Login attempts</td><td>Maybe normal</td><td>Attack?</td></tr><tr><td>Traffic</td><td>Service down?</td><td>Bot flood?</td></tr></table></div>
+            <p>Feature ka domain samjho. Har low value anomaly nahi, har high value bhi nahi — context matters.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Normal data se μ aur σ seekho. Nayi value ka p(x) bahut kam = ajeeb = anomaly.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Anomaly hamesha kharab cheez hai?</summary><p>Nahi — bas “aam se alag”. Ek genuine bada kharcha bhi flag ho sakta hai. Isliye aam taur pe alert insaan check karta hai, system turant saza nahi deta.</p></details>
+            <details class="qa"><summary>Training data mein kharab motors bhi hon to?</summary><p>Thode se hon to chalta hai, par training mostly normal examples se honi chahiye. Warna model “normal” ki photo hi dhundhli bana lega.</p></details>
+
+            <details class="qa"><summary>Gaussian fit na ho to kya?</summary><p>Feature transform try karo: log(x), square root, ya x^(1/3). Agar phir bhi weird hai, different model ya extra features socho.</p></details>
+            <details class="qa"><summary>Har feature ko bell curve banana zaroori?</summary><p>Perfect bell zaroori nahi, par roughly single peak aur sensible spread helpful hai. Bahut skewed feature p(x) ko misleading bana sakta hai.</p></details>

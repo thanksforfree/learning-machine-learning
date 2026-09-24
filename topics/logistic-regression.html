@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Logistic regression aur sigmoid: Kisi bhi number ko 0–1 ke chance mein badalna. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Logistic regression aur sigmoid (ML · 1) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-blue">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../supervised.html">ML · 1: Supervised Machine Learning</a> › Topic 8 / 12</nav>
+        <p class="eyebrow">ML · 1 · TOPIC 08 · CATEGORY CHUNNA</p>
+        <h1>Logistic regression aur sigmoid</h1>
+        <p>Kisi bhi number ko 0–1 ke chance mein badalna</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 1 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="s1" href="ml-kya-hai.html"><span>01</span>Machine learning asal mein hai kya?</a>
+            <a data-topic-link="s2" href="linear-regression.html"><span>02</span>Linear regression — seedhi line ka model</a>
+            <a data-topic-link="s3" href="cost-function.html"><span>03</span>Cost function — line ko marks dena</a>
+            <a data-topic-link="s4" href="gradient-descent.html"><span>04</span>Gradient descent — pahad se neeche utarna</a>
+            <a data-topic-link="s5" href="multiple-features.html"><span>05</span>Multiple features aur vectorization</a>
+            <a data-topic-link="s6" href="feature-scaling.html"><span>06</span>Feature scaling aur training check</a>
+            <a data-topic-link="s7" href="feature-engineering.html"><span>07</span>Feature engineering aur polynomial regression</a>
+            <a data-topic-link="s8" class="current" aria-current="page" href="logistic-regression.html"><span>08</span>Logistic regression aur sigmoid</a>
+            <a data-topic-link="s9" href="decision-boundary.html"><span>09</span>Decision boundary</a>
+            <a data-topic-link="s10" href="logistic-cost.html"><span>10</span>Logistic cost (log loss)</a>
+            <a data-topic-link="s11" href="overfitting.html"><span>11</span>Underfitting aur overfitting</a>
+            <a data-topic-link="s12" href="regularization.html"><span>12</span>Regularization — weights pe lagaam</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s12"><span>ML · 1 progress</span><strong data-progress-label>0 / 12 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Classification ka pehla model. Neural network ka har sigmoid neuron literally ek chhota logistic regression hai.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z4" href="maths-powers-e-log.html"><small>Maths</small>Power, e aur log</a></div></div>
+        
+        <article class="lesson-card single" id="s8">
+          <div class="lesson-body">
+
+            <div class="chat">
+              <p class="msg me">Ab tumor khatarnak hai ya nahi, ye batana hai. Answer 0 (nahi) ya 1 (haan). Linear regression hi use kar lein?</p>
+              <p class="msg dost">Try karke dekhte hain. Tumor size vs 0/1 pe line fit karo, aur bolo “line 0.5 se upar to khatarnak”. Shuru mein chal bhi jayega.</p>
+              <p class="msg dost">Ab data mein ek <em>bahut bada</em> tumor add karo (clearly khatarnak). Line uski taraf jhuk jaati hai, 0.5 wala point khisak jaata hai, aur beech wale kuch khatarnak tumors ab “safe” dikhne lagte hain! Ek bilkul sahi example ne sab bigaad diya. Upar se line 1.7 ya −0.3 jaisa output deti hai — chance kabhi 170% hota hai kya?</p>
+              <p class="msg me">To kya karein?</p>
+              <p class="msg dost">Line ka output ek <strong>S-shape machine</strong> mein daalo jo kisi bhi number ko 0 aur 1 ke beech daba deti hai. Isko <strong>sigmoid</strong> kehte hain. Line + sigmoid = <strong>logistic regression</strong>.</p>
+              <p class="msg me">0 aur 1 ke beech matlab probability jaisa?</p>
+              <p class="msg dost">Exactly. Doctor bhi “chance zyada/kam” type baat karta hai; sigmoid model ko wahi bhasha de deta hai.</p>
+            </div>
+            <figure class="figure">
+              <svg viewBox="0 0 400 210" role="img" aria-label="Sigmoid curve: bade negative z pe 0, z=0 pe 0.5, bade positive z pe 1">
+                <line x1="20" y1="190" x2="385" y2="190" stroke="#b8c2d3"/><line x1="200" y1="10" x2="200" y2="195" stroke="#dde3ec"/>
+                <line x1="20" y1="105" x2="385" y2="105" stroke="#dde3ec" stroke-dasharray="4 4"/><line x1="20" y1="20" x2="385" y2="20" stroke="#dde3ec" stroke-dasharray="4 4"/>
+                <polyline points="20,190 80,187 110,182 140,170 170,144 200,105 230,66 260,40 290,28 320,23 380,20" fill="none" stroke="#3567e8" stroke-width="3"/>
+                <text x="8" y="194" font-size="11" fill="#7a879b">0</text><text x="4" y="109" font-size="11" fill="#7a879b">.5</text><text x="8" y="24" font-size="11" fill="#7a879b">1</text>
+                <text x="200" y="206" font-size="11" text-anchor="middle" fill="#7a879b">z = 0</text><text x="380" y="206" font-size="11" text-anchor="end" fill="#7a879b">z →</text>
+              </svg>
+              <div class="cap">Sigmoid: z kitna bhi bada/chhota ho, output hamesha 0 aur 1 ke beech.</div>
+            </figure>
+            <div class="formula"><code>z = w · x + b          (wahi purani line)
+f = g(z) = 1 / (1 + e⁻ᶻ)   (sigmoid)</code><ul><li>f = “y = 1 hone ka chance”. f = 0.73 matlab model ke hisaab se 73% chance khatarnak.</li></ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>z</th><th>−4</th><th>−2</th><th>0</th><th>2</th><th>4</th></tr>
+              <tr><td>g(z)</td><td>0.02</td><td>0.12</td><td>0.50</td><td>0.88</td><td>0.98</td></tr>
+            </table></div>
+            <h4>Ek solved example</h4>
+            <p>Model ne seekha w = 0.5, b = −3. Ab alag tumors:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Tumor size</th><th>z = 0.5 × size − 3</th><th>Chance (sigmoid)</th><th>Faisla (≥ 0.5?)</th></tr>
+              <tr><td>2 cm</td><td>−2</td><td>12%</td><td>Safe (0)</td></tr>
+              <tr><td>6 cm</td><td>0</td><td>50%</td><td>Border pe</td></tr>
+              <tr><td>8 cm</td><td>1</td><td>73%</td><td>Khatarnak (1)</td></tr>
+              <tr><td>12 cm</td><td>3</td><td>95%</td><td>Khatarnak (1)</td></tr>
+            </table></div>
+            <p>Notice karo: z = 0 pe chance exactly 50%. Isi wajah se z = 0 wali jagah decision boundary ban jaati hai — next topic mein iski picture dekhenge.</p>            <h4>Threshold ka business decision</h4>
+            <p>Sigmoid chance deta hai; final haan/na tum threshold se banate ho. Threshold context pe depend karta hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Case</th><th>Model chance f</th><th>Threshold</th><th>Faisla</th></tr>
+              <tr><td>Normal spam filter</td><td>0.42</td><td>0.5</td><td>Not spam</td></tr>
+              <tr><td>Cancer screening</td><td>0.42</td><td>0.3</td><td class="bad">Extra test karao</td></tr>
+            </table></div>
+            <p>Same probability, alag decision. Kyunki spam mein false alarm irritating hai; health mein missed case mehenga pad sakta hai.</p>
+
+            <div class="lesson-callout"><b>Chhota check-in:</b> Logistic regression ka “linear” hissa abhi bhi z = w·x + b hai. Sigmoid sirf us score ko chance wali language mein translate karta hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Logistic regression = pehle line wala score, phir sigmoid se usko 0–1 ka chance banao, phir threshold se haan/na.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Ye “e” kya hai?</summary><p>Ek fixed number ≈ 2.718, bilkul π ≈ 3.14 jaisa. Calculation NumPy (np.exp) kar deta hai. Tumhe bas S-shape yaad rakhni hai.</p></details>
+            <details class="qa"><summary>Naam “regression” hai par kaam classification — confusing nahi?</summary><p>Haan, naam confusing hai. Andar se ye ek number (chance) predict karta hai, isliye regression bola gaya. Phir threshold se category banti hai.</p></details>
+            <details class="qa"><summary>Threshold hamesha 0.5 hi rakhna hai?</summary><p>Nahi, woh default hai. Cancer screening mein 0.3 rakh sakte ho — koi asli case miss na ho, chahe kuch healthy logon ka extra test ho jaye. Spam filter mein 0.8 — koi zaroori email galti se spam mein na chala jaye.</p></details>
+            <details class="qa"><summary>73% matlab model 73% pakka hai?</summary><p>Ye model ka andaaza hai, guarantee nahi. Model achhe data pe achhe se train hua ho tabhi ye number bharosemand hota hai.</p></details>            <details class="qa"><summary>Sigmoid output 0.99 ho to kya class pakki hai?</summary><p>Nahi. Bas model bahut confident hai. Agar training data biased, noisy, ya naye data se alag hai, to 0.99 bhi galat ho sakta hai. Confidence aur correctness alag cheezein hain.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>w = 1, b = −4, x = 4 → z aur chance?</summary><p>z = 0 → chance <b>0.5</b>.</p></details>
+              <details class="qa"><summary>Threshold 0.5 se kam kab rakhoge?</summary><p>Jab asli positive miss karna bahut mehenga ho — jaise bimaari screening.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="s8"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="feature-engineering.html"><small>← Pichhla</small>Feature engineering aur polynomial regression</a>
+          <a class="pager-next" href="decision-boundary.html"><small>Agla →</small>Decision boundary</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

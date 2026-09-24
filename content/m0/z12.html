@@ -1,0 +1,80 @@
+            <div class="chat">
+              <p class="msg me">Vector ki “lambai” ka kya matlab? Vector to list hai.</p>
+              <p class="msg dost">Map pe ek arrow socho. Right 3 kadam, up 4 kadam. Arrow ki seedhi lambai 5 hoti hai. Wahi vector norm.</p>
+              <p class="msg me">Aur similarity?</p>
+              <p class="msg dost">Do arrows same direction mein dekh rahe hain ya ulte? Cosine similarity angle se yahi batati hai.</p>
+            </div>
+            <h4>L2 norm, L1 norm, squared L2</h4>
+            <p>Vector <code>v = [3, −4]</code> lo. Ye ek chhota route hai: 3 right, 4 down.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Naam</th><th>Formula</th><th>v = [3, −4]</th><th>Feel</th></tr>
+              <tr><td>L2 norm</td><td><code>√Σvᵢ²</code></td><td>√(9 + 16) = <b>5</b></td><td>Seedhi arrow lambai</td></tr>
+              <tr><td>L1 norm</td><td><code>Σ|vᵢ|</code></td><td>|3| + |−4| = <b>7</b></td><td>Galiyon se chalna: right + down</td></tr>
+              <tr><td>Squared L2</td><td><code>Σvᵢ²</code></td><td>9 + 16 = <b>25</b></td><td>Root nahi, calculation easy</td></tr>
+            </table></div>
+            <figure class="figure">
+              <svg viewBox="0 0 360 190" role="img" aria-label="3-4-5 triangle showing vector L2 norm">
+                <line x1="60" y1="150" x2="260" y2="150" stroke="#b8c2d3"/>
+                <line x1="60" y1="150" x2="60" y2="40" stroke="#b8c2d3"/>
+                <line x1="60" y1="150" x2="210" y2="70" stroke="#3567e8" stroke-width="4"/>
+                <line x1="210" y1="70" x2="210" y2="150" stroke="#c2410c" stroke-dasharray="4 3"/>
+                <line x1="60" y1="150" x2="210" y2="150" stroke="#159477" stroke-width="3"/>
+                <g font-size="11"><text x="125" y="168" fill="#159477">3</text><text x="218" y="112" fill="#c2410c">4</text><text x="135" y="95" fill="#3567e8">L2 = 5</text></g>
+              </svg>
+              <div class="cap">L2 norm Pythagoras wali seedhi distance hai.</div>
+            </figure>
+            <h4>Frobenius norm — matrix ki lambai</h4>
+            <p>Matrix ke liye same idea: saare numbers square karo, jodo, root lo. Matrix <code>[[1,2],[2,2]]</code> ka Frobenius norm = √(1 + 4 + 4 + 4) = √13 ≈ <strong>3.606</strong>.</p>
+            <div class="formula"><code>||A||_F = √(Σ over all rows and columns Aᵢⱼ²)</code><ul>
+              <li>Neural network mein W matrix hota hai.</li>
+              <li>L2 regularization aksar W ke squared Frobenius norm ko cost mein add karta hai.</li>
+            </ul></div>
+            <h4>Euclidean distance — do vectors kitne door</h4>
+            <p>Distance mein pehle difference vector banao, phir L2 norm lo.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Do points</th><th>Difference</th><th>Distance</th></tr>
+              <tr><td><code>a = [1,2]</code>, <code>b = [4,6]</code></td><td><code>a − b = [-3,-4]</code></td><td>√(9 + 16) = <b>5</b></td></tr>
+            </table></div>
+            <h4>Cosine similarity — direction same hai?</h4>
+            <p>Distance size se affect hoti hai. Cosine similarity direction dekhti hai. Agar dono arrows same direction mein hain to 1, seedhe opposite to −1, 90° pe 0.</p>
+            <div class="formula"><code>cosine_similarity(a,b) = (a · b) ÷ (||a||₂ × ||b||₂)</code><ul>
+              <li><b>a · b</b> = dot product.</li>
+              <li><b>||a||₂</b> aur <b>||b||₂</b> = dono vectors ki L2 lambai.</li>
+              <li>Answer −1 se 1 ke beech hota hai.</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>a</th><th>b</th><th>Dot</th><th>Norms</th><th>Cosine</th></tr>
+              <tr><td>[1,2]</td><td>[2,1]</td><td>1×2 + 2×1 = 4</td><td>√5 aur √5</td><td>4 ÷ 5 = <b>0.8</b></td></tr>
+              <tr><td>[1,0]</td><td>[−1,0]</td><td>−1</td><td>1 aur 1</td><td><b>−1</b></td></tr>
+            </table></div>
+            <h4>Unit length pe normalize karna</h4>
+            <p>Normalize = vector ko apni lambai se divide karo. <code>[3,4]</code> ki L2 lambai 5 hai, to unit vector <code>[3/5, 4/5] = [0.6, 0.8]</code>. Ab lambai 1 ho gayi.</p>
+<pre class="code">import numpy as np
+
+v = np.array([3, 4])
+norm = np.linalg.norm(v)        <span class="cm"># 5.0</span>
+unit = v / norm                 <span class="cm"># [0.6, 0.8]</span>
+
+a = np.array([1, 2])
+b = np.array([2, 1])
+cos = np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+print(cos)                      <span class="cm"># 0.8</span></pre>
+            <h4>Deep learning mein ye kahan milega?</h4>
+            <ul>
+              <li><b>L2 regularization:</b> weights ki lambai chhoti rakhna.</li>
+              <li><b>Gradient checking:</b> numerical gradient aur backprop gradient ki distance compare karna.</li>
+              <li><b>Face recognition:</b> do face encodings ki distance.</li>
+              <li><b>Word embeddings:</b> cosine similarity se “king” aur “queen” jaise vectors compare karna.</li>
+            </ul>
+            <div class="mistake"><b>Dhyan rakhna:</b> Cosine similarity calculate karte waqt zero vector se divide nahi kar sakte. Norm 0 ho to direction defined hi nahi.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Norm = vector ki size, distance = do vectors ke beech ka gap, cosine = direction ki similarity.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>L1 aur L2 mein kaunsa better?</summary><p>“Better” problem pe depend karta hai. L2 smooth hai aur deep learning mein common. L1 kuch weights ko exact zero ki taraf push karta hai, jo sparse models mein useful hota hai.</p></details>
+            <details class="qa"><summary>Squared L2 kyu use karte hain?</summary><p>Root avoid ho jaata hai, derivative clean hota hai, aur bade weights ko zyada saza milti hai. Regularization mein ye convenient hai.</p></details>
+            <details class="qa"><summary>Cosine similarity distance se kab better?</summary><p>Jab size nahi, direction matter kare. Text embeddings mein sentence lamba-chhota ho sakta hai, par meaning direction se pakadna hota hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary><code>[6,8]</code> ka L2 norm?</summary><p>√(36 + 64) = √100 = <b>10</b>.</p></details>
+              <details class="qa"><summary><code>[1,0]</code> aur <code>[0,1]</code> ka cosine?</summary><p>Dot = 0, norms 1 aur 1. Cosine = <b>0</b>, matlab 90°.</p></details>
+              <details class="qa"><summary><code>[6,8]</code> ko unit vector banao.</summary><p>Norm 10. Divide karo: <code>[0.6, 0.8]</code>. Final <b>[0.6, 0.8]</b>.</p></details>
+            </div>

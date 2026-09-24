@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="K-means algorithm: Jhande gaado, team banao, jhanda khiskao. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>K-means algorithm (ML · 3) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../unsupervised.html">ML · 3: Unsupervised Learning, Recommenders, RL</a> › Topic 2 / 13</nav>
+        <p class="eyebrow">ML · 3 · TOPIC 02 · CLUSTERING</p>
+        <h1>K-means algorithm</h1>
+        <p>Jhande gaado, team banao, jhanda khiskao</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 3 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="u1" href="unsupervised-clustering.html"><span>01</span>Unsupervised learning aur clustering</a>
+            <a data-topic-link="u2" class="current" aria-current="page" href="k-means.html"><span>02</span>K-means algorithm</a>
+            <a data-topic-link="u3" href="k-means-cost-choose-k.html"><span>03</span>K-means cost, initialization aur K chunna</a>
+            <a data-topic-link="u4" href="anomaly-gaussian.html"><span>04</span>Anomaly detection aur Gaussian</a>
+            <a data-topic-link="u5" href="anomaly-algorithm.html"><span>05</span>Anomaly detection algorithm aur evaluation</a>
+            <a data-topic-link="u6" href="recommender-features.html"><span>06</span>Recommender: item features ke saath</a>
+            <a data-topic-link="u7" href="collaborative-filtering.html"><span>07</span>Collaborative filtering aur binary labels</a>
+            <a data-topic-link="u8" href="mean-normalization.html"><span>08</span>Mean normalization, TensorFlow aur related items</a>
+            <a data-topic-link="u9" href="content-based-filtering.html"><span>09</span>Content-based filtering aur deep learning</a>
+            <a data-topic-link="u10" href="pca.html"><span>10</span>PCA — bahut features ko kam mein samet-na</a>
+            <a data-topic-link="u11" href="reinforcement-learning-basics.html"><span>11</span>Reinforcement learning basics</a>
+            <a data-topic-link="u12" href="q-function-bellman.html"><span>12</span>Q-function aur Bellman equation</a>
+            <a data-topic-link="u13" href="deep-q-network.html"><span>13</span>Continuous states aur Deep Q-Network</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11,u12,u13"><span>ML · 3 progress</span><strong data-progress-label>0 / 13 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Sabse popular clustering algorithm. Simple, fast, aur samajhne mein aasan.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z6" href="maths-vectors-matrices.html"><small>Maths</small>Vectors, matrices aur dot product</a><a class="chip" data-topic-link="z12" href="maths-norms-similarity.html"><small>Maths</small>Norms, distance aur cosine similarity</a></div></div>
+        
+        <article class="lesson-card single" id="u2">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Computer groups dhundhta kaise hai? Koi magic wand hai?</p>
+              <p class="msg dost">Magic nahi, ek desi khel. Bade maidan mein log khade hain. Tum K = 2 jhande random jagah gaad dete ho. Phir bolte ho: “har insaan apne <strong>sabse paas wale</strong> jhande ke paas chala jaye.” Do teams ban gayi.</p>
+              <p class="msg dost">Ab har jhanda uthao aur apni team ke <strong>beech</strong> (average jagah) gaad do. Jhande khisak gaye! To log dobara check karein: ab kaunsa jhanda paas hai? Kuch log team badlenge. Phir jhande dobara beech mein. Baar baar — jab tak koi team na badle. Yahi <strong>K-means</strong> hai.</p>
+            </div>
+            <div class="visual-flow"><span>1. K centers random rakho</span><b>→</b><span class="flow-highlight">2. Har point sabse paas wale center ko</span><b>→</b><span class="flow-highlight">3. Center ko apne group ke average pe le jao</span><b>↻</b><span>Koi badlav nahi → ruk jao</span></div>
+            <p>Center ko <strong>centroid</strong> kehte hain — group ka “center of gravity”. Naam heavy hai, par matlab bas group ka average point.</p>
+            <h4>Chhota sa example — ek line pe 6 points</h4>
+            <p>Customers ke monthly visits: <strong>1, 2, 3, 10, 11, 12</strong>. K = 2. Shuruaati centers galat jagah: <strong>c₁ = 1, c₂ = 3</strong>.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Round</th><th>Centers</th><th>Assignment (paas wala center)</th><th>Naye centers (average)</th></tr>
+              <tr><td>1</td><td>1, 3</td><td>c₁: {1, 2}<br>c₂: {3, 10, 11, 12}</td><td>c₁ = 1.5<br>c₂ = (3+10+11+12)/4 = 9</td></tr>
+              <tr><td>2</td><td>1.5, 9</td><td>c₁: {1, 2, 3} (3 ab 1.5 ke paas)<br>c₂: {10, 11, 12}</td><td>c₁ = 2<br>c₂ = 11</td></tr>
+              <tr><td>3</td><td>2, 11</td><td>Same groups — koi badlav nahi</td><td class="good">Ruk gaya ✓</td></tr>
+            </table></div>
+            <p>Galat shuruaat ke baawajood do round mein sensible groups mil gaye: “kabhi-kabhi aane wale” (1–3) aur “regular” (10–12). Yahan ruk ke table khud check kar lo — 3 sach mein 1.5 se zyada paas hai ya 9 se?</p>
+            <h4>“Paas” kaise naapte hain?</h4>
+            <p>Seedhi doori (distance) — map pe do jagah ke beech ki line. Do features ho to Pythagoras wala tareeka: √((x₁ − c₁)² + (x₂ − c₂)²). Code mein <code>np.linalg.norm(x - c)</code>. Bas yaad rakho: “paas” ka matlab numbers se decide hota hai, aankhon se nahi.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Agar ek feature “salary” (lakhs) aur doosra “rating” (1–5) hai to doori mein salary hi hawi rahegi. Clustering se pehle <strong>feature scaling</strong> karo.</div>
+
+            <h4>2D distance ka ek round</h4>
+            <div class="chat"><p class="msg me">Line wala example easy tha. Do features mein assignment kaise hota hai?</p><p class="msg dost">Same idea. Har point se har center ki distance nikaalo. Jo kam, point us team mein. Bas Pythagoras ka calculator version.</p></div>
+            <p>Centers: c₁ = (0,0), c₂ = (4,0). Teen points assign karte hain.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Point</th><th>Distance to c₁</th><th>Distance to c₂</th><th>Assignment</th></tr><tr><td>A (1,1)</td><td>√(1²+1²)=<b>1.41</b></td><td>√(3²+1²)=3.16</td><td class="good">c₁</td></tr><tr><td>B (3,1)</td><td>√(3²+1²)=3.16</td><td>√(1²+1²)=<b>1.41</b></td><td class="good">c₂</td></tr><tr><td>C (2,0)</td><td>2.00</td><td>2.00</td><td>Tie — koi rule</td></tr></table></div>
+            <p>Agar c₁ ko A mila aur c₂ ko B mila, naye centers A aur B ke average pe jayenge. Agar multiple points mile, unka average. K-means ka “means” wahi average hai.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Tie rare hota hai. Code mein koi fixed rule hota hai, jaise pehla center choose karna. Isse usually final result pe bada farak nahi padta.</div>
+            <h4>Center move ka average check</h4>
+            <p>Assignment ke baad centroid simply apni team ka average hota hai. Do points A(1,1) aur D(3,3) c₁ team mein aaye:</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Coordinate</th><th>Average</th><th>New center</th></tr><tr><td>x</td><td>(1+3)/2 = 2</td><td rowspan="2" class="good">(2,2)</td></tr><tr><td>y</td><td>(1+3)/2 = 2</td></tr></table></div>
+            <p>Isi average ki wajah se center team ke beech mein aa jaata hai. Phir assignments dobara check hote hain.</p>
+            <div class="lesson-callout"><b>Beginner checkpoint:</b> K-means mein labels ka naam algorithm nahi jaanta. Center 1 aur center 2 bas IDs hain; meaning tum data dekh ke doge.</div>
+            <p>Distance formula features ke units pe sensitive hai. Height meters mein aur income rupees mein ho to income wali direction center ko kheench legi. Isliye scaling K-means ka “pehle brush karo” step samjho.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> K-means = “paas wale center ko jao” + “center ko group ke beech le jao” — repeat.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Koi center ke paas ek bhi point na aaye to?</summary><p>Aam taur pe us center ko hata dete hain (K − 1 groups), ya use random nayi jagah rakh ke dobara try karte hain.</p></details>
+            <details class="qa"><summary>Kya K-means hamesha ruk jaata hai?</summary><p>Haan. Har step pe total doori ya to ghatti hai ya same rehti hai — agle topic mein iska “cost” dekhenge. Isliye ye hamesha kahin na kahin settle ho jaata hai.</p></details>
+            <details class="qa"><summary>Groups saaf-saaf alag na hon to?</summary><p>Tab bhi K-means groups bana dega. Jaise T-shirt sizes: logon ki height-weight ek lagatar phailaav hai, par K = 3 se S/M/L bana sakte ho. Useful hai, chahe natural border na ho.</p></details>
+
+            <details class="qa"><summary>K-means round kitni baar chalega?</summary><p>Jab assignments change hona band ho jayein, ya centers almost move na karein, ya max iterations hit ho jaayein. Practical libraries max_iter rakhti hain.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Points 0, 1, 9, 10; centers 0 aur 1. Pehle round ke baad naye centers?</summary><p>c₁ = {0} → 0, c₂ = {1, 9, 10} → 6.67. Agle round mein 1 ab 0 ke paas → c₁ = 0.5, c₂ = 9.5.</p></details>
+              <details class="qa"><summary>K-means se pehle scaling kyu?</summary><p>Bade unit wala feature doori pe hawi ho jaata hai.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="u2"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="unsupervised-clustering.html"><small>← Pichhla</small>Unsupervised learning aur clustering</a>
+          <a class="pager-next" href="k-means-cost-choose-k.html"><small>Agla →</small>K-means cost, initialization aur K chunna</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Recurrent Neural Network (RNN): Yaaddasht wala network. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Recurrent Neural Network (RNN) (DL · 5) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-sequence-models.html">DL · 5: Sequence Models</a> › Topic 2 / 15</nav>
+        <p class="eyebrow">DL · 5 · TOPIC 02 · RNN</p>
+        <h1>Recurrent Neural Network (RNN)</h1>
+        <p>Yaaddasht wala network</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 5 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="q1" href="dl-why-sequence-models.html"><span>01</span>Sequence models kyu, aur notation</a>
+            <a data-topic-link="q2" class="current" aria-current="page" href="dl-rnn-model.html"><span>02</span>Recurrent Neural Network (RNN)</a>
+            <a data-topic-link="q3" href="dl-bptt-rnn-types.html"><span>03</span>Backprop through time aur RNN ke types</a>
+            <a data-topic-link="q4" href="dl-language-model-sampling.html"><span>04</span>Language model aur naye sentences banana</a>
+            <a data-topic-link="q5" href="dl-vanishing-gradients-gru.html"><span>05</span>Vanishing gradients aur GRU</a>
+            <a data-topic-link="q6" href="dl-lstm-brnn-deep-rnn.html"><span>06</span>LSTM, bidirectional RNN aur deep RNN</a>
+            <a data-topic-link="q7" href="dl-word-embeddings.html"><span>07</span>Word embeddings: shabdon ko matlab wale numbers</a>
+            <a data-topic-link="q8" href="dl-word2vec-negative-sampling.html"><span>08</span>Embedding matrix, Word2Vec aur negative sampling</a>
+            <a data-topic-link="q9" href="dl-glove-sentiment-debiasing.html"><span>09</span>GloVe, sentiment classification aur bias hatana</a>
+            <a data-topic-link="q10" href="dl-seq2seq-beam-search.html"><span>10</span>Sequence-to-sequence aur beam search</a>
+            <a data-topic-link="q11" href="dl-beam-refinements-bleu.html"><span>11</span>Beam search refinements, error analysis aur BLEU</a>
+            <a data-topic-link="q12" href="dl-attention-model.html"><span>12</span>Attention model</a>
+            <a data-topic-link="q13" href="dl-speech-trigger-word.html"><span>13</span>Speech recognition aur trigger word detection</a>
+            <a data-topic-link="q14" href="dl-transformer-self-attention.html"><span>14</span>Transformer intuition aur self-attention</a>
+            <a data-topic-link="q15" href="dl-multihead-transformer.html"><span>15</span>Multi-head attention aur Transformer network</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="q1,q2,q3,q4,q5,q6,q7,q8,q9,q10,q11,q12,q13,q14,q15"><span>DL · 5 progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>RNN pehla network hai jo pichhli baat yaad rakh ke aage chalta hai. Baaki sab sequence models iske upgrade hain.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Normal network kyu nahi: alag lengths, position pe seekh share nahi</li><li>RNN ko time mein khol ke dekhna</li><li>a⟨t⟩ = g(W_aa a⟨t−1⟩ + W_ax x⟨t⟩ + b_a), ŷ⟨t⟩ = g(W_ya a⟨t⟩ + b_y)</li><li>Chhoti notation: W_a[a, x]</li><li>Activations: tanh/ReLU andar, sigmoid/softmax output</li><li>Kamzori: sirf pichhla context dikhta hai</li></ul></details>
+        <article class="lesson-card single" id="q2">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Normal neural network ko sentence de dein na. “Aaj baarish hogi” ke 3 one-hot vectors chipka do.</p>
+              <p class="msg dost">Chhote sentence pe jugaad chalega. Par kal 3 words, parso 30 words? Aur “baarish” position 2 pe aaye ya position 8 pe, model ko same idea reuse karna chahiye.</p>
+              <p class="msg me">Toh hume koi aisa network chahiye jo line-by-line padh sake?</p>
+              <p class="msg dost">Bilkul. RNN ek reader ki tarah hai: ek word padhta hai, apni chhoti si memory update karta hai, phir agla word.</p>
+            </div>
+            <h4>Normal network kyu awkward ho jaata hai</h4>
+            <div class="compare-grid">
+              <div><b>Alag lengths</b><br>Review: “mast” = 1 word. Review: “delivery late thi par taste mast” = 6 words. Fixed input layer ko dono kaise doge?</div>
+              <div><b>Position sharing nahi</b><br>“Delhi” 1st word ho ya 10th, NER model ko place ka signal same tarah use karna chahiye. Normal dense network har position ke liye alag weights seekh sakta hai.</div>
+            </div>
+            <p><strong>Recurrent Neural Network</strong> same weights ko har time step pe reuse karta hai. Isliye “word ka pattern” position se kam chipakta hai.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 560 210" role="img" aria-label="RNN time mein unfolded, har step memory a update karta hai">
+                <rect x="35" y="92" width="70" height="44" rx="10" fill="#edf3ff" stroke="#3567e8"/><text x="56" y="118" font-size="11">x⟨1⟩</text>
+                <rect x="160" y="92" width="70" height="44" rx="10" fill="#edf3ff" stroke="#3567e8"/><text x="181" y="118" font-size="11">x⟨2⟩</text>
+                <rect x="285" y="92" width="70" height="44" rx="10" fill="#edf3ff" stroke="#3567e8"/><text x="306" y="118" font-size="11">x⟨3⟩</text>
+                <rect x="35" y="35" width="70" height="38" rx="9" fill="#e9f7f3" stroke="#159477"/><text x="55" y="58" font-size="11">a⟨1⟩</text>
+                <rect x="160" y="35" width="70" height="38" rx="9" fill="#e9f7f3" stroke="#159477"/><text x="180" y="58" font-size="11">a⟨2⟩</text>
+                <rect x="285" y="35" width="70" height="38" rx="9" fill="#e9f7f3" stroke="#159477"/><text x="305" y="58" font-size="11">a⟨3⟩</text>
+                <rect x="410" y="35" width="80" height="38" rx="9" fill="#fff3ec" stroke="#e0703a"/><text x="431" y="58" font-size="11">ŷ⟨3⟩</text>
+                <path d="M70 92 V73 M195 92 V73 M320 92 V73 M105 54 H160 M230 54 H285 M355 54 H410" stroke="#8a96aa" stroke-width="2"/>
+                <text x="122" y="46" font-size="11" fill="#7653d6">same Waa</text><text x="248" y="46" font-size="11" fill="#7653d6">same Waa</text>
+              </svg>
+              <div class="cap">Unrolled RNN: ek hi cell ko time mein copy karke socho. Weights share hote hain.</div>
+            </figure>
+            <h4>RNN ka memory update</h4>
+            <p>Har step pe do cheezein milti hain: abhi ka input x⟨t⟩ aur pichhli memory a⟨t−1⟩. Dono milke nayi memory a⟨t⟩ banate hain.</p>
+            <div class="formula"><code>a⟨t⟩ = g(Wₐₐ a⟨t−1⟩ + Wₐₓ x⟨t⟩ + bₐ)
+ŷ⟨t⟩ = g(Wᵧₐ a⟨t⟩ + bᵧ)</code><ul>
+              <li><b>a⟨t⟩</b> = hidden state / memory at time t.</li>
+              <li><b>Wₐₐ</b> = purani memory ko kaise use karna.</li>
+              <li><b>Wₐₓ</b> = current input ko kaise use karna.</li>
+              <li><b>Wᵧₐ</b> = memory se prediction kaise banana.</li>
+            </ul></div>
+            <h4>Chhoti notation: Wₐ[a, x]</h4>
+            <p>Formula lamba lag raha hai? Dono inputs ko side-by-side chipka do: [a⟨t−1⟩, x⟨t⟩]. Phir ek combined matrix Wₐ se multiply karo.</p>
+            <div class="formula"><code>a⟨t⟩ = g(Wₐ [a⟨t−1⟩, x⟨t⟩] + bₐ)</code><ul>
+              <li>Ye wahi baat hai, bas notebook mein neat likhne ka tareeka.</li>
+              <li>Jaise dosa batter aur aloo masala alag bowls se aate hain, par tawa pe ek hi dish banti hai.</li>
+            </ul></div>
+            <h4>Mini worked example</h4>
+            <p>Maan lo hidden state 2 numbers ka hai. Linear mix ke baad values [0.4, −0.2] aayi. Andar tanh lagaya:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Quantity</th><th>Value</th><th>Result</th></tr>
+              <tr><td>tanh(0.4)</td><td>0.4</td><td class="good">0.380</td></tr>
+              <tr><td>tanh(−0.2)</td><td>−0.2</td><td>−0.197</td></tr>
+              <tr><td>Output logits</td><td>[1.2, 0.3, −0.5]</td><td>softmax = [0.629, 0.256, 0.115]</td></tr>
+            </table></div>
+            <p>Agar 3 labels hain — jaise person, place, other — to softmax probabilities ka total 1 hota hai. Yahan pehla label 62.9% chance le raha hai.</p>
+            <h4>Activations ka practical choice</h4>
+            <p>RNN ke hidden update mein aksar <strong>tanh</strong> use hota hai, kyunki memory ko −1 se +1 ke beech rakhta hai. Kabhi ReLU bhi use hota hai. Output side problem pe depend karta hai:</p>
+            <ul>
+              <li>Binary answer: sigmoid.</li>
+              <li>Many classes: softmax.</li>
+              <li>Number predict karna: linear output.</li>
+            </ul>
+            <h4>Kamzori: RNN sirf pichhla context dekhta hai</h4>
+            <p>Left-to-right RNN jab word 10 pe prediction karta hai, tab usne word 1 se 10 tak dekha hai. Future word 11, 12 nahi. NER mein kabhi future useful hota hai: “Java coffee pi” vs “Java class likhi”. Isliye aage bidirectional RNN aayega.</p>
+            <pre class="code">import numpy as np
+
+def rnn_step(x_t, a_prev, Waa, Wax, ba):
+    z = Waa @ a_prev + Wax @ x_t + ba
+    a_t = np.tanh(z)      <span class="cm"># chhoti memory update</span>
+    return a_t</pre>
+            <div class="mistake"><b>Dhyan rakhna:</b> RNN cell ki copies alag-alag layers nahi hain. Diagram mein 10 boxes dikhte hain, par weights same share hote hain.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> RNN ek word padhta hai, memory update karta hai, phir next word. Same weights har position pe reuse hote hain.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>a⟨0⟩ kya hota hai?</summary><p>Usually zeros se start karte hain. Matlab model sentence shuru hone se pehle blank memory se baithta hai.</p></details>
+            <details class="qa"><summary>Har time step pe output zaroor chahiye?</summary><p>Nahi. NER mein har word pe label chahiye. Sentiment mein sirf end pe ek output chahiye. Shape problem ke hisaab se badalta hai.</p></details>
+            <details class="qa"><summary>RNN long sentence yaad rakhta hai?</summary><p>Thoda rakhta hai, par bahut lambi dependency mein struggle karta hai. GRU/LSTM isi dard ki medicine hain.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Agar hidden state size 5 hai, toh a⟨t⟩ mein kitne numbers honge?</summary><p>Hidden state size hi memory length hai. Isliye <b>5 numbers</b>.</p></details>
+              <details class="qa"><summary>Softmax output [0.2, 0.5, 0.3] mein model ka chosen class kaunsa?</summary><p>Sabse bada chance 0.5 hai, jo 2nd class ka hai. <b>Class 2</b>.</p></details>
+              <details class="qa"><summary>Same word different positions pe aaye, RNN kaunsa benefit deta hai?</summary><p>Same weights reuse hote hain, isliye model pattern ko position-independent tarike se zyada easily seekh sakta hai.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="q2"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-why-sequence-models.html"><small>← Pichhla</small>Sequence models kyu, aur notation</a>
+          <a class="pager-next" href="dl-bptt-rnn-types.html"><small>Agla →</small>Backprop through time aur RNN ke types</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

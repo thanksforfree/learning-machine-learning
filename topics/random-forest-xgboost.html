@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Random forest aur XGBoost: Ek tree ki jagah trees ki panchayat. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Random forest aur XGBoost (ML · 2) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../advanced.html">ML · 2: Advanced Learning Algorithms</a> › Topic 12 / 12</nav>
+        <p class="eyebrow">ML · 2 · TOPIC 12 · DECISION TREES</p>
+        <h1>Random forest aur XGBoost</h1>
+        <p>Ek tree ki jagah trees ki panchayat</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 2 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="a1" href="neural-network-idea.html"><span>01</span>Neural network ka idea</a>
+            <a data-topic-link="a2" href="forward-propagation.html"><span>02</span>Forward propagation</a>
+            <a data-topic-link="a3" href="tensorflow.html"><span>03</span>TensorFlow mein network banana</a>
+            <a data-topic-link="a4" href="activation-functions.html"><span>04</span>Activation functions</a>
+            <a data-topic-link="a5" href="softmax-multiclass.html"><span>05</span>Multiclass aur softmax</a>
+            <a data-topic-link="a6" href="backprop-adam.html"><span>06</span>Backpropagation aur Adam</a>
+            <a data-topic-link="a7" href="train-cv-test.html"><span>07</span>Training, CV aur test set</a>
+            <a data-topic-link="a8" href="bias-variance.html"><span>08</span>Bias aur variance</a>
+            <a data-topic-link="a9" href="ml-development-cycle.html"><span>09</span>ML development cycle</a>
+            <a data-topic-link="a10" href="precision-recall.html"><span>10</span>Precision, recall aur F1</a>
+            <a data-topic-link="a11" href="decision-trees.html"><span>11</span>Decision tree, entropy aur information gain</a>
+            <a data-topic-link="a12" class="current" aria-current="page" href="random-forest-xgboost.html"><span>12</span>Random forest aur XGBoost</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12"><span>ML · 2 progress</span><strong data-progress-label>0 / 12 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Industry mein table data ke liye XGBoost aksar pehli pasand hai. Aur ye tay karna ki trees chunein ya neural network — engineer ka faisla.</div>
+        
+        
+        <article class="lesson-card single" id="a12">
+          <div class="lesson-body">
+
+            <div class="chat">
+              <p class="msg me">Ek tree kaafi nahi? Itna bhi kya panchayat?</p>
+              <p class="msg dost">Ek tree bahut <strong>moody</strong> hota hai — data mein ek example badlo to pehla sawaal hi badal sakta hai aur poora tree alag ban jaata hai. Solution: bahut saare trees banao aur <strong>voting</strong> karao. Jaise ek dost ki raay pe film choose karne ki jagah 10 doston se puchho.</p>
+              <p class="msg me">Par same data pe 10 trees to same hi banenge?</p>
+              <p class="msg dost">Isliye har tree ko thoda <strong>alag data</strong> dete hain — “sampling with replacement”. Ek thaili mein saare examples, ek nikaalo, note karo, <em>wapas daal do</em>, phir nikaalo. Kuch examples do baar aayenge, kuch ek baar bhi nahi. Har tree ka apna thoda alag dataset.</p>
+            </div>
+            <div class="visual-flow"><span>Data</span><b>→</b><span>Tree 1: Aam<br>Tree 2: Aam<br>Tree 3: Nahi</span><b>→</b><span class="flow-highlight">Voting: Aam (2 vs 1)</span></div>
+            <h4>Random forest</h4>
+            <p>Upar wali trick + ek aur twist: har split pe <strong>saare features nahi</strong>, bas kuch random features mein se chuno. Isse trees aur alag-alag bante hain, aur panchayat ka faisla aur stable.</p>
+            <h4>Boosting / XGBoost — galtiyon pe focus</h4>
+            <div class="chat">
+              <p class="msg dost">Exam ki taiyaari socho: pehle poora mock test do. Phir jo sawaal galat hue, <em>unko</em> zyada practice karo. Phir naya test, phir galat wale pe zyada focus. Boosting yahi karta hai — har naya tree pichhle trees ki galtiyon pe zyada dhyan deta hai.</p>
+            </div>
+            <p><strong>XGBoost</strong> (eXtreme Gradient Boosting) iska fast, bahut popular version hai jisme regularization bhi built-in hai. Table wale data ke competitions mein aksar jeet-ta hai — matlab Excel-type data ho to isko ignore mat karna.</p>
+<pre class="code">from xgboost import XGBClassifier
+model = XGBClassifier()
+model.fit(X_train, y_train)
+pred = model.predict(X_test)  <span class="cm"># final mein honest test set pe</span></pre>
+            <h4>Trees vs neural networks — kab kya?</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th></th><th>Decision trees / XGBoost</th><th>Neural networks</th></tr>
+              <tr><td>Kaisa data</td><td>Table jaisa (Excel): age, salary, city</td><td>Photos, awaaz, text + table bhi</td></tr>
+              <tr><td>Training speed</td><td>Fast</td><td>Slow ho sakta</td></tr>
+              <tr><td>Samajhna</td><td>Chhota tree insaan padh sakta</td><td>Mushkil</td></tr>
+              <tr><td>Transfer learning</td><td>Nahi</td><td>Haan</td></tr>
+              <tr><td>Kai models jodna</td><td>Mushkil</td><td>Aasan (ek saath train)</td></tr>
+            </table></div>
+            <div class="lesson-callout"><b>Module 2 ki badi picture:</b> Neural networks layered features khud banate hain; trees sawaal puchh ke baantte hain. Dono mein asli skill hai — sahi data split, bias/variance diagnosis, error analysis, aur sahi metric chunna.</div>
+
+            <h4>Sampling with replacement ko numbers se dekho</h4>
+            <div class="chat"><p class="msg me">Replacement wala part thoda ajeeb hai. Wapas daal ke sample kyu?</p><p class="msg dost">Taaki har tree ko thoda alag duniya mile. Same size ka dataset banega, par kuch examples repeat honge aur kuch miss. Isi se trees mein diversity aati hai.</p></div>
+            <p>Maan lo original training examples [1, 2, 3, 4, 5, 6] hain. Ek tree ke liye 6 draws kiye, har draw ke baad example wapas daal diya.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Draws</th><th>Tree ko mila data</th><th>Repeat</th><th>Out-of-bag (nahi mila)</th></tr><tr><td>6</td><td>[2, 2, 5, 1, 6, 2]</td><td>2 teen baar</td><td>3, 4</td></tr><tr><td>6</td><td>[1, 3, 3, 4, 6, 6]</td><td>3 aur 6 repeat</td><td>2, 5</td></tr></table></div>
+            <p>Har tree thoda alag data dekhta hai. Phir random feature subset ka twist add karo — ab trees aur bhi alag sochenge. Voting average karke moodiness kam ho jaati hai.</p>
+            <h4>Boosting ka tiny numeric feel</h4>
+            <div class="table-wrap"><table class="calc"><tr><th>Round</th><th>Pichhli galti</th><th>Naya tree kis pe focus?</th><th>Effect</th></tr><tr><td>1</td><td>Loan fraud cases miss</td><td>Fraud-like rows ko zyada weight</td><td>Recall better</td></tr><tr><td>2</td><td>High-income genuine users false alarm</td><td>Un rows pe correction</td><td>Precision better</td></tr></table></div>
+            <h4>Voting probability bhi de sakti hai</h4>
+            <p>Random forest sirf final class nahi, vote fraction se rough confidence bhi de sakta hai.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Trees</th><th>Votes: fraud</th><th>Votes: safe</th><th>Output feel</th></tr><tr><td>100</td><td>82</td><td>18</td><td class="bad">Fraud probability ~0.82</td></tr><tr><td>100</td><td>51</td><td>49</td><td>Borderline, review karo</td></tr><tr><td>100</td><td>5</td><td>95</td><td class="good">Mostly safe</td></tr></table></div>
+            <p>Ye calibrated probability hamesha perfect nahi hoti, par ranking aur thresholding mein useful signal deti hai.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Random forest diversity + voting se stable hota hai; XGBoost pichhli galtiyon pe focus karke strong model banata hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Kitne trees banaye?</summary><p>Aam taur pe 64 se 500 ke beech. Zyada trees se nuksaan kam hota hai, bas slow ho jaata hai. Ek point ke baad fayda band.</p></details>
+            <details class="qa"><summary>Random forest vs XGBoost — kaunsa pehle try karun?</summary><p>Table data pe XGBoost aam taur pe thoda behtar hota hai. Par rule simple hai: dono try karo, CV set pe compare karo, phir decide. Andaz se model choose karna lottery hai.</p></details>
+
+            <details class="qa"><summary>Out-of-bag examples ka use kya?</summary><p>Jo examples kisi tree ne training mein nahi dekhe, unpe us tree ko test kar sakte ho. Random forest mein isse extra validation signal milta hai.</p></details>
+            <details class="qa"><summary>XGBoost overfit kar sakta hai?</summary><p>Haan. Isliye depth, learning rate, number of trees, regularization tune karte hain. Powerful model hai, magic shield nahi.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Random forest mein trees ek doosre se alag kaise bante hain?</summary><p>Sampling with replacement + har split pe random features ka subset.</p></details>
+              <details class="qa"><summary>Photos ki classification — trees ya neural network?</summary><p><b>Neural network</b>.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="a12"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="decision-trees.html"><small>← Pichhla</small>Decision tree, entropy aur information gain</a>
+          <a class="pager-next" href="unsupervised-clustering.html"><small>Agla · ML · 3 →</small>Unsupervised learning aur clustering</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

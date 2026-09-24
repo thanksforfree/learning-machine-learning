@@ -1,0 +1,70 @@
+            <div class="chat">
+              <p class="msg me">Maine kabhi coding nahi ki. ML ke liye kitna Python chahiye?</p>
+              <p class="msg dost">Shuru karne ke liye bahut kam! Variables, lists, functions, loops, aur NumPy. Ek shaam mein basics aa jayenge. Course ke labs <strong>Jupyter Notebook</strong> mein hain — ek aisa page jahan code ke chhote tukde (cells) likho aur turant result dekho. Shift + Enter = cell chalao.</p>
+              <p class="msg me">Error aaya to? Main to wahi bandh kar dunga.</p>
+              <p class="msg dost">Mat bandh karna 😄. Error Python ka daantna nahi, location share karna hai. Last line padho, variable print karo, phir ek chhota change. Isi process se coding seekhte hain.</p>
+            </div>
+            <h4>1. Variables aur print</h4>
+<pre class="code">price = 50          <span class="cm"># number rakha</span>
+name = "Asha"       <span class="cm"># text (string)</span>
+is_spam = True      <span class="cm"># haan/na (boolean)</span>
+print(price * 2)    <span class="cm"># 100</span></pre>
+            <h4>2. Lists aur loops</h4>
+<pre class="code">sizes = [800, 1200, 1600]
+for s in sizes:              <span class="cm"># har item ke liye</span>
+    print(0.04 * s + 10)     <span class="cm"># 42.0, 58.0, 74.0</span></pre>
+            <div class="mistake"><b>Indentation matter karti hai:</b> Python mein loop/function ke andar ki lines ko 4 spaces aage likhna zaroori hai. Yahi batata hai ki kaunsi line andar hai.</div>
+            <h4>3. Functions — apni machine banao</h4>
+<pre class="code">def predict(x, w, b):
+    return w * x + b
+
+print(predict(1200, 0.04, 10))   <span class="cm"># 58.0</span></pre>
+            <h4>4. if / else</h4>
+<pre class="code">chance = 0.73
+if chance >= 0.5:
+    print("khatarnak")
+else:
+    print("safe")</pre>
+            <h4>5. NumPy — ML ka asli hathiyaar</h4>
+            <p>Python list pe math ek-ek karna padta hai. NumPy array pe poori list pe ek saath kaam ho jaata hai (vectorized) — jaise ek-ek chai banane ke bajay canteen wali badi ketli.</p>
+<pre class="code">import numpy as np
+
+x = np.array([800, 1200, 1600])
+print(0.04 * x + 10)          <span class="cm"># [42. 58. 74.] — bina loop!</span>
+
+w = np.array([0.04, 3])
+house = np.array([1200, 3])
+print(np.dot(w, house) + 10)  <span class="cm"># 67.0</span>
+
+X = np.array([[1200, 3],      <span class="cm"># 2D: har row ek ghar</span>
+              [800,  2]])
+print(X.shape)                <span class="cm"># (2, 2)</span>
+print(X @ w + 10)             <span class="cm"># [67. 48.] — dono ghar ek saath</span>
+print(np.mean(x), np.std(x))  <span class="cm"># average aur σ</span></pre>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Kaam</th><th>NumPy</th></tr>
+              <tr><td>Array banao</td><td>np.array([...])</td></tr>
+              <tr><td>Shape dekho</td><td>X.shape</td></tr>
+              <tr><td>Dot product / matrix multiply</td><td>np.dot(a, b), X @ W</td></tr>
+              <tr><td>e<sup>x</sup>, log</td><td>np.exp(x), np.log(x)</td></tr>
+              <tr><td>Average, σ, total</td><td>np.mean, np.std, np.sum</td></tr>
+              <tr><td>Pehli column / pehli row</td><td>X[:, 0], X[0]</td></tr>
+              <tr><td>Zeros se shuru</td><td>np.zeros(4)</td></tr>
+            </table></div>
+            <h4>6. Graph banana — matplotlib</h4>
+<pre class="code">import matplotlib.pyplot as plt
+plt.scatter([800, 1200, 1600], [45, 55, 76])   <span class="cm"># dots</span>
+plt.plot([800, 1600], [42, 74])                <span class="cm"># line</span>
+plt.xlabel("size"); plt.ylabel("price")
+plt.show()</pre>
+            <h4>7. scikit-learn — ready-made models</h4>
+            <p>Seekhne ke baad kaam mein aksar ready-made models use hote hain:</p>
+<pre class="code">from sklearn.linear_model import LinearRegression
+model = LinearRegression()
+model.fit(X, y)            <span class="cm"># training</span>
+model.predict(X_new)       <span class="cm"># naya andaaza</span></pre>
+            <div class="oneliner"><b>Yaad rakhna:</b> Python = bhasha, NumPy = tez math, matplotlib = graph, scikit-learn/TensorFlow = ready models. Course labs Jupyter mein chalte hain.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Python kahan chalaun? Install karna padega?</summary><p>Sabse aasan: Google Colab (browser mein, free) ya course ke apne lab notebooks. Computer pe chahiye to Python + VS Code + Jupyter extension.</p></details>
+            <details class="qa"><summary>Error aaye to kya karun?</summary><p>Error ki <em>aakhri line</em> padho — wahan asli wajah hoti hai (jaise “shapes not aligned” = matrix shape mismatch). Phir us line ke variables ka <code>.shape</code> ya value print karke dekho.</p></details>
+            <details class="qa"><summary>Kitni coding practice chahiye course se pehle?</summary><p>Upar ke 7 hisse samajh aa gaye aur khud 5-10 chhote programs likh liye to kaafi hai. Baaki course ke saath seekhte jaoge.</p></details>

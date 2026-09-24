@@ -1,0 +1,72 @@
+            <div class="chat">
+              <p class="msg me">Forward pass samajh aa gaya. Par RNN train kaise hota hai?</p>
+              <p class="msg dost">Jaise tum puri cricket innings dekh ke bolte ho “yahan shot galat tha, yahan run lena tha”. RNN bhi end mein loss dekh ke purane time steps tak blame bhejta hai.</p>
+              <p class="msg me">Time mein peeche blame? Thoda sci-fi lag raha hai.</p>
+              <p class="msg dost">Naam hi stylish hai: <strong>Backpropagation Through Time</strong>. Par idea wahi old backprop hai, bas unrolled RNN ke boxes ke across.</p>
+            </div>
+            <h4>Har time step pe loss, total loss sum</h4>
+            <p>NER jaise task mein har word ka label hota hai. Model har time step pe prediction ŷ⟨t⟩ deta hai. Har prediction ki chhoti loss L⟨t⟩, aur total loss in sab ka sum.</p>
+            <div class="formula"><code>L = Σ L⟨t⟩ = L⟨1⟩ + L⟨2⟩ + ... + L⟨Tᵧ⟩</code><ul>
+              <li><b>L⟨t⟩</b> = t-th output ki galti.</li>
+              <li><b>Total L</b> = poori sequence ki galti.</li>
+              <li>Training ka goal: total L kam karna.</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Word</th><th>Sahi label</th><th>Loss</th></tr>
+              <tr><td>Riya</td><td>Person</td><td>0.11</td></tr>
+              <tr><td>Delhi</td><td>Place</td><td>0.36</td></tr>
+              <tr><td>mein</td><td>Other</td><td>0.22</td></tr>
+              <tr><td>hai</td><td>Other</td><td>0.51</td></tr>
+              <tr><td colspan="2">Total</td><td class="good">1.20</td></tr>
+            </table></div>
+            <p>Numbers seedhe add hue: 0.11 + 0.36 + 0.22 + 0.51 = 1.20. Bas, sequence ki report card ready.</p>
+            <h4>Backprop through time ka intuition</h4>
+            <figure class="figure">
+              <svg viewBox="0 0 560 210" role="img" aria-label="Loss se gradient arrows time mein peeche ja rahe hain">
+                <rect x="50" y="80" width="70" height="44" rx="10" fill="#e9f7f3" stroke="#159477"/><text x="70" y="106" font-size="11">a⟨1⟩</text>
+                <rect x="185" y="80" width="70" height="44" rx="10" fill="#e9f7f3" stroke="#159477"/><text x="205" y="106" font-size="11">a⟨2⟩</text>
+                <rect x="320" y="80" width="70" height="44" rx="10" fill="#e9f7f3" stroke="#159477"/><text x="340" y="106" font-size="11">a⟨3⟩</text>
+                <rect x="455" y="80" width="70" height="44" rx="10" fill="#fff3ec" stroke="#e0703a"/><text x="476" y="106" font-size="11">Loss</text>
+                <path d="M120 102 H185 M255 102 H320 M390 102 H455" stroke="#8a96aa" stroke-width="2"/>
+                <path d="M455 140 C350 180 255 180 120 140" fill="none" stroke="#7653d6" stroke-width="2" stroke-dasharray="5 4"/>
+                <text x="225" y="182" font-size="11" fill="#7653d6">gradient peeche jaata hai</text>
+              </svg>
+              <div class="cap">Forward pass left se right. Backward pass loss se peeche, time steps ke through.</div>
+            </figure>
+            <p>Unrolled diagram ko normal deep network jaisa socho. Farq bas itna: har box same weights share karta hai, toh gradients alag time steps se aake same W mein add hote hain.</p>
+            <div class="visual-flow"><span>Forward<br><small>x⟨1⟩ se x⟨T⟩</small></span><b>→</b><span>Loss sum<br><small>har output</small></span><b>→</b><span class="flow-highlight">Backward in time<br><small>shared W update</small></span></div>
+            <h4>RNN shapes: problem ka design yahin se choose hota hai</h4>
+            <p>Sequence model ka input length aur output length relation har app mein different hota hai. Ye table yaad ho gaya toh architecture choose karna kaafi easy ho jaata hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Type</th><th>Input</th><th>Output</th><th>Example</th></tr>
+              <tr><td>One-to-one</td><td>Ek vector</td><td>Ek label</td><td>Normal image classifier</td></tr>
+              <tr><td>Many-to-one</td><td>Many words</td><td>Ek label</td><td>Movie review positive/negative</td></tr>
+              <tr><td>One-to-many</td><td>Ek seed</td><td>Many notes</td><td>Music banana</td></tr>
+              <tr><td>Many-to-many, Tₓ = Tᵧ</td><td>Words</td><td>Har word ka label</td><td>Naam pehchanna (NER)</td></tr>
+              <tr><td>Many-to-many, alag lengths</td><td>Hindi sentence</td><td>English sentence</td><td>Translation encoder-decoder</td></tr>
+            </table></div>
+            <h4>Many-to-many: Tₓ = Tᵧ</h4>
+            <p>NER mein input “Aman Pune gaya” hai. Output bhi 3 labels: Person, Place, Other. Har input word ka ek label. Yahan har time step pe loss natural hai.</p>
+            <h4>Many-to-one: sentiment</h4>
+            <p>“Delivery late thi par biryani kamaal thi” — poora sentence padhne ke baad ek final answer chahiye: positive ya negative. Isliye RNN end tak memory banata hai, phir last state se output.</p>
+            <h4>One-to-many: music banana</h4>
+            <p>Ek seed note ya genre do: “lofi monsoon”. Model pehla note predict kare, phir us predicted note ko next input bana ke next note. Aise melody grow hoti hai.</p>
+            <h4>Many-to-many alag lengths: translation</h4>
+            <p>“Mujhe chai chahiye” ke 3 words hain, “I would like tea” ke 4 words. Yahan encoder input sentence ko summary mein pack karta hai, decoder output sentence banata hai. Tₓ aur Tᵧ match karna zaroori nahi.</p>
+            <pre class="code">loss = 0
+for t in range(Ty):
+    y_hat_t = outputs[t]
+    loss += cross_entropy(y_hat_t, y_true[t])  <span class="cm"># har step ka bill add</span>
+loss.backward()  <span class="cm"># framework BPTT kar dega</span></pre>
+            <div class="mistake"><b>Dhyan rakhna:</b> Many-to-one mein har time step pe forced output mat lagao. Agar task ka answer sirf poori sequence ke baad milta hai, last hidden state se output lena simple aur clean hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> RNN ka loss time steps pe add hota hai, aur BPTT wahi loss ka blame time mein peeche bhejta hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>BPTT koi naya algorithm hai?</summary><p>Core backprop hi hai. “Through time” isliye bolte hain kyunki RNN ko time steps mein unroll karke gradients pass hote hain.</p></details>
+            <details class="qa"><summary>One-to-one bhi sequence model hai?</summary><p>Nahi, woh mostly normal network ka case hai. Table mein isliye rakha taaki contrast clear ho.</p></details>
+            <details class="qa"><summary>Translation mein encoder-decoder kyu?</summary><p>Input aur output lengths alag hote hain. Encoder source sentence samajhta hai, decoder target sentence generate karta hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Losses 0.4, 0.2, 0.7 hain. Total sequence loss?</summary><p>0.4 + 0.2 + 0.7 = <b>1.3</b>.</p></details>
+              <details class="qa"><summary>“Ye phone bahut slow hai” se star rating predict karni hai. Type?</summary><p>Input many words, output ek rating. Ye <b>many-to-one</b> hai.</p></details>
+              <details class="qa"><summary>Har video frame pe “running / sitting” label chahiye. Type?</summary><p>Input frames aur output labels same timeline pe. Ye <b>many-to-many, Tₓ = Tᵧ</b> hai.</p></details>
+            </div>

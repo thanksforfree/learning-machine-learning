@@ -1,0 +1,77 @@
+            <div class="chat">
+              <p class="msg me">Normal neural network ko sentence de dein na. “Aaj baarish hogi” ke 3 one-hot vectors chipka do.</p>
+              <p class="msg dost">Chhote sentence pe jugaad chalega. Par kal 3 words, parso 30 words? Aur “baarish” position 2 pe aaye ya position 8 pe, model ko same idea reuse karna chahiye.</p>
+              <p class="msg me">Toh hume koi aisa network chahiye jo line-by-line padh sake?</p>
+              <p class="msg dost">Bilkul. RNN ek reader ki tarah hai: ek word padhta hai, apni chhoti si memory update karta hai, phir agla word.</p>
+            </div>
+            <h4>Normal network kyu awkward ho jaata hai</h4>
+            <div class="compare-grid">
+              <div><b>Alag lengths</b><br>Review: “mast” = 1 word. Review: “delivery late thi par taste mast” = 6 words. Fixed input layer ko dono kaise doge?</div>
+              <div><b>Position sharing nahi</b><br>“Delhi” 1st word ho ya 10th, NER model ko place ka signal same tarah use karna chahiye. Normal dense network har position ke liye alag weights seekh sakta hai.</div>
+            </div>
+            <p><strong>Recurrent Neural Network</strong> same weights ko har time step pe reuse karta hai. Isliye “word ka pattern” position se kam chipakta hai.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 560 210" role="img" aria-label="RNN time mein unfolded, har step memory a update karta hai">
+                <rect x="35" y="92" width="70" height="44" rx="10" fill="#edf3ff" stroke="#3567e8"/><text x="56" y="118" font-size="11">x⟨1⟩</text>
+                <rect x="160" y="92" width="70" height="44" rx="10" fill="#edf3ff" stroke="#3567e8"/><text x="181" y="118" font-size="11">x⟨2⟩</text>
+                <rect x="285" y="92" width="70" height="44" rx="10" fill="#edf3ff" stroke="#3567e8"/><text x="306" y="118" font-size="11">x⟨3⟩</text>
+                <rect x="35" y="35" width="70" height="38" rx="9" fill="#e9f7f3" stroke="#159477"/><text x="55" y="58" font-size="11">a⟨1⟩</text>
+                <rect x="160" y="35" width="70" height="38" rx="9" fill="#e9f7f3" stroke="#159477"/><text x="180" y="58" font-size="11">a⟨2⟩</text>
+                <rect x="285" y="35" width="70" height="38" rx="9" fill="#e9f7f3" stroke="#159477"/><text x="305" y="58" font-size="11">a⟨3⟩</text>
+                <rect x="410" y="35" width="80" height="38" rx="9" fill="#fff3ec" stroke="#e0703a"/><text x="431" y="58" font-size="11">ŷ⟨3⟩</text>
+                <path d="M70 92 V73 M195 92 V73 M320 92 V73 M105 54 H160 M230 54 H285 M355 54 H410" stroke="#8a96aa" stroke-width="2"/>
+                <text x="122" y="46" font-size="11" fill="#7653d6">same Waa</text><text x="248" y="46" font-size="11" fill="#7653d6">same Waa</text>
+              </svg>
+              <div class="cap">Unrolled RNN: ek hi cell ko time mein copy karke socho. Weights share hote hain.</div>
+            </figure>
+            <h4>RNN ka memory update</h4>
+            <p>Har step pe do cheezein milti hain: abhi ka input x⟨t⟩ aur pichhli memory a⟨t−1⟩. Dono milke nayi memory a⟨t⟩ banate hain.</p>
+            <div class="formula"><code>a⟨t⟩ = g(Wₐₐ a⟨t−1⟩ + Wₐₓ x⟨t⟩ + bₐ)
+ŷ⟨t⟩ = g(Wᵧₐ a⟨t⟩ + bᵧ)</code><ul>
+              <li><b>a⟨t⟩</b> = hidden state / memory at time t.</li>
+              <li><b>Wₐₐ</b> = purani memory ko kaise use karna.</li>
+              <li><b>Wₐₓ</b> = current input ko kaise use karna.</li>
+              <li><b>Wᵧₐ</b> = memory se prediction kaise banana.</li>
+            </ul></div>
+            <h4>Chhoti notation: Wₐ[a, x]</h4>
+            <p>Formula lamba lag raha hai? Dono inputs ko side-by-side chipka do: [a⟨t−1⟩, x⟨t⟩]. Phir ek combined matrix Wₐ se multiply karo.</p>
+            <div class="formula"><code>a⟨t⟩ = g(Wₐ [a⟨t−1⟩, x⟨t⟩] + bₐ)</code><ul>
+              <li>Ye wahi baat hai, bas notebook mein neat likhne ka tareeka.</li>
+              <li>Jaise dosa batter aur aloo masala alag bowls se aate hain, par tawa pe ek hi dish banti hai.</li>
+            </ul></div>
+            <h4>Mini worked example</h4>
+            <p>Maan lo hidden state 2 numbers ka hai. Linear mix ke baad values [0.4, −0.2] aayi. Andar tanh lagaya:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Quantity</th><th>Value</th><th>Result</th></tr>
+              <tr><td>tanh(0.4)</td><td>0.4</td><td class="good">0.380</td></tr>
+              <tr><td>tanh(−0.2)</td><td>−0.2</td><td>−0.197</td></tr>
+              <tr><td>Output logits</td><td>[1.2, 0.3, −0.5]</td><td>softmax = [0.629, 0.256, 0.115]</td></tr>
+            </table></div>
+            <p>Agar 3 labels hain — jaise person, place, other — to softmax probabilities ka total 1 hota hai. Yahan pehla label 62.9% chance le raha hai.</p>
+            <h4>Activations ka practical choice</h4>
+            <p>RNN ke hidden update mein aksar <strong>tanh</strong> use hota hai, kyunki memory ko −1 se +1 ke beech rakhta hai. Kabhi ReLU bhi use hota hai. Output side problem pe depend karta hai:</p>
+            <ul>
+              <li>Binary answer: sigmoid.</li>
+              <li>Many classes: softmax.</li>
+              <li>Number predict karna: linear output.</li>
+            </ul>
+            <h4>Kamzori: RNN sirf pichhla context dekhta hai</h4>
+            <p>Left-to-right RNN jab word 10 pe prediction karta hai, tab usne word 1 se 10 tak dekha hai. Future word 11, 12 nahi. NER mein kabhi future useful hota hai: “Java coffee pi” vs “Java class likhi”. Isliye aage bidirectional RNN aayega.</p>
+            <pre class="code">import numpy as np
+
+def rnn_step(x_t, a_prev, Waa, Wax, ba):
+    z = Waa @ a_prev + Wax @ x_t + ba
+    a_t = np.tanh(z)      <span class="cm"># chhoti memory update</span>
+    return a_t</pre>
+            <div class="mistake"><b>Dhyan rakhna:</b> RNN cell ki copies alag-alag layers nahi hain. Diagram mein 10 boxes dikhte hain, par weights same share hote hain.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> RNN ek word padhta hai, memory update karta hai, phir next word. Same weights har position pe reuse hote hain.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>a⟨0⟩ kya hota hai?</summary><p>Usually zeros se start karte hain. Matlab model sentence shuru hone se pehle blank memory se baithta hai.</p></details>
+            <details class="qa"><summary>Har time step pe output zaroor chahiye?</summary><p>Nahi. NER mein har word pe label chahiye. Sentiment mein sirf end pe ek output chahiye. Shape problem ke hisaab se badalta hai.</p></details>
+            <details class="qa"><summary>RNN long sentence yaad rakhta hai?</summary><p>Thoda rakhta hai, par bahut lambi dependency mein struggle karta hai. GRU/LSTM isi dard ki medicine hain.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Agar hidden state size 5 hai, toh a⟨t⟩ mein kitne numbers honge?</summary><p>Hidden state size hi memory length hai. Isliye <b>5 numbers</b>.</p></details>
+              <details class="qa"><summary>Softmax output [0.2, 0.5, 0.3] mein model ka chosen class kaunsa?</summary><p>Sabse bada chance 0.5 hai, jo 2nd class ka hai. <b>Class 2</b>.</p></details>
+              <details class="qa"><summary>Same word different positions pe aaye, RNN kaunsa benefit deta hai?</summary><p>Same weights reuse hote hain, isliye model pattern ko position-independent tarike se zyada easily seekh sakta hai.</p></details>
+            </div>

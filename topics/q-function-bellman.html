@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Q-function aur Bellman equation: Abhi ka inaam + aage ka best. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Q-function aur Bellman equation (ML · 3) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../unsupervised.html">ML · 3: Unsupervised Learning, Recommenders, RL</a> › Topic 12 / 13</nav>
+        <p class="eyebrow">ML · 3 · TOPIC 12 · REINFORCEMENT LEARNING</p>
+        <h1>Q-function aur Bellman equation</h1>
+        <p>Abhi ka inaam + aage ka best</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 3 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="u1" href="unsupervised-clustering.html"><span>01</span>Unsupervised learning aur clustering</a>
+            <a data-topic-link="u2" href="k-means.html"><span>02</span>K-means algorithm</a>
+            <a data-topic-link="u3" href="k-means-cost-choose-k.html"><span>03</span>K-means cost, initialization aur K chunna</a>
+            <a data-topic-link="u4" href="anomaly-gaussian.html"><span>04</span>Anomaly detection aur Gaussian</a>
+            <a data-topic-link="u5" href="anomaly-algorithm.html"><span>05</span>Anomaly detection algorithm aur evaluation</a>
+            <a data-topic-link="u6" href="recommender-features.html"><span>06</span>Recommender: item features ke saath</a>
+            <a data-topic-link="u7" href="collaborative-filtering.html"><span>07</span>Collaborative filtering aur binary labels</a>
+            <a data-topic-link="u8" href="mean-normalization.html"><span>08</span>Mean normalization, TensorFlow aur related items</a>
+            <a data-topic-link="u9" href="content-based-filtering.html"><span>09</span>Content-based filtering aur deep learning</a>
+            <a data-topic-link="u10" href="pca.html"><span>10</span>PCA — bahut features ko kam mein samet-na</a>
+            <a data-topic-link="u11" href="reinforcement-learning-basics.html"><span>11</span>Reinforcement learning basics</a>
+            <a data-topic-link="u12" class="current" aria-current="page" href="q-function-bellman.html"><span>12</span>Q-function aur Bellman equation</a>
+            <a data-topic-link="u13" href="deep-q-network.html"><span>13</span>Continuous states aur Deep Q-Network</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11,u12,u13"><span>ML · 3 progress</span><strong data-progress-label>0 / 13 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Q-values mil gaye to best action chunna trivial hai. Bellman equation unhe nikaalne ka raasta hai.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z5" href="maths-average-probability.html"><small>Maths</small>Average, phailaav aur probability</a></div></div>
+        
+        <article class="lesson-card single" id="u12">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Best policy ke liye har possible raasta try kar lein? Spreadsheet bana leta hoon.</p>
+              <p class="msg dost">Chhoti gali mein ho jayega, badi duniya mein spreadsheet ro dega. Better idea: har (state, action) jodi ko ek <strong>score</strong> do: “agar main yahan hoon, ye action lun, aur <em>uske baad</em> best khelun, to kitna return milega?” Isko <strong>Q(s, a)</strong> kehte hain — Q for “quality”.</p>
+              <p class="msg me">Aur Q pata ho to?</p>
+              <p class="msg dost">To life aasan! Har state mein bas woh action lo jiska Q sabse zyada. Best policy = har state mein max Q wala action.</p>
+            </div>
+            <h4>Delivery robot ke Q values (γ = 0.5)</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Ghar</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+              <tr><td>Q(s, ←)</td><td rowspan="2">50<br><small>(end)</small></td><td class="good">25</td><td class="good">12.5</td><td>6.25</td><td rowspan="2">20<br><small>(end)</small></td></tr>
+              <tr><td>Q(s, →)</td><td>6.25</td><td>5</td><td class="good">10</td></tr>
+              <tr><td>Best action</td><td></td><td>←</td><td>←</td><td>→</td><td></td></tr>
+            </table></div>
+            <h4>Bellman equation — “abhi ka inaam + aage ka best”</h4>
+            <div class="formula"><code>Q(s, a) = R(s) + γ × max Q(s', a')</code><ul>
+              <li><b>R(s)</b> = abhi wali state ka reward (turant milne wala)</li>
+              <li><b>s'</b> = action lene ke baad nayi state</li>
+              <li><b>max Q(s', a')</b> = wahan se aage best khelne ka value</li>
+              <li>Matlab: “aaj ki kamai + kal se best tarike se kamaane ka discounted value”.</li>
+            </ul></div>
+            <h4>Check karo — formula se Q nikaalo</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Q</th><th>R(s)</th><th>Nayi state s'</th><th>max Q(s')</th><th>Hisaab</th></tr>
+              <tr><td>Q(2, ←)</td><td>0</td><td>1 (end, 50)</td><td>50</td><td>0 + 0.5 × 50 = <b>25</b></td></tr>
+              <tr><td>Q(3, ←)</td><td>0</td><td>2</td><td>25</td><td>0 + 0.5 × 25 = <b>12.5</b></td></tr>
+              <tr><td>Q(4, →)</td><td>0</td><td>5 (end, 20)</td><td>20</td><td>0 + 0.5 × 20 = <b>10</b></td></tr>
+              <tr><td>Q(4, ←)</td><td>0</td><td>3</td><td>12.5</td><td>0 + 0.5 × 12.5 = <b>6.25</b></td></tr>
+            </table></div>
+            <p>Pichle page wale returns se exactly match! Bellman equation ka comfort yahi hai: badi future-planning problem ko <strong>chhote ek-kadam wale</strong> tukdon mein tod deta hai. Ab tak theek?</p>
+            <h4>Random (stochastic) duniya</h4>
+            <div class="chat">
+              <p class="msg dost">Asli duniya mein robot ko “left” bolo to shayad 90% baar left jaaye aur 10% baar pair phisal ke right. Train bhi kabhi platform badal deti hai, life hai. Tab ek hi policy har baar alag return degi. To hum <strong>expected return</strong> (bahut baar chalane pe average) maximize karte hain.</p>
+            </div>
+            <div class="formula"><code>Q(s, a) = R(s) + γ × Average[ max Q(s', a') ]</code><ul><li>Average = saari possible nayi states ka, unke chance ke hisaab se.</li><li>Phisalne ka chance badhe → Q values thode kam ho jaate hain (plan pe bharosa kam).</li></ul></div>
+
+            <h4>Bellman update ek iteration mein</h4>
+            <div class="chat"><p class="msg me">Q random se start karke sach ke paas kaise jaata hai?</p><p class="msg dost">Har update mein woh padosi state ki best value dekh ke apni value sudhaarta hai. Jaise colony mein news phailti hai: cake shop ke paas wale ghar ko pehle pata, phir uske padosi ko.</p></div>
+            <p>Start mein non-terminal Q sab 0. Terminal: ghar 1 = 50, ghar 5 = 20. γ = 0.5.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Update</th><th>Formula</th><th>Naya Q</th><th>Meaning</th></tr><tr><td>Q(2, ←)</td><td>0 + 0.5×50</td><td class="good">25</td><td>Ghar 2 ko cake ki khabar mili</td></tr><tr><td>Q(4, →)</td><td>0 + 0.5×20</td><td class="good">10</td><td>Ghar 4 ko chai ki khabar mili</td></tr><tr><td>Q(3, ←)</td><td>0 + 0.5×25</td><td>12.5</td><td>Ab ghar 3 ko ghar 2 se signal mila</td></tr></table></div>
+            <p>Repeated updates se values door tak propagate hoti hain. Isi wajah se Bellman equation dynamic programming aur Q-learning dono ka heart hai.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Agar rewards ya γ galat set hue, agent weird policy seekh sakta hai. RL mein reward design bahut sensitive hota hai.</div>
+            <h4>Reward design ka tiny trap</h4>
+            <p>Agar robot ko sirf “jaldi finish” reward diya, woh shortcut mein crash bhi kar sakta hai. Reward ko full behaviour capture karna chahiye.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Reward design</th><th>Agent kya seekh sakta</th><th>Problem</th></tr><tr><td>+100 finish, crash penalty nahi</td><td>Fast crash bhi try</td><td class="bad">Unsafe</td></tr><tr><td>+100 finish, −100 crash, −0.3 fuel</td><td>Safe aur efficient</td><td class="good">Better</td></tr></table></div>
+            <p>RL mein “jo reward doge, wahi agent optimize karega” — is line ko seriously lo.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Q(s, a) = “yahan ye kiya aur phir best khela to kitna milega”. Bellman: Q = abhi ka reward + γ × agli state ka best Q.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Q pehle se kaise pata hoga? Woh to best policy pe depend karta hai!</summary><p>Haan, ye chicken-and-egg lagta hai. Trick: Q ka random andaaza lo, Bellman se baar baar sudharo — andaaza sach ke paas pahunch jaata hai. Agla topic yahi karta hai neural network ke saath.</p></details>
+            <details class="qa"><summary>Terminal state pe Q kya hota hai?</summary><p>Wahan kahani khatam, aage kuch nahi. To Q = bas us state ka reward (ghar 1 pe 50, ghar 5 pe 20). Uske baad “future best” zero hai.</p></details>
+
+            <details class="qa"><summary>Q aur V mein farak?</summary><p>V(s) state ki value hai: yahan se best khelne pe kitna milega. Q(s,a) action-specific hai: yahan se ye action lo, phir best khelo to kitna milega.</p></details>
+            <details class="qa"><summary>Bellman equation supervised learning jaisi kyu lagti hai?</summary><p>Kyunki hum target bana lete hain: R + γ max Q(next). DQN mein isi target pe neural network train hota hai, isliye supervised wali smell aati hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>R(s) = 0, γ = 0.5, agli state ka max Q = 40. Q(s, a)?</summary><p>0 + 0.5 × 40 = <b>20</b>.</p></details>
+              <details class="qa"><summary>Q pata ho to best action kaise chunna?</summary><p>Woh action jiska Q <b>sabse zyada</b>.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="u12"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="reinforcement-learning-basics.html"><small>← Pichhla</small>Reinforcement learning basics</a>
+          <a class="pager-next" href="deep-q-network.html"><small>Agla →</small>Continuous states aur Deep Q-Network</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

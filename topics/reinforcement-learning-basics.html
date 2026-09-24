@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Reinforcement learning basics: State, action, reward, return, policy. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Reinforcement learning basics (ML · 3) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../unsupervised.html">ML · 3: Unsupervised Learning, Recommenders, RL</a> › Topic 11 / 13</nav>
+        <p class="eyebrow">ML · 3 · TOPIC 11 · REINFORCEMENT LEARNING</p>
+        <h1>Reinforcement learning basics</h1>
+        <p>State, action, reward, return, policy</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 3 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="u1" href="unsupervised-clustering.html"><span>01</span>Unsupervised learning aur clustering</a>
+            <a data-topic-link="u2" href="k-means.html"><span>02</span>K-means algorithm</a>
+            <a data-topic-link="u3" href="k-means-cost-choose-k.html"><span>03</span>K-means cost, initialization aur K chunna</a>
+            <a data-topic-link="u4" href="anomaly-gaussian.html"><span>04</span>Anomaly detection aur Gaussian</a>
+            <a data-topic-link="u5" href="anomaly-algorithm.html"><span>05</span>Anomaly detection algorithm aur evaluation</a>
+            <a data-topic-link="u6" href="recommender-features.html"><span>06</span>Recommender: item features ke saath</a>
+            <a data-topic-link="u7" href="collaborative-filtering.html"><span>07</span>Collaborative filtering aur binary labels</a>
+            <a data-topic-link="u8" href="mean-normalization.html"><span>08</span>Mean normalization, TensorFlow aur related items</a>
+            <a data-topic-link="u9" href="content-based-filtering.html"><span>09</span>Content-based filtering aur deep learning</a>
+            <a data-topic-link="u10" href="pca.html"><span>10</span>PCA — bahut features ko kam mein samet-na</a>
+            <a data-topic-link="u11" class="current" aria-current="page" href="reinforcement-learning-basics.html"><span>11</span>Reinforcement learning basics</a>
+            <a data-topic-link="u12" href="q-function-bellman.html"><span>12</span>Q-function aur Bellman equation</a>
+            <a data-topic-link="u13" href="deep-q-network.html"><span>13</span>Continuous states aur Deep Q-Network</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11,u12,u13"><span>ML · 3 progress</span><strong data-progress-label>0 / 13 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Teesra bada paradigm: na labels, na sirf data — balki actions ke results se seekhna.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z4" href="maths-powers-e-log.html"><small>Maths</small>Power, e aur log</a></div></div>
+        
+        <article class="lesson-card single" id="u11">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Reinforcement learning (RL) baaki sab se alag kaise hai?</p>
+              <p class="msg dost">Kutte ko trick sikhaate ho? Tum har pal nahi bolte “ab pair 3 cm upar”. Bas sahi karta hai to <strong>biscuit</strong>, galat pe biscuit nahi. Dheere dheere woh khud samajh jaata hai kya karna hai. RL mein bhi computer ko exact answer nahi dete — bas <strong>reward</strong> dete hain.</p>
+            </div>
+            <h4>RL ki dictionary — ek delivery robot ki kahani</h4>
+            <p>Ek gali mein 5 ghar hain (1 se 5). Robot kisi ghar pe khada hai aur left ya right ja sakta hai. <strong>Ghar 1</strong> pe ek cake shop hai: pahunchne pe reward <strong>50</strong>. <strong>Ghar 5</strong> pe chai shop: reward <strong>20</strong>. Beech ke gharon pe 0. Kisi bhi end pe pahunch ke kahani khatam.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Ghar</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+              <tr><td>Reward</td><td class="good">50 🎂</td><td>0</td><td>0</td><td>0</td><td class="good">20 ☕</td></tr>
+            </table></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Shabd</th><th>Matlab</th><th>Robot example</th></tr>
+              <tr><td><b>Agent</b></td><td>Jo seekh raha aur faisla le raha</td><td>Robot</td></tr>
+              <tr><td><b>Environment</b></td><td>Duniya jisme agent hai</td><td>Gali</td></tr>
+              <tr><td><b>State (s)</b></td><td>Abhi ki situation</td><td>Kaunse ghar pe hai (1–5)</td></tr>
+              <tr><td><b>Action (a)</b></td><td>Kya kar sakta hai</td><td>Left ya right</td></tr>
+              <tr><td><b>Reward R(s)</b></td><td>State mein milne wala inaam</td><td>50, 0, 0, 0, 20</td></tr>
+              <tr><td><b>Terminal state</b></td><td>Jahan kahani khatam</td><td>Ghar 1 aur 5</td></tr>
+            </table></div>
+            <h4>Return aur discount factor γ — “aaj ka ₹100 kal ke ₹100 se better”</h4>
+            <div class="chat">
+              <p class="msg dost">Tumhe koi bole: ₹100 abhi lo, ya ₹100 ek saal baad? Abhi wala lo! Door ka reward thoda kam valuable lagta hai. RL mein har agle step ka reward <strong>γ (gamma)</strong> se multiply hota hai. γ = 0.5 lete hain (samjhane ke liye; asli mein aksar 0.9–0.99).</p>
+            </div>
+            <div class="formula"><code>Return = R₁ + γ·R₂ + γ²·R₃ + γ³·R₄ + …</code><ul><li>R₁ = abhi wali state ka reward, R₂ = agle step ka, …</li></ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Shuru</th><th>Raasta</th><th>Rewards</th><th>Return (γ = 0.5)</th></tr>
+              <tr><td>Ghar 3</td><td>← ← (3 → 2 → 1)</td><td>0, 0, 50</td><td>0 + 0.5×0 + 0.25×50 = <b>12.5</b></td></tr>
+              <tr><td>Ghar 3</td><td>→ → (3 → 4 → 5)</td><td>0, 0, 20</td><td>0 + 0 + 0.25×20 = <b>5</b></td></tr>
+              <tr><td>Ghar 4</td><td>← ← ← (4 → 3 → 2 → 1)</td><td>0, 0, 0, 50</td><td>0.125×50 = <b>6.25</b></td></tr>
+              <tr><td>Ghar 4</td><td>→ (4 → 5)</td><td>0, 20</td><td>0.5×20 = <b>10</b> ✓</td></tr>
+            </table></div>
+            <p>Interesting, na? Ghar 3 se cake (50) ke liye left jaana best. Par ghar 4 se cake bahut door hai — discount ki wajah se paas wali chai (20) better. γ agent ko <strong>“jaldi reward lo”</strong> wali soch deta hai.</p>
+            <h4>Policy (π) — har state ke liye plan</h4>
+            <p>Policy = ek rule-book: “is state mein ye action lo”. Upar ke hisaab se best policy: ghar 2 → left, ghar 3 → left, ghar 4 → right. RL ka goal: <strong>woh policy dhundho jo return maximum kare</strong>.</p>
+            <div class="lesson-callout"><b>MDP (Markov Decision Process):</b> Ye poora setup — states, actions, rewards, γ, policy — isko MDP kehte hain. “Markov” ka matlab: aage kya hoga woh sirf <em>abhi ki state</em> pe depend karta hai, tum yahan kaise pahunche us pe nahi. Jaise Ludo mein ab tum kis square pe ho, wahi matter karta hai.</div>
+
+            <h4>γ badalne se policy ka mood badalta hai</h4>
+            <div class="chat"><p class="msg me">γ bas formula ka symbol lag raha. Isse behaviour sach mein badalta hai?</p><p class="msg dost">Bilkul. γ chhota matlab “jaldi reward do”. γ bada matlab “door ka reward bhi important”. Same street example mein dekho.</p></div>
+            <p>Ghar 4 se do options: right jao to ek step baad chai reward 20. Left-left-left jao to 3 steps baad cake reward 50.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>γ</th><th>Chai return</th><th>Cake return</th><th>Best</th></tr><tr><td>0.5</td><td>0.5×20 = <b>10</b></td><td>0.5³×50 = <b>6.25</b></td><td class="good">Chai</td></tr><tr><td>0.9</td><td>0.9×20 = <b>18</b></td><td>0.9³×50 = <b>36.45</b></td><td class="good">Cake</td></tr></table></div>
+            <p>Same world, different γ, different decision. Isliye γ hyperparameter hai — agent kitna future-minded ho, ye set karta hai.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> RL = agent action leta hai, reward milta hai, aur woh policy seekhta hai jo discounted total reward (return) maximum kare.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>RL kahan use hota hai?</summary><p>Robots ko chalna sikhana, games (chess, video games), factory optimization, stock trading ke experiments, helicopter/drone control. Supervised learning se kam jagah, par exciting.</p></details>
+            <details class="qa"><summary>Negative reward bhi hota hai?</summary><p>Haan. Jaise robot deewar se takraye to −10, ya fuel jalaye to −0.3. Agent seekhta hai ki aise kaam kam kare, warna total return ka mood kharab.</p></details>
+            <details class="qa"><summary>γ = 1 rakha to?</summary><p>Door aur paas ka reward barabar. Tab ghar 4 se bhi cake (50) best lagega. γ chhota → agent “abhi ka socho” wala, γ bada → “lamba socho” wala.</p></details>
+
+            <details class="qa"><summary>Reward state ka hota hai ya action ka?</summary><p>Notation course/book pe depend karta hai: R(s), R(s,a), ya R(s,a,s'). Idea same hai — action ke baad environment se feedback milta hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Rewards 0, 0, 100, γ = 0.9. Return?</summary><p>0.9² × 100 = <b>81</b>.</p></details>
+              <details class="qa"><summary>Policy kya hai?</summary><p>Har state mein kaunsa action lena hai — rule-book.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="u11"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="pca.html"><small>← Pichhla</small>PCA — bahut features ko kam mein samet-na</a>
+          <a class="pager-next" href="q-function-bellman.html"><small>Agla →</small>Q-function aur Bellman equation</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

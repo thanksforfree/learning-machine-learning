@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Learning rate decay aur local optima ka sach: Kadam dheere-dheere chhote karo. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Learning rate decay aur local optima ka sach (DL · 2) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-improving-networks.html">DL · 2: Improving Deep Neural Networks</a> › Topic 11 / 15</nav>
+        <p class="eyebrow">DL · 2 · TOPIC 11 · OPTIMIZATION ALGORITHMS</p>
+        <h1>Learning rate decay aur local optima ka sach</h1>
+        <p>Kadam dheere-dheere chhote karo</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 2 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="i1" href="dl-train-dev-test-bias-variance.html"><span>01</span>Train/dev/test aur bias-variance</a>
+            <a data-topic-link="i2" href="dl-l2-regularization.html"><span>02</span>L2 regularization</a>
+            <a data-topic-link="i3" href="dl-dropout.html"><span>03</span>Dropout</a>
+            <a data-topic-link="i4" href="dl-augmentation-early-stopping.html"><span>04</span>Data augmentation aur early stopping</a>
+            <a data-topic-link="i5" href="dl-normalizing-inputs.html"><span>05</span>Inputs normalize karna</a>
+            <a data-topic-link="i6" href="dl-vanishing-exploding-init.html"><span>06</span>Vanishing/exploding gradients aur weight initialization</a>
+            <a data-topic-link="i7" href="dl-gradient-checking.html"><span>07</span>Gradient checking</a>
+            <a data-topic-link="i8" href="dl-mini-batch.html"><span>08</span>Mini-batch gradient descent</a>
+            <a data-topic-link="i9" href="dl-exponentially-weighted-averages.html"><span>09</span>Exponentially weighted averages</a>
+            <a data-topic-link="i10" href="dl-momentum-rmsprop-adam.html"><span>10</span>Momentum, RMSprop aur Adam</a>
+            <a data-topic-link="i11" class="current" aria-current="page" href="dl-learning-rate-decay-local-optima.html"><span>11</span>Learning rate decay aur local optima ka sach</a>
+            <a data-topic-link="i12" href="dl-hyperparameter-tuning.html"><span>12</span>Hyperparameter tuning ka tareeka</a>
+            <a data-topic-link="i13" href="dl-batch-normalization.html"><span>13</span>Batch normalization</a>
+            <a data-topic-link="i14" href="dl-softmax-regression.html"><span>14</span>Softmax regression</a>
+            <a data-topic-link="i15" href="dl-frameworks-tensorflow.html"><span>15</span>Deep learning frameworks aur TensorFlow</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15"><span>DL · 2 progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Training ke end mein finesse, aur ek purana darr (local minimum) jo high dimensions mein utna bada nahi hai.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z4" href="maths-powers-e-log.html"><small>Maths</small>Power, e aur log</a></div></div>
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Decay kyu: end mein chhote kadam</li><li>α = α₀ / (1 + decay_rate × epoch) worked</li><li>Exponential, 1/√epoch, staircase, manual decay</li><li>High dimensions mein local optima kam, saddle points zyada</li><li>Plateaus: training slow kyu hoti hai</li></ul></details>
+        <article class="lesson-card single" id="i11">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Training start mein fast thi, end mein loss ke aas-paas ghoom rahi hai. Jaise auto parking spot miss kar raha ho.</p>
+              <p class="msg dost">Perfect analogy. Pehle road khaali thi to bada accelerator theek. Parking mein wahi speed rakhi to gaadi aage-peeche hoti rahegi.</p>
+              <p class="msg me">To learning rate dheere-dheere kam?</p>
+              <p class="msg dost">Haan. Start mein bade kadam, end mein chhote kadam. Isko learning rate decay bolte hain.</p>
+              <p class="msg me">Aur local minimum ka darr? Kahin galat gaddhe mein phas gaye to?</p>
+              <p class="msg dost">Deep learning mein asli villain aksar local minimum nahi, <strong>saddle point</strong> aur plateau hote hain. Ab woh bhi dekhenge.</p>
+            </div>
+            <h4>Decay kyu: end mein finesse chahiye</h4>
+            <p>Mini-batch training noisy hoti hai. Fixed α rakho to network optimum ke paas bhi thoda hilta rahega. Decay α ko time ke saath kam karta hai, taaki last mein model chhote, sambhal ke kadam le.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 420 210" role="img" aria-label="Learning rate decay se bade steps pehle aur chhote steps baad mein">
+                <path d="M40,40 Q210,315 380,40" fill="none" stroke="#b8c2d3" stroke-width="3"/>
+                <polyline points="70,75 150,140 195,168 215,176 225,179" fill="none" stroke="#3567e8" stroke-width="3"/>
+                <g fill="#3567e8"><circle cx="70" cy="75" r="6"/><circle cx="150" cy="140" r="6"/><circle cx="195" cy="168" r="5"/><circle cx="215" cy="176" r="4"/><circle cx="225" cy="179" r="4"/></g>
+                <text x="75" y="62" font-size="11" fill="#3567e8">bada step</text><text x="230" y="174" font-size="11" fill="#3567e8">chhota step</text>
+              </svg>
+              <div class="cap">Start mein jaldi neeche. End mein halka kadam, warna gaddhe ke aas-paas uchhalna.</div>
+            </figure>
+            <h4>Ek common schedule: α = α₀ / (1 + decay_rate × epoch)</h4>
+            <div class="formula"><code>α = α₀ / (1 + decay_rate × epoch)</code><ul>
+              <li><b>α₀</b> = starting learning rate</li>
+              <li><b>decay_rate</b> = kitni speed se α ghatega</li>
+              <li><b>epoch</b> = poore training data ka ek chakkar</li>
+            </ul></div>
+            <p>Example: α₀ = 0.1, decay_rate = 0.05.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Epoch</th><th>Formula</th><th>α</th></tr>
+              <tr><td>0</td><td>0.1 / (1 + 0)</td><td>0.1000</td></tr>
+              <tr><td>10</td><td>0.1 / (1 + 0.5)</td><td>0.0667</td></tr>
+              <tr><td>20</td><td>0.1 / (1 + 1.0)</td><td>0.0500</td></tr>
+              <tr><td>50</td><td>0.1 / (1 + 2.5)</td><td>0.0286</td></tr>
+            </table></div>
+            <h4>Decay ke aur flavours</h4>
+            <p>Ek hi recipe nahi hoti. Project ke hisaab se schedule choose hota hai.</p>
+            <div class="compare-grid">
+              <div><b>Exponential</b>α = α₀ × 0.95ᵉᵖᵒᶜʰ. Har epoch 5% kam.</div>
+              <div><b>1/√epoch</b>α = α₀ / √epoch. Shuru mein tez drop, baad mein dheere.</div>
+              <div><b>Staircase</b>10 epochs tak same α, phir achanak aadha. Exam ke chapters jaisa: block khatam, pace badlo.</div>
+              <div><b>Manual</b>Loss plateau ho gaya? Engineer khud α kam karta hai. Old-school, par kabhi useful.</div>
+            </div>
+            <pre class="code">alpha0 = 0.1
+decay_rate = 0.05
+for epoch in range(60):
+    alpha = alpha0 / (1 + decay_rate * epoch)
+    train_one_epoch(alpha)  <span class="cm"># optimizer ko chhota step do</span></pre>
+            <h4>Local optima ka sach</h4>
+            <p>2D graph mein local minimum easy dikhta hai: ek chhota gaddha jahan ball phas gayi. Par deep networks mein parameters lakhon-crores hote hain. High dimensions mein sab directions mein upar hona rare hai. Zyada common scene: kuch directions mein upar, kuch mein neeche — ghode ki saddle jaisa.</p>
+            <div class="tree-visual"><span class="tree-node">Gradient near zero?</span><div class="tree-branches"><div><small>Sab taraf upar</small><span class="tree-leaf">local minimum</span></div><div><small>Kuch upar, kuch neeche</small><span class="tree-leaf">saddle point</span></div></div></div>
+            <p>Saddle point pe slope zero ke paas lag sakta hai, to optimizer slow ho jaata hai. Par ek direction milte hi woh nikal sakta hai. Isliye “har problem local minimum hai” wala darr thoda purana ho chuka hai.</p>
+            <h4>Plateaus: training slow kyu hoti hai</h4>
+            <p>Plateau matlab zameen lagbhag flat. Gradient chhota, update chhota, progress slow. Momentum aur Adam yahan help kar sakte hain, kyunki woh recent directions ki memory rakhte hain. Learning rate decay end mein help karta hai, par plateau ke beech mein kabhi-kabhi α bahut chhota kar dena training ko aur slow kar sakta hai.</p>
+            <div class="lesson-callout"><b>Practical flow:</b> Pehle ek achha α find karo. Phir agar training end mein noisy settle ho rahi hai, decay add karo. Decay bad optimizer ya wrong α ka replacement nahi hai.</div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Decay ko start se bahut aggressive mat rakho. α jaldi chhota ho gaya to model parking spot tak pahunchne se pehle hi cycle ki speed pe aa jayega.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Learning rate decay training ke end mein kadam chhote karta hai. Deep nets mein local minima se zyada saddle points aur plateaus training ko slow karte hain.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Decay hamesha lagana chahiye?</summary><p>Nahi. Pehle fixed α se baseline banao. Agar loss end mein bounce kar raha hai ya validation improve nahi ho raha, decay try karo.</p></details>
+            <details class="qa"><summary>Epoch aur iteration mein farak?</summary><p>Iteration = ek mini-batch update. Epoch = poore training set ka ek full pass. Decay schedule dono ke basis pe ban sakta hai, par formula mein kya use ho raha hai clear rakho.</p></details>
+            <details class="qa"><summary>Plateau mein patience kitna?</summary><p>Loss, dev metric aur learning rate teeno dekho. Kabhi bas wait karna padta hai, kabhi α adjust, kabhi architecture/normalization ki zaroorat hoti hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>α₀ = 0.2, decay_rate = 0.1, epoch = 5. α kitna?</summary><p>α = 0.2 / (1 + 0.1 × 5) = 0.2 / 1.5 = <b>0.1333</b>.</p></details>
+              <details class="qa"><summary>High dimensions mein local minima se zyada kaunsa point common hota hai?</summary><p><b>Saddle point</b>: kuch directions mein neeche ja sakte ho, kuch mein upar.</p></details>
+              <details class="qa"><summary>Training start se hi bahut slow hai. Decay pehla fix hai?</summary><p>Nahi. Pehle α, initialization, normalization, optimizer check karo. Decay start ko aur slow kar sakta hai.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="i11"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-momentum-rmsprop-adam.html"><small>← Pichhla</small>Momentum, RMSprop aur Adam</a>
+          <a class="pager-next" href="dl-hyperparameter-tuning.html"><small>Agla →</small>Hyperparameter tuning ka tareeka</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Backpropagation aur Adam: Galti ki zimmedari peeche ki taraf baantna. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Backpropagation aur Adam (ML · 2) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../advanced.html">ML · 2: Advanced Learning Algorithms</a> › Topic 6 / 12</nav>
+        <p class="eyebrow">ML · 2 · TOPIC 06 · NEURAL NETWORKS</p>
+        <h1>Backpropagation aur Adam</h1>
+        <p>Galti ki zimmedari peeche ki taraf baantna</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 2 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="a1" href="neural-network-idea.html"><span>01</span>Neural network ka idea</a>
+            <a data-topic-link="a2" href="forward-propagation.html"><span>02</span>Forward propagation</a>
+            <a data-topic-link="a3" href="tensorflow.html"><span>03</span>TensorFlow mein network banana</a>
+            <a data-topic-link="a4" href="activation-functions.html"><span>04</span>Activation functions</a>
+            <a data-topic-link="a5" href="softmax-multiclass.html"><span>05</span>Multiclass aur softmax</a>
+            <a data-topic-link="a6" class="current" aria-current="page" href="backprop-adam.html"><span>06</span>Backpropagation aur Adam</a>
+            <a data-topic-link="a7" href="train-cv-test.html"><span>07</span>Training, CV aur test set</a>
+            <a data-topic-link="a8" href="bias-variance.html"><span>08</span>Bias aur variance</a>
+            <a data-topic-link="a9" href="ml-development-cycle.html"><span>09</span>ML development cycle</a>
+            <a data-topic-link="a10" href="precision-recall.html"><span>10</span>Precision, recall aur F1</a>
+            <a data-topic-link="a11" href="decision-trees.html"><span>11</span>Decision tree, entropy aur information gain</a>
+            <a data-topic-link="a12" href="random-forest-xgboost.html"><span>12</span>Random forest aur XGBoost</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12"><span>ML · 2 progress</span><strong data-progress-label>0 / 12 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Neural network seekhta kaise hai — iska asli jawab. Loss na gire to kya check karna hai, woh bhi yahin se aata hai.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z7" href="maths-slope-derivative.html"><small>Maths</small>Slope, derivative aur chain rule</a></div></div>
+        
+        <article class="lesson-card single" id="a6">
+          <div class="lesson-body">
+
+            <div class="chat">
+              <p class="msg me">Network mein hazaaron weights hain. Kaunsa weight galti ka kitna zimmedar hai, ye kaise pakdenge?</p>
+              <p class="msg dost">Cricket team match haar gayi. Coach scoreboard se <em>peeche</em> sochta hai: “score kam kyu? middle order dab gaya; pressure kyu? opener jaldi out.” Result se shuru karke zimmedari har player tak pahunchti hai. <strong>Backpropagation</strong> bhi output ki galti se peeche har layer, har weight tak jaake poochta hai — “bhai, tumhara kitna hissa tha?”</p>
+            </div>
+            <h4>Chhota sa example (bina calculus ke)</h4>
+            <p>x = 2, weight w = 3, sahi answer y = 5. Prediction f = w × x = 6. Galti d = f − y = 1. Cost J = d² / 2 = 0.5.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Tareeka</th><th>Hisaab</th><th>Slope (J pe w ka asar)</th></tr>
+              <tr><td>Thoda sa hila ke dekho</td><td>w = 3.001 → f = 6.002 → d = 1.002 → J = 0.502. J 0.002 badha jab w 0.001 badha</td><td><b>2</b></td></tr>
+              <tr><td>Chain (backprop)</td><td>J pe d ka asar = d = 1<br>d pe f ka asar = 1<br>f pe w ka asar = x = 2<br>Multiply: 1 × 1 × 2</td><td><b>2</b> — same!</td></tr>
+            </table></div>
+            <p>Bas! Yehi <strong>chain multiplication</strong> backprop hai. Haan, pehli baar thoda jaadu lagta hai, par idea simple hai: har chhote step ka asar multiply karo. Hazaaron weights ke liye ye ek backward pass mein efficiently ho jaata hai. Phir gradient descent (ya Adam) in slopes se weights update karta hai.</p>
+            <div class="visual-flow"><span>Input</span><b>→</b><span>Forward: prediction</span><b>→</b><span>Loss: kitna galat?</span><b>→</b><span class="flow-highlight">Backward: zimmedari baanto</span><b>→</b><span>Weights update</span><b>↻</b></div>
+            <h4>Adam optimizer — smart gear</h4>
+            <p>Normal gradient descent mein sab weights ka ek hi α hota hai. <strong>Adam</strong> thoda smart driver hai: koi weight ek hi direction mein steady ja raha hai to kadam bada; idhar-udhar hil raha hai to kadam chhota. Jaise scooty traffic mein khud speed adjust kare. Zyadatar practical starts mein Adam default choice hai.</p>
+            <div class="compare-grid">
+              <div><b>Epoch</b>Poore training data pe ek chakkar.</div>
+              <div><b>Mini-batch</b>Ek update ke liye data ka chhota hissa (jaise 32 examples). Fast updates.</div>
+            </div>
+            <div class="lesson-callout"><b>Doosri layer types:</b> Dense layer mein har neuron poora input dekhta hai. <b>Convolutional layer</b> mein har neuron input ka bas ek chhota hissa dekhta hai (jaise photo ka ek kona). Kam weights → fast training, kam data mein bhi kaam, overfitting kam.</div>
+
+            <h4>Backprop ke baad update ka effect</h4>
+            <div class="chat"><p class="msg me">Slope mil gaya, par weight actual mein kitna badalta hai?</p><p class="msg dost">Learning rate α uska step size hai. Slope direction aur steepness batata hai; α bolta hai “itna hi kadam lena, bhaagna nahi”.</p></div>
+            <p>Wahi example: x = 2, y = 5, shuru w = 3. Prediction 6 tha, slope dJ/dw = 2. Learning rate α = 0.1.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Step</th><th>w</th><th>Prediction f = 2w</th><th>Error d = f − 5</th><th>Slope = d×2</th><th>New w = w − 0.1×slope</th></tr><tr><td>0</td><td>3.00</td><td>6.00</td><td>1.00</td><td>2.00</td><td class="good">2.80</td></tr><tr><td>1</td><td>2.80</td><td>5.60</td><td>0.60</td><td>1.20</td><td class="good">2.68</td></tr><tr><td>2</td><td>2.68</td><td>5.36</td><td>0.36</td><td>0.72</td><td class="good">2.61</td></tr></table></div>
+            <p>Target w = 2.5 hai, kyunki 2×2.5 = 5. Dekho weights dheere-dheere us taraf aa rahe hain. Bas isi ko thousands of weights pe scale kar do.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> α bahut bada hua to w target ke aage-peeche uchhal sakta hai. Loss badhne lage to learning rate pe shak karo.</div>
+            <h4>Autodiff ko kaise trust karein?</h4>
+            <p>TensorFlow/PyTorch gradients khud nikaalte hain, par trust blind nahi. Chhote cases pe sanity check kar sakte ho.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Check</th><th>Expected sign</th><th>Meaning</th></tr><tr><td>Prediction target se zyada</td><td>Slope positive</td><td>w badhaoge to loss badhega, so w ghatao</td></tr><tr><td>Prediction target se kam</td><td>Slope negative</td><td>w badhaoge to loss ghatega, so w badhao</td></tr><tr><td>Prediction perfect</td><td>Slope near 0</td><td>Update chhota hona chahiye</td></tr></table></div>
+            <p>Agar signs hi ulte aa rahe hain, loss formula, labels, ya activation-loss pairing check karo.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Backprop = har weight ka slope nikaalna. Gradient descent/Adam = us slope se weight sudharna.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Backprop aur gradient descent ek hi cheez hain?</summary><p>Nahi, team-mates hain. Backprop = “kis weight ko kis taraf kitna badlo” (slope) nikaalta hai. Gradient descent/Adam = asal mein badalta hai.</p></details>
+            <details class="qa"><summary>Backprop haath se karna padega?</summary><p>Nahi. TensorFlow automatic karta hai (isko autodiff kehte hain). Idea samajhna zaroori hai taaki bugs samajh sako.</p></details>
+            <details class="qa"><summary>Mera loss kam hi nahi ho raha. Kya check karun?</summary><p>Checklist: (1) data aur labels sahi hain? (2) output activation aur loss match karte hain? (3) inputs scaled hain? (4) learning rate theek hai? (5) Sirf 10 examples pe train karke dekho — itne kam pe to model ratt hi lega. Wahan bhi loss na gire to pakka bug hai.</p></details>
+
+            <details class="qa"><summary>Adam use karun to learning rate matter karta hai?</summary><p>Haan, matter karta hai. Adam har weight ka step adjust karta hai, par base learning rate α phir bhi overall speed set karta hai. 0.001 common starting point hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Backprop kya nikaalta hai aur Adam kya karta hai?</summary><p>Backprop = har weight ka slope. Adam = un slopes se weights update (smart step size ke saath).</p></details>
+              <details class="qa"><summary>f = w · x aur x = 3. f pe w ka asar (slope)?</summary><p><b>3</b>.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="a6"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="softmax-multiclass.html"><small>← Pichhla</small>Multiclass aur softmax</a>
+          <a class="pager-next" href="train-cv-test.html"><small>Agla →</small>Training, CV aur test set</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

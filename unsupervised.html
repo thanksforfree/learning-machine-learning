@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Bina labels ke groups (K-means) aur ajeeb cases (anomaly detection) dhundhna, Netflix jaise recommendations banana, PCA se data ko chhota karna, aur reward se seekhne wala reinforcement learning.">
+  <title>ML · 3: Unsupervised Learning, Recommenders, RL — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="index.html">Learning map</a><a href="maths.html">Maths</a><a class="active" href="ml.html">ML</a><a href="dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="module-hero">
+      <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Learning map</a> › <a href="ml.html">Machine Learning Specialization</a></nav>
+      <p class="eyebrow">ML COURSE 3 • DHUNDHO, SUJHAO, KHUD SEEKHO</p>
+      <h1>Unsupervised Learning, Recommenders, RL</h1>
+      <p>Bina labels ke groups (K-means) aur ajeeb cases (anomaly detection) dhundhna, Netflix jaise recommendations banana, PCA se data ko chhota karna, aur reward se seekhne wala reinforcement learning.</p>
+      <div class="module-path"><span>Groups dhundho</span> → <span>Ajeeb pakdo</span> → <span>Recommend karo</span> → <span>PCA</span> → <span>Reward se seekho</span></div>
+      <div class="hero-actions"><a class="button button-primary" href="topics/unsupervised-clustering.html">Topic 01 se shuru karo →</a>
+      <div class="progress-box inline" data-module-topics="u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11,u12,u13"><span>Progress</span><strong data-progress-label>0 / 13 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div></div>
+    </section>
+    <div class="module-overview">
+      <section class="lesson-group"><p class="eyebrow">CLUSTERING</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="u1" href="topics/unsupervised-clustering.html">
+          <span class="topic-index">01</span>
+          <span class="topic-card-text"><b>Unsupervised learning aur clustering</b><small>Answer key nahi, phir bhi structure</small><em>Duniya ka zyadatar data bina labels ka hai. Usme se kuch kaam ka nikaalna — yahan se shuru hota hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="u2" href="topics/k-means.html">
+          <span class="topic-index">02</span>
+          <span class="topic-card-text"><b>K-means algorithm</b><small>Jhande gaado, team banao, jhanda khiskao</small><em>Sabse popular clustering algorithm. Simple, fast, aur samajhne mein aasan.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="u3" href="topics/k-means-cost-choose-k.html">
+          <span class="topic-index">03</span>
+          <span class="topic-card-text"><b>K-means cost, initialization aur K chunna</b><small>Kai baar try karo, best rakho</small><em>Algorithm chalana aasan hai; achha result lena aur sahi K chunna asli skill hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">ANOMALY DETECTION</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="u4" href="topics/anomaly-gaussian.html">
+          <span class="topic-index">04</span>
+          <span class="topic-card-text"><b>Anomaly detection aur Gaussian</b><small>Normal pehchano, ajeeb pakdo</small><em>Fraud, machine failure, hacking — jahan “kharab” examples bahut kam hain, wahan ye kaam aata hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="u5" href="topics/anomaly-algorithm.html">
+          <span class="topic-index">05</span>
+          <span class="topic-card-text"><b>Anomaly detection algorithm aur evaluation</b><small>ε, features aur supervised se farak</small><em>Algorithm ke saath yeh jaanna ki kab anomaly detection use karna hai aur kab supervised — engineering judgement.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">RECOMMENDER SYSTEMS</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="u6" href="topics/recommender-features.html">
+          <span class="topic-index">06</span>
+          <span class="topic-card-text"><b>Recommender: item features ke saath</b><small>Har user ke liye chhota linear regression</small><em>YouTube, Netflix, Amazon ka dil. Sabse simple version se shuru karke idea pakdo.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="u7" href="topics/collaborative-filtering.html">
+          <span class="topic-index">07</span>
+          <span class="topic-card-text"><b>Collaborative filtering aur binary labels</b><small>User taste aur item features dono seekho</small><em>Jab item ke features pata hi na hon — bas users ka behaviour ho — tab ye algorithm kaam aata hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="u8" href="topics/mean-normalization.html">
+          <span class="topic-index">08</span>
+          <span class="topic-card-text"><b>Mean normalization, TensorFlow aur related items</b><small>Naye user ko average do</small><em>Practical recommenders ke chhote par zaroori details: naye users, custom training loop, aur “ye bhi pasand aayega”.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="u9" href="topics/content-based-filtering.html">
+          <span class="topic-index">09</span>
+          <span class="topic-card-text"><b>Content-based filtering aur deep learning</b><small>Profile match, retrieval aur ranking</small><em>Modern recommenders isi tarah bante hain — do neural networks, retrieval + ranking, aur ethics ka dhyan.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">DIMENSIONALITY REDUCTION</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="u10" href="topics/pca.html">
+          <span class="topic-index">10</span>
+          <span class="topic-card-text"><b>PCA — bahut features ko kam mein samet-na</b><small>Data ki best “photo angle”</small><em>Bahut features wale data ko aankh se dekhne (visualize) ka sabse common tareeka.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <section class="lesson-group"><p class="eyebrow">REINFORCEMENT LEARNING</p>
+        <div class="topic-list">
+        <a class="topic-card" data-topic-card="u11" href="topics/reinforcement-learning-basics.html">
+          <span class="topic-index">11</span>
+          <span class="topic-card-text"><b>Reinforcement learning basics</b><small>State, action, reward, return, policy</small><em>Teesra bada paradigm: na labels, na sirf data — balki actions ke results se seekhna.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="u12" href="topics/q-function-bellman.html">
+          <span class="topic-index">12</span>
+          <span class="topic-card-text"><b>Q-function aur Bellman equation</b><small>Abhi ka inaam + aage ka best</small><em>Q-values mil gaye to best action chunna trivial hai. Bellman equation unhe nikaalne ka raasta hai.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        <a class="topic-card" data-topic-card="u13" href="topics/deep-q-network.html">
+          <span class="topic-index">13</span>
+          <span class="topic-card-text"><b>Continuous states aur Deep Q-Network</b><small>Lunar lander, ε-greedy, soft update</small><em>Asli duniya ke RL ka tareeka — aur poore course ko jodne wala aakhri topic.</em></span>
+          <span class="topic-done" aria-hidden="true">✓</span>
+        </a>
+        </div></section>
+      <div class="next-module end-card"><div><p class="eyebrow">MACHINE LEARNING SPECIALIZATION POORA</p><h2>Ab aage kya?</h2><p>Learning map pe jao — doosra track shuru karo, ya kisi bhi topic ke “Ab tumhari baari” sawaal dobara solve karo.</p></div><a class="button button-primary" href="index.html">Learning map →</a></div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

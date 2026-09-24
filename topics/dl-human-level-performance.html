@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Human-level performance aur avoidable bias: Insaan kitna achha hai, is se pata chalta hai kya karna hai. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Human-level performance aur avoidable bias (DL · 3) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-structuring-projects.html">DL · 3: Structuring Machine Learning Projects</a> › Topic 4 / 9</nav>
+        <p class="eyebrow">DL · 3 · TOPIC 04 · HUMAN SE TULNA</p>
+        <h1>Human-level performance aur avoidable bias</h1>
+        <p>Insaan kitna achha hai, is se pata chalta hai kya karna hai</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 3 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="p1" href="dl-ml-strategy-orthogonalization.html"><span>01</span>ML strategy aur orthogonalization</a>
+            <a data-topic-link="p2" href="dl-single-number-metric.html"><span>02</span>Ek number wala metric, satisficing aur optimizing</a>
+            <a data-topic-link="p3" href="dl-dev-test-setup.html"><span>03</span>Dev/test set lagana, aur kab badalna</a>
+            <a data-topic-link="p4" class="current" aria-current="page" href="dl-human-level-performance.html"><span>04</span>Human-level performance aur avoidable bias</a>
+            <a data-topic-link="p5" href="dl-error-analysis.html"><span>05</span>Error analysis aur galat labels</a>
+            <a data-topic-link="p6" href="dl-mismatched-distributions.html"><span>06</span>Training aur testing alag distributions pe</a>
+            <a data-topic-link="p7" href="dl-fix-data-mismatch.html"><span>07</span>Data mismatch kaise theek karein</a>
+            <a data-topic-link="p8" href="dl-transfer-multitask.html"><span>08</span>Transfer learning aur multi-task learning</a>
+            <a data-topic-link="p9" href="dl-end-to-end.html"><span>09</span>End-to-end deep learning</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="p1,p2,p3,p4,p5,p6,p7,p8,p9"><span>DL · 3 progress</span><strong data-progress-label>0 / 9 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Train error 8% achha hai ya bura? Jawab is baat pe tika hai ki insaan kitni galti karte hain.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Insaan se tulna kyu, aur Bayes error</li><li>Human-level ke paas progress slow kyu hoti hai</li><li>Avoidable bias vs variance — numbers ke saath do scenarios</li><li>Human-level kise maanein (aam insaan, expert, experts ki team) — apne domain ke example se</li><li>Human-level se aage nikalna — kaunse kaamon mein aasan</li><li>Model sudhaarne ki poori checklist</li></ul></details>
+        <article class="lesson-card single" id="p4">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Train error 13% hai. Ye achha hai ya kharab?</p>
+              <p class="msg dost">Akele 13% dekh ke jawab dena waise hi hai jaise “₹500 mehenga hai?” bina item bataye.</p>
+              <p class="msg me">To context kya chahiye?</p>
+              <p class="msg dost">Insaan kitna achha kar sakta hai, ya best possible ke kitne paas hai. Usse pata chalta hai ki 13% shame hai ya celebration.</p>
+              <p class="msg me">Human-level performance ek benchmark hai?</p>
+              <p class="msg dost">Haan. Especially un tasks mein jahan humans naturally good hain: photo quality check, awaaz, text moderation, handwriting.</p>
+            </div>
+
+            <h4>Insaan se tulna kyu?</h4>
+            <p>Human-level performance tumhe ek practical ceiling ka andaaza deta hai. Agar trained textile inspector fabric defects pe 5% galti karta hai aur tumhara model 24% pe hai, gap clear hai. Agar experienced inspector 14% galti karta hai aur model 15% pe hai, story bilkul alag hai.</p>
+            <p>Is "best possible" ko theory mein <strong>Bayes error</strong> bolte hain: woh error jo perfect classifier bhi avoid nahi kar sakta, kyunki data mein noise, blur, ambiguity hoti hai. Bayes error exact nahi milta. Human-level aksar uska useful proxy hota hai.</p>
+            <div class="formula"><code>avoidable bias = train error − human-level error
+variance = dev error − train error</code><ul>
+              <li><b>human-level error</b> = approximate lower bound, perfect nahi par useful</li>
+              <li><b>avoidable bias</b> = training set pe abhi kitna improve ho sakte ho</li>
+              <li><b>variance</b> = training se dev pe jaate hi kitna toot rahe ho</li>
+            </ul></div>
+
+            <h4>Human-level ke paas progress slow kyu?</h4>
+            <p>Start mein model obvious patterns seekhta hai: "kapde pe bada oil stain hai", "audio mein command clearly hai". Is stage pe improvement fast hoti hai. Human-level ke paas aate-aate bachi hui mistakes tough hoti hain: halki scratch, folded cloth shadow, confusing slang, ambiguous labels.</p>
+            <div class="visual-flow">
+              <span>Easy patterns<br><small>fast gains</small></span><b>→</b>
+              <span>Subtle cases<br><small>slow gains</small></span><b>→</b>
+              <span class="flow-highlight">Human-level ke paas<br><small>hard grind</small></span>
+            </div>
+            <p>Jaise exam mein 40 se 80 marks lana ek type ki mehnat hai; 96 se 98 lana alag level ka microscope kaam hai.</p>
+
+            <h4>Avoidable bias vs variance — numbers se</h4>
+            <p>Do textile-quality camera projects dekhte hain. Dono ka dev error similar lag sakta hai, par dawa alag hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Scenario</th><th>Human</th><th>Train</th><th>Dev</th><th>Avoidable bias</th><th>Variance</th><th>Next move</th></tr>
+              <tr><td>A</td><td>4%</td><td>15%</td><td>17%</td><td>15 − 4 = 11%</td><td>17 − 15 = 2%</td><td class="bad">Bias: bigger model/features</td></tr>
+              <tr><td>B</td><td>11%</td><td>12%</td><td>22%</td><td>12 − 11 = 1%</td><td>22 − 12 = 10%</td><td class="bad">Variance: more data/regularize</td></tr>
+            </table></div>
+            <p>A mein model training set pe hi human se door hai. B mein train human ke paas hai, par dev pe toot raha hai. Same train number ka matlab context ke saath badal gaya.</p>
+
+            <h4>Human-level kise maanein?</h4>
+            <p>Textile inspection task mein "insaan" kaun? Naya trainee? Shift ka experienced QC person? Do inspectors ka audit? Choice matter karti hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Benchmark</th><th>Error</th><th>Use kab</th></tr>
+              <tr><td>Naya trainee</td><td>18%</td><td>Training app UX compare karna</td></tr>
+              <tr><td>Experienced QC</td><td>9%</td><td>Factory floor target</td></tr>
+              <tr><td>2-inspector audit</td><td>5%</td><td>Best practical proxy for Bayes error</td></tr>
+            </table></div>
+            <p>Usually, jis performance ko product beat karna chahta hai, usko benchmark banao. Agar tool QC worker ko assist karega, experienced QC relevant hai. Agar audit team final arbiter hai, audit-level useful hai.</p>
+
+            <h4>Human-level se aage nikalna</h4>
+            <p>Kuch kaam mein model humans se aage nikal sakta hai: ad click prediction, recommender ranking, fraud patterns, huge table data. Kyu? Kyunki humans ke paas itna raw data dekhne ki capacity nahi.</p>
+            <p>Par photo/audio/text jaise natural perception tasks mein human-level ke aas-paas aana common hai; usse aage jaana harder hota hai. Hard ka matlab impossible nahi. Bas diagnosis mein human benchmark ka role dheere-dheere kam hota jaata hai.</p>
+
+            <h4>Model sudhaarne ki checklist</h4>
+            <p>Numbers dekh ke next action chuno. Ye checklist fridge pe chipka sakte ho.</p>
+            <div class="compare-grid">
+              <div><b>High avoidable bias</b>Bigger network, train longer, architecture change, input features better, optimization debug.</div>
+              <div><b>High variance</b>More data, augmentation, L2/dropout, simpler model, data leakage check.</div>
+              <div><b>Near human-level</b>Error analysis karo. Ambiguous examples, label quality, rare cases, product metric check.</div>
+              <div><b>Beyond human-level</b>Human benchmark less useful. Dev/test and business metrics pe rely karo.</div>
+            </div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Human-level ko blindly “Bayes error” mat maan lo. Humans bhi tired, biased, ya untrained ho sakte hain. Benchmark ka source likh ke rakho.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Error number tab bolta hai jab tum uske paas baseline rakhte ho. Warna 13% sirf hawa mein latakta number hai.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Agar task mein humans kharab hain to?</summary><p>Tab human-level weak benchmark hai. Jaise millions of transactions mein fraud pattern. Wahan dev/test metric, business cost, aur historical system comparison zyada useful.</p></details>
+            <details class="qa"><summary>Human-level measure karna expensive hai. Skip kar sakte hain?</summary><p>Small sample pe rough audit karo. 100–200 examples bhi direction de sakte hain. Perfect number ka wait karte karte project mat rok do.</p></details>
+            <details class="qa"><summary>Model human se better hai, phir bhi mistakes scary hain. Kya karein?</summary><p>Safety-critical task mein average better hona kaafi nahi. Worst-case, subgroups, calibration, monitoring, human review process — sab design karo.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Human 5%, train 18%, dev 20%. Bias aur variance?</summary><p>Avoidable bias = 18 − 5 = 13%. Variance = 20 − 18 = 2%. <b>Final answer: high avoidable bias</b>.</p></details>
+              <details class="qa"><summary>Human 12%, train 13%, dev 25%. Next move?</summary><p>Avoidable bias = 1%, variance = 12%. Train human ke paas, dev bahut kharab. More data/regularization. <b>Final answer: high variance</b>.</p></details>
+              <details class="qa"><summary>Trainee 18%, experienced QC 9%, audit pair 5%, model train 8%, dev 11%. Human-level kis number se compare karoge?</summary><p>Agar best practical lower bound chahiye to audit pair 5%. Factory workflow compare ke liye 9% bhi useful. <b>Final answer: context ke hisaab se, diagnosis mein 5% stronger proxy</b>.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="p4"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-dev-test-setup.html"><small>← Pichhla</small>Dev/test set lagana, aur kab badalna</a>
+          <a class="pager-next" href="dl-error-analysis.html"><small>Agla →</small>Error analysis aur galat labels</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

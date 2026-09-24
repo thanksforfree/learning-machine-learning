@@ -1,0 +1,35 @@
+
+            <div class="chat">
+              <p class="msg me">Neural network sunte hi lagta hai koi sci-fi machine aa gayi.</p>
+              <p class="msg dost">Haan, naam thoda heavy hai. Par andar ka first building block bilkul Module 1 wala hai: inputs lo, weights se multiply karo, jodo, sigmoid lagao — ek 0–1 ka number. <strong>Ek neuron bas itna hi karta hai.</strong></p>
+              <p class="msg dost">Ab socho ek phone company jaanna chahti hai ki naya phone hit hoga ya nahi. Inputs: price, camera, battery, ad ka budget. Ek akela neuron sab soch sakta hai — par behtar hai ek <strong>team</strong> banao:</p>
+              <p class="msg dost">• Neuron A soche: “log afford kar payenge?”<br>• Neuron B soche: “logon ko phone ke baare mein pata chalega?”<br>• Neuron C soche: “quality achhi lagegi?”<br>Phir ek final neuron in teeno ki raay sunke bole: “hit hone ka 80% chance.”</p>
+              <p class="msg me">A, B, C ko ye kaam kisne assign kiya?</p>
+              <p class="msg dost">Kisi ne nahi! Hum sirf inputs aur final answer dete hain. Training ke dauraan network <strong>khud</strong> decide karta hai ki beech wale neurons kya “sochein”. Isliye beech wali layer ko <strong>hidden layer</strong> kehte hain — hum usko kuch direct nahi batate.</p>
+            </div>
+            <figure class="figure">
+              <svg viewBox="0 0 420 230" role="img" aria-label="4 inputs se 3 hidden neurons, phir 1 output neuron">
+                <g stroke="#cfc4f2" stroke-width="1.3">
+                  <line x1="70" y1="40" x2="210" y2="60"/><line x1="70" y1="40" x2="210" y2="115"/><line x1="70" y1="40" x2="210" y2="170"/>
+                  <line x1="70" y1="93" x2="210" y2="60"/><line x1="70" y1="93" x2="210" y2="115"/><line x1="70" y1="93" x2="210" y2="170"/>
+                  <line x1="70" y1="146" x2="210" y2="60"/><line x1="70" y1="146" x2="210" y2="115"/><line x1="70" y1="146" x2="210" y2="170"/>
+                  <line x1="70" y1="199" x2="210" y2="60"/><line x1="70" y1="199" x2="210" y2="115"/><line x1="70" y1="199" x2="210" y2="170"/>
+                  <line x1="210" y1="60" x2="340" y2="115"/><line x1="210" y1="115" x2="340" y2="115"/><line x1="210" y1="170" x2="340" y2="115"/>
+                </g>
+                <g fill="#f2edff" stroke="#7653d6" stroke-width="2"><circle cx="70" cy="40" r="14"/><circle cx="70" cy="93" r="14"/><circle cx="70" cy="146" r="14"/><circle cx="70" cy="199" r="14"/><circle cx="210" cy="60" r="16"/><circle cx="210" cy="115" r="16"/><circle cx="210" cy="170" r="16"/></g>
+                <circle cx="340" cy="115" r="18" fill="#7653d6"/>
+                <g font-size="10" fill="#4b5871" text-anchor="end"><text x="50" y="44">price</text><text x="50" y="97">camera</text><text x="50" y="150">battery</text><text x="50" y="203">ad budget</text></g>
+                <g font-size="10" fill="#684abe" text-anchor="middle"><text x="210" y="38">afford?</text><text x="210" y="142">pata chalega?</text><text x="210" y="198">quality?</text></g>
+                <text x="340" y="150" font-size="11" text-anchor="middle" fill="#684abe">hit? 80%</text>
+                <g font-size="10" fill="#8a96aa" text-anchor="middle"><text x="70" y="224">input layer</text><text x="210" y="224">hidden layer</text><text x="340" y="224">output layer</text></g>
+              </svg>
+              <div class="cap">Har gol = ek neuron. Har line = ek weight. Beech ke naam sirf samjhane ke liye — asli mein network khud tay karta hai.</div>
+            </figure>
+            <p><strong>Photo mein chehra pehchanna:</strong> pehli layers chhoti cheezein pakadti hain (edges, lines), beech wali unko jod ke aankh-naak jaise hisse, aur aakhri layers poora chehra. Jaise chai mein adrak, elaichi, doodh alag-alag taste dete hain, waise layers chhote clues jodti rehti hain. Matlab network <strong>features khud bana leta hai</strong> — Module 1 jaisi manual feature engineering kam karni padti hai. Nice na?</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Neural network = logistic regression units ki layers, jahan har layer pichli layer ke output se naye, better clues banati hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Kya ye sach mein insaani dimaag jaisa kaam karta hai?</summary><p>Naam dimaag se inspired hai, bas. Asli neuron bahut complex hai; ye ek simple math formula hai. Ise dimaag ki copy mat samjho.</p></details>
+            <details class="qa"><summary>Kitni layers aur kitne neurons rakhne hain?</summary><p>Problem pe depend karta hai. Isko “architecture” kehte hain aur ye tumhara design decision hai. “Deep learning” = bahut saari layers. Topic 08 mein seekhoge ki bada network kab madad karta hai.</p></details>
+            <details class="qa"><summary>Neural networks achanak itne popular kyu ho gaye?</summary><p>Do cheezein hui: data bahut badh gaya (internet, phones) aur computers (khaas kar GPU) bahut fast ho gaye. Purane models data badhne pe ek limit pe atak jaate hain, par bade neural networks zyada data se aur better hote rehte hain.</p></details>
+            <details class="qa"><summary>Har hidden neuron ka meaning hamesha samajh aayega?</summary><p>Nahi. Example mein naam diye taaki picture clear ho. Asli networks mein ek neuron aksar kai cheezon ka mix pakadta hai — thoda camera, thoda price, thoda kuch aur. Seedha naam nahi milta, aur ye normal hai.</p></details>
+            <details class="qa"><summary>Kya neural networks se jald hi insaan jaisi “general” intelligence (AGI) ban jayegi?</summary><p>Do cheezein alag rakho. <strong>Narrow AI</strong> — ek kaam mein bahut achha (spam filter, face unlock) — aaj har jagah hai aur tezi se badh raha hai. <strong>AGI</strong> — insaan jaisa har kaam kar sake — abhi door ka aur uncertain lakshya hai. Artificial neuron asli neuron ka bahut simple roop hai, aur dimaag kaise seekhta hai woh abhi poori tarah samjha bhi nahi gaya. Isliye hype se bacho, par progress ko hal-ke mein bhi mat lo.</p></details>

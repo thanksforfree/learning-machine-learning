@@ -1,0 +1,115 @@
+            <div class="chat">
+              <p class="msg me">Dost, computer vision ka naam sunte hi mujhe lagta hai ki photo dekhna to insaan wali cheez hai. Computer kya dekhega?</p>
+              <p class="msg dost">Computer ko photo bas numbers ki badi Excel sheet dikhti hai. Har pixel mein red, green, blue ki value. Par haan, us sheet mein pattern chhupa hota hai.</p>
+              <p class="msg me">Pattern matlab?</p>
+              <p class="msg dost">Jaise chai ke cup ka kinara, traffic signal ka gol shape, shirt ki sleeve ki line. CNN pehle aise <strong>edges</strong> pakadna seekhta hai, phir un edges se parts, phir poora object.</p>
+              <p class="msg me">Aur normal neural network se ye kaam nahi ho sakta?</p>
+              <p class="msg dost">Ho sakta hai chhoti photo pe. Par badi photo aate hi parameters ka tiffin dabba phat jaata hai. Isi liye convolution wali soch chahiye.</p>
+            </div>
+
+            <h4>Computer vision ke teen common kaam</h4>
+            <div class="compare-grid">
+              <div><b>Classification</b>Photo mein kya hai? Jaise “ye mango hai ya apple?” Sirf label.</div>
+              <div><b>Detection</b>Kya hai aur kahan hai? Jaise CCTV frame mein helmet kis box mein hai.</div>
+              <div><b>Style transfer</b>Content ek photo ka, style doosri image ka. Jaise tumhari selfie ko rangoli-jaisi texture dena.</div>
+            </div>
+            <p>In teeno mein first useful clue aksar edge hota hai. Agar object ka boundary hi nahi dikha, to aage ki pehchaan mushkil ho jaati hai.</p>
+
+            <h4>Badi photo ki asli dikkat</h4>
+            <p>Phone se li hui 1200 × 800 RGB photo socho. Har pixel ke 3 channels hote hain.</p>
+            <div class="formula"><code>inputs = height × width × channels = 1200 × 800 × 3 = 28,80,000</code><ul>
+              <li><b>height, width</b> = photo ke pixel rows aur columns</li>
+              <li><b>channels</b> = RGB mein 3: red, green, blue</li>
+              <li><b>28.8 lakh inputs</b> = sirf ek photo ka raw vector</li>
+            </ul></div>
+            <p>Agar first hidden layer mein 800 neurons rakh diye, to weights lagbhag 28.8 lakh × 800 = 230.4 crore. Arre bhai, pehli layer hi full IPL auction ban gayi. CNN ka idea hai: chhoti khidki se local pattern dekho, aur wohi khidki poori photo pe ghumao.</p>
+
+            <h4>Vertical edge: 7×7 photo pe 3×3 filter</h4>
+            <p>Yeh toy photo hai: left side thoda dark 2, right side bright 9. Beech mein seedha vertical edge hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Row</th><th colspan="7">7×7 photo</th></tr>
+              <tr><td>1</td><td>2</td><td>2</td><td>2</td><td>9</td><td>9</td><td>9</td><td>9</td></tr>
+              <tr><td>2</td><td>2</td><td>2</td><td>2</td><td>9</td><td>9</td><td>9</td><td>9</td></tr>
+              <tr><td>3</td><td>2</td><td>2</td><td>2</td><td>9</td><td>9</td><td>9</td><td>9</td></tr>
+              <tr><td>4</td><td>2</td><td>2</td><td>2</td><td>9</td><td>9</td><td>9</td><td>9</td></tr>
+              <tr><td>5</td><td>2</td><td>2</td><td>2</td><td>9</td><td>9</td><td>9</td><td>9</td></tr>
+              <tr><td>6</td><td>2</td><td>2</td><td>2</td><td>9</td><td>9</td><td>9</td><td>9</td></tr>
+              <tr><td>7</td><td>2</td><td>2</td><td>2</td><td>9</td><td>9</td><td>9</td><td>9</td></tr>
+            </table></div>
+            <p>Filter lo:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><td>1</td><td>0</td><td>−1</td></tr>
+              <tr><td>1</td><td>0</td><td>−1</td></tr>
+              <tr><td>1</td><td>0</td><td>−1</td></tr>
+            </table></div>
+            <p>Har 3×3 patch pe element-wise multiply karo, phir sum. Pehle patch mein columns [2, 2, 2] repeat ho rahe hain, isliye left aur right cancel ho jaate hain. Edge pe patch columns [2, 2, 9] repeat ho rahe hain:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Patch</th><th>Calculation</th><th>Output</th></tr>
+              <tr><td>Columns 1–3</td><td>(2 − 2), teen rows</td><td>0</td></tr>
+              <tr><td>Columns 2–4</td><td>(2 − 9) + (2 − 9) + (2 − 9)</td><td>−21</td></tr>
+              <tr><td>Columns 3–5</td><td>(2 − 9) + (2 − 9) + (2 − 9)</td><td>−21</td></tr>
+              <tr><td>Columns 4–6</td><td>9 − 9, teen rows</td><td>0</td></tr>
+              <tr><td>Columns 5–7</td><td>9 − 9, teen rows</td><td>0</td></tr>
+            </table></div>
+            <p>Poora 5×5 output:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><td>0</td><td>−21</td><td>−21</td><td>0</td><td>0</td></tr>
+              <tr><td>0</td><td>−21</td><td>−21</td><td>0</td><td>0</td></tr>
+              <tr><td>0</td><td>−21</td><td>−21</td><td>0</td><td>0</td></tr>
+              <tr><td>0</td><td>−21</td><td>−21</td><td>0</td><td>0</td></tr>
+              <tr><td>0</td><td>−21</td><td>−21</td><td>0</td><td>0</td></tr>
+            </table></div>
+            <p>Minus sign se darna nahi. Iska matlab bas edge ki direction hai: dark-left bright-right. Filter ko ulta kar do <code>[−1,0,1]</code>, to wahi jagah +21 degi.</p>
+
+            <figure class="figure">
+              <svg viewBox="0 0 420 170" role="img" aria-label="Filter photo pe slide karke edge response banata hai">
+                <rect x="25" y="25" width="120" height="120" fill="#edf3ff" stroke="#b8c2d3"/>
+                <rect x="85" y="25" width="60" height="120" fill="#3567e8" opacity="0.55"/>
+                <rect x="55" y="45" width="60" height="60" fill="none" stroke="#c2410c" stroke-width="3"/>
+                <text x="85" y="158" font-size="11" text-anchor="middle" fill="#4b5871">7×7 photo</text>
+                <text x="205" y="82" font-size="11" text-anchor="middle" fill="#7a879b">3×3 filter</text>
+                <text x="205" y="102" font-size="11" text-anchor="middle" fill="#7a879b">dot product</text>
+                <path d="M155,82 L250,82" stroke="#7653d6" stroke-width="2" marker-end="url(#a)"/>
+                <defs><marker id="a" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#7653d6"/></marker></defs>
+                <rect x="270" y="45" width="90" height="90" fill="#fff3ec" stroke="#e0703a"/>
+                <rect x="292" y="45" width="45" height="90" fill="#e0703a" opacity="0.35"/>
+                <text x="315" y="158" font-size="11" text-anchor="middle" fill="#4b5871">5×5 edge map</text>
+              </svg>
+              <div class="cap">Convolution = chhota filter slide karo, har jagah ek score nikalo.</div>
+            </figure>
+
+            <h4>Horizontal edge aur sign ka meaning</h4>
+            <p>Vertical filter left-right badlaav pakadta hai. Horizontal filter top-bottom badlaav pakadta hai:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><td>1</td><td>1</td><td>1</td></tr>
+              <tr><td>0</td><td>0</td><td>0</td></tr>
+              <tr><td>−1</td><td>−1</td><td>−1</td></tr>
+            </table></div>
+            <p>Hamari toy photo mein top-bottom koi change nahi, isliye horizontal filter ka output sab 0 aayega. Agar upar dark aur neeche bright hota, to strong negative ya positive response aata.</p>
+
+            <h4>Sobel, Scharr, aur learned filters</h4>
+            <p>Purane computer vision mein humans filters design karte the. Sobel jaisa filter center ke aas-paas edge ko thoda zyada weight deta hai. Scharr bhi edge detection ke liye ek hand-made filter family hai.</p>
+            <p>CNN mein twist ye hai: hum filter ke 9 numbers manually nahi bharte. Training ke dauraan network khud decide karta hai ki kaunsa filter useful hai — koi vertical edge, koi texture, koi curve, koi shirt ka button.</p>
+            <pre class="code">import numpy as np
+patch = np.array([[2, 2, 9],
+                  [2, 2, 9],
+                  [2, 2, 9]])
+f = np.array([[1, 0, -1],
+              [1, 0, -1],
+              [1, 0, -1]])
+score = np.sum(patch * f)  <span class="cm"># -21, strong vertical edge</span></pre>
+
+            <div class="mistake"><b>Dhyan rakhna:</b> Edge detector ka output “object mil gaya” nahi hota. Ye sirf low-level clue hai. CNN mein bahut layers milke simple edges se complex shapes banati hain.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Photo numbers ki grid hai; filter chhoti torch hai; edge map batata hai ki badlaav kahan strong hai.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Output 5×5 kyu aaya, 7×7 kyu nahi?</summary><p>3×3 filter bina padding ke 7×7 photo mein sirf 5 positions vertically aur 5 positions horizontally fit hota hai. Formula next page mein detail se aayega.</p></details>
+            <details class="qa"><summary>Negative edge bhi useful hai?</summary><p>Haan. Sign direction batata hai. Bright-left dark-right aur dark-left bright-right dono edge hain, bas opposite direction.</p></details>
+            <details class="qa"><summary>Filter ke numbers random se start hote hain?</summary><p>Training ke start mein random hote hain. Backprop unhe dheere-dheere useful pattern detectors bana deta hai.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>1200×800 RGB photo mein kitne raw inputs?</summary><p>1200 × 800 × 3 = <b>28,80,000 inputs</b>.</p></details>
+              <details class="qa"><summary>7×7 image pe 3×3 filter, no padding, stride 1. Output size?</summary><p>Filter 5 positions each direction mein fit hota hai, to <b>5×5</b>.</p></details>
+              <details class="qa"><summary>Agar vertical filter ko multiply karke +21 ki jagah −21 aaye, kya model fail ho gaya?</summary><p>Nahi. Sign sirf direction batata hai. Strong magnitude ka matlab edge strong hai; <b>−21 bhi kaam ka signal</b>.</p></details>
+            </div>

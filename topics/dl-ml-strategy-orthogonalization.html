@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ML strategy aur orthogonalization: Har problem ka apna alag knob. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>ML strategy aur orthogonalization (DL · 3) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-structuring-projects.html">DL · 3: Structuring Machine Learning Projects</a> › Topic 1 / 9</nav>
+        <p class="eyebrow">DL · 3 · TOPIC 01 · SETUP</p>
+        <h1>ML strategy aur orthogonalization</h1>
+        <p>Har problem ka apna alag knob</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 3 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="p1" class="current" aria-current="page" href="dl-ml-strategy-orthogonalization.html"><span>01</span>ML strategy aur orthogonalization</a>
+            <a data-topic-link="p2" href="dl-single-number-metric.html"><span>02</span>Ek number wala metric, satisficing aur optimizing</a>
+            <a data-topic-link="p3" href="dl-dev-test-setup.html"><span>03</span>Dev/test set lagana, aur kab badalna</a>
+            <a data-topic-link="p4" href="dl-human-level-performance.html"><span>04</span>Human-level performance aur avoidable bias</a>
+            <a data-topic-link="p5" href="dl-error-analysis.html"><span>05</span>Error analysis aur galat labels</a>
+            <a data-topic-link="p6" href="dl-mismatched-distributions.html"><span>06</span>Training aur testing alag distributions pe</a>
+            <a data-topic-link="p7" href="dl-fix-data-mismatch.html"><span>07</span>Data mismatch kaise theek karein</a>
+            <a data-topic-link="p8" href="dl-transfer-multitask.html"><span>08</span>Transfer learning aur multi-task learning</a>
+            <a data-topic-link="p9" href="dl-end-to-end.html"><span>09</span>End-to-end deep learning</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="p1,p2,p3,p4,p5,p6,p7,p8,p9"><span>DL · 3 progress</span><strong data-progress-label>0 / 9 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Ek project mein das idea hote hain aur time ek ka. Ye soch batati hai ki kaunsa knob ghumana hai.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Strategy kyu: galat idea pe mahine barbaad</li><li>Orthogonalization: TV/gaadi ke controls wali analogy</li><li>Chaar kadmon ki chain: train → dev → test → real world, har ek ka apna knob</li><li>Early stopping “orthogonal” kyu nahi</li></ul></details>
+        <article class="lesson-card single" id="p1">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Dost, model ka dev error high hai. Main bigger network, zyada data, dropout, sab ek saath try kar dun?</p>
+              <p class="msg dost">Bas wahi to project ka trap hai. Sab knob ek saath ghumaaoge to pata hi nahi chalega kis cheez ne fayda diya.</p>
+              <p class="msg me">Par deadline kal hai. Kuch to karna padega na?</p>
+              <p class="msg dost">Haan, par mechanic wali soch se. Pehle awaaz kahan se aa rahi hai dekho, phir wahi part kholo. ML strategy ka kaam hai tumhe random jugaad se bachana.</p>
+              <p class="msg me">Matlab strategy bhi ek technical skill hai?</p>
+              <p class="msg dost">Bilkul. Senior ML engineer ka aadha kaam code nahi, <strong>sahi next experiment</strong> choose karna hota hai.</p>
+            </div>
+
+            <h4>Strategy kyu chahiye?</h4>
+            <p>Asli project mein ideas ki line lag jaati hai: architecture badlo, labels saaf karo, dev set badlo, learning rate tune karo, data augmentation lagao, model compress karo. Har idea ?reasonable? lagta hai. Problem ye hai ki har idea mehenga hai.</p>
+            <p>Maan lo tum crop-disease app bana rahe ho. Farmers leaf ki photo bhejte hain. Dev error 18% hai. Team mein teen awaaz aayi:</p>
+            <ul>
+              <li>?Aur 50,000 photos collect karo.?</li>
+              <li>?Bada vision model use karo.?</li>
+              <li>?Dev set galat hai, ye studio photos se bana hai.?</li>
+            </ul>
+            <p>Teeno pe mahina laga diya, phir bhi confusion. Strategy ka seedha matlab: <em>pehle diagnose, phir focused action</em>. Galat direction mein tez bhaagna bhi time waste hi hai.</p>
+
+            <h4>Orthogonalization ? har problem ka alag knob</h4>
+            <p>TV ka remote socho. Volume ka button sirf awaaz badhata hai. Brightness ka button sirf screen ko roshan karta hai. Agar ek hi button volume bhi badhaye, channel bhi badle, aur TV band bhi kar de, to mummy remote chhupa degi.</p>
+            <p><strong>Orthogonalization</strong> ka vibe yahi hai: har issue ke liye ek mostly-separate control. Gaadi mein steering direction sambhale, accelerator speed, brake rukna. ML project mein bhi aise clean controls chahiye.</p>
+            <div class="compare-grid">
+              <div><b>Non-orthogonal jugaad</b>Ek hi change se train error bhi badle, dev error bhi, runtime bhi, aur metric bhi. Samajhna mushkil.</div>
+              <div><b>Orthogonal soch</b>Har stage pe poochho: fail kahan ho raha hai? Us stage ke liye kaunsa knob hai?</div>
+            </div>
+
+            <h4>Chaar kadmon ki chain</h4>
+            <p>Project ko ek pipeline ki tarah dekho. Har link pass hona chahiye. Ek link fail hua to usi pe kaam karo.</p>
+            <div class="visual-flow">
+              <span>Train set<br><small>seekh paaya?</small></span><b>?</b>
+              <span>Dev set<br><small>generalize?</small></span><b>?</b>
+              <span>Test set<br><small>honest number?</small></span><b>?</b>
+              <span class="flow-highlight">Real world<br><small>users khush?</small></span>
+            </div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Stage</th><th>Symptom</th><th>Knob jo pehle try hoga</th></tr>
+              <tr><td>Train</td><td>Train error hi high</td><td class="good">Bigger model, better features, zyada training</td></tr>
+              <tr><td>Dev</td><td>Train achha, dev kharab</td><td class="good">Regularization, more data, augmentation</td></tr>
+              <tr><td>Test</td><td>Dev achha, test kharab</td><td class="bad">Dev pe overfit; dev set/metric process check</td></tr>
+              <tr><td>Real world</td><td>Test achha, users complain</td><td class="bad">Metric ya data distribution galat</td></tr>
+            </table></div>
+            <p>Yahan magic ye nahi ki table yaad kar lo. Magic ye hai ki ?sab kuch try? karne ke bajay chain ka pehla broken link dhundo.</p>
+
+            <h4>Worked example: electricity-theft detector</h4>
+            <p>Bijli board ka model unusual meter readings flag karta hai. Numbers dekho:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Check</th><th>Error</th><th>Gap</th><th>Diagnosis</th></tr>
+              <tr><td>Field auditor</td><td>4%</td><td>—</td><td>Approx baseline</td></tr>
+              <tr><td>Train</td><td>16%</td><td>16 − 4 = 12%</td><td class="bad">Train pe hi weak: bias</td></tr>
+              <tr><td>Dev</td><td>18%</td><td>18 − 16 = 2%</td><td>Variance chhoti</td></tr>
+            </table></div>
+            <p>Is case mein “aur data lao” shayad first move nahi. Model training set pe hi auditor se 12 points door hai. Pehle model/feature side ko strong karo.</p>
+            <div class="formula"><code>avoidable bias = train error − baseline error
+variance gap = dev error − train error</code><ul>
+              <li><b>baseline</b> = insaan, purana system, ya best-known process ka error</li>
+              <li><b>avoidable bias</b> bada ho to model abhi training data bhi nahi pakad raha</li>
+              <li><b>variance gap</b> bada ho to model training examples se zyada chipak gaya</li>
+            </ul></div>
+
+            <h4>Early stopping orthogonal kyu nahi?</h4>
+            <p>Early stopping matlab dev error badhne lage to training rok do. Sunne mein nice. Par ye ek knob se do kaam kar raha hai:</p>
+            <ul>
+              <li>Optimization: model ko train loss kam karne ke liye kitna time do?</li>
+              <li>Regularization: model ko overfit hone se kaise rokna?</li>
+            </ul>
+            <p>Jaise scooter ka accelerator aur brake ek hi handle pe ho. Chalega, par control clean nahi. Orthogonal style mein pehle model ko achhe se optimize karo, phir overfitting ke liye L2, dropout, data, augmentation jaise clearer knobs use karo.</p>
+            <div class="lesson-callout"><b>Real project tip:</b> Early stopping kabhi-kabhi practical hota hai, especially compute bachane ke liye. Bas usko “perfect clean knob” mat samjho. Debugging mein pehle simple, alag-alag controls better hote hain.</div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Metric, dev set, architecture, regularization sab ek hi experiment mein change mat karo. Agar result improve hua, credit kisko doge? Agar kharab hua, blame kisko doge?</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Strategy ka goal hero banna nahi; random mehnat ko bachana hai. Broken link pakdo, us link ka clean knob ghumao.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Kya hamesha ek hi change karna zaroori hai?</summary><p>Research mode mein haan, clarity ke liye. Emergency production bug mein kabhi-kabhi bundle change karna padta hai. Par baad mein isolate karke samjho, warna same bug dobara aayega.</p></details>
+            <details class="qa"><summary>Baseline nahi pata to?</summary><p>Chhota manual audit karo. 100 examples pe expert ya team ka best guess lo. Perfect baseline nahi chahiye; direction ke liye rough anchor bhi kaafi help karta hai.</p></details>
+            <details class="qa"><summary>Real world fail ho raha hai par test achha hai. Kya karun?</summary><p>Metric ya test distribution users jaisi nahi hai. Pehle nishaana badlo: real user examples se dev/test refresh karo, phir model improve karo.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Hindi voice assistant: baseline 4%, train 14%, dev 15%. Pehla knob?</summary><p>Train-baseline gap = 10%, dev-train gap = 1%. Pehla knob model/feature/training side: bigger model, better audio features, longer training. <b>Final answer: high avoidable bias</b>.</p></details>
+              <details class="qa"><summary>Traffic camera model: train 3%, dev 13%, test 13%. Kahan focus?</summary><p>Train achha, dev gap 10%. Overfitting/generalization issue. More target data, augmentation, regularization. <b>Final answer: high variance</b>.</p></details>
+              <details class="qa"><summary>Ek experiment mein dev set bhi badla aur dropout bhi add kiya. Result 2% better. Kya conclusion?</summary><p>Conclusion weak hai, kyunki do knobs saath badle. Improvement dev set change se bhi ho sakta hai, dropout se bhi. <b>Final answer: isolate karke repeat karo</b>.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="p1"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-frameworks-tensorflow.html"><small>← Pichhla · DL · 2</small>Deep learning frameworks aur TensorFlow</a>
+          <a class="pager-next" href="dl-single-number-metric.html"><small>Agla →</small>Ek number wala metric, satisficing aur optimizing</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

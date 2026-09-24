@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Data mismatch kaise theek karein: Training data ko asli jaisa banao. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Data mismatch kaise theek karein (DL · 3) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-structuring-projects.html">DL · 3: Structuring Machine Learning Projects</a> › Topic 7 / 9</nav>
+        <p class="eyebrow">DL · 3 · TOPIC 07 · ALAG DISTRIBUTION KA DATA</p>
+        <h1>Data mismatch kaise theek karein</h1>
+        <p>Training data ko asli jaisa banao</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 3 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="p1" href="dl-ml-strategy-orthogonalization.html"><span>01</span>ML strategy aur orthogonalization</a>
+            <a data-topic-link="p2" href="dl-single-number-metric.html"><span>02</span>Ek number wala metric, satisficing aur optimizing</a>
+            <a data-topic-link="p3" href="dl-dev-test-setup.html"><span>03</span>Dev/test set lagana, aur kab badalna</a>
+            <a data-topic-link="p4" href="dl-human-level-performance.html"><span>04</span>Human-level performance aur avoidable bias</a>
+            <a data-topic-link="p5" href="dl-error-analysis.html"><span>05</span>Error analysis aur galat labels</a>
+            <a data-topic-link="p6" href="dl-mismatched-distributions.html"><span>06</span>Training aur testing alag distributions pe</a>
+            <a data-topic-link="p7" class="current" aria-current="page" href="dl-fix-data-mismatch.html"><span>07</span>Data mismatch kaise theek karein</a>
+            <a data-topic-link="p8" href="dl-transfer-multitask.html"><span>08</span>Transfer learning aur multi-task learning</a>
+            <a data-topic-link="p9" href="dl-end-to-end.html"><span>09</span>End-to-end deep learning</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="p1,p2,p3,p4,p5,p6,p7,p8,p9"><span>DL · 3 progress</span><strong data-progress-label>0 / 9 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Data mismatch ka koi fixed formula nahi, par kuch practical tareeke hain jo aksar kaam karte hain.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Train aur dev ke farak ko khud dekh ke samajhna</li><li>Training data ko dev jaisa banana ya aur jama karna</li><li>Artificial data synthesis: saaf awaaz + gaadi ka shor</li><li>Khatra: chhote se set se synthesize kiya to network usi pe overfit ho jaata hai (apna example)</li></ul></details>
+        <article class="lesson-card single" id="p7">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Diagnosis bol raha hai data mismatch. Ab exact fix kya hai?</p>
+              <p class="msg dost">Kaash ek universal button hota: “mismatch hatao”. Reality mein pehle farak samajhna padta hai.</p>
+              <p class="msg me">Matlab phir se examples dekhne padenge?</p>
+              <p class="msg dost">Haan dost. Train examples aur dev examples side-by-side kholo. Data ki smell lo. Kabhi camera angle, kabhi mic, kabhi user behaviour.</p>
+              <p class="msg me">Aur phir?</p>
+              <p class="msg dost">Training data ko dev jaisa banao — real data collect karke, ya carefully synthetic data banake.</p>
+            </div>
+
+            <h4>Train aur dev ka farak khud dekho</h4>
+            <p>Data mismatch spreadsheet se poora samajh nahi aata. 50 train examples aur 50 dev examples open karo. Differences likho. Ye detective work hai.</p>
+            <p>Receipt OCR project mein train data flat scanner bills se tha, dev data shop-counter phone photos se. Error analysis mein ye differences dikhe:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Farak</th><th>Train data</th><th>Dev data</th><th>Possible fix</th></tr>
+              <tr><td>Paper shape</td><td>Seedha, flat</td><td>Muda hua, corners cut</td><td class="good">Fold augmentation</td></tr>
+              <tr><td>Light</td><td>Even scanner light</td><td>Tube-light glare, shadow</td><td class="good">Glare/shadow data</td></tr>
+              <tr><td>Background</td><td>White scanner bed</td><td>Wood counter, plastic bag</td><td>Target backgrounds add</td></tr>
+              <tr><td>Text mix</td><td>English item names</td><td>Hindi-English shorthand</td><td>Vocabulary expand</td></tr>
+            </table></div>
+            <p>Ab “data mismatch” vague nahi raha. Tumhe pata hai kis tarah ka data chahiye.</p>
+
+            <h4>Training data ko dev jaisa banana</h4>
+            <p>Best fix usually real target-style data collect karna hai. Agar users low-end phones use karte hain, low-end phone photos lao. Agar bills folded aate hain, folded bills collect karo. Agar counter glare common hai, glare wale examples lao.</p>
+            <div class="visual-flow">
+              <span>Mismatch dekho</span><b>→</b>
+              <span>Target-like examples lao</span><b>→</b>
+              <span class="flow-highlight">Train mix update</span><b>→</b>
+              <span>Dev pe check</span>
+            </div>
+            <p>Target data kam ho to usko carefully train mein add karo, par dev/test holdout bachao. Sab train mein daal diya to compass kho jaayega.</p>
+
+            <h4>Artificial data synthesis</h4>
+            <p>Jab real target data expensive ho, synthetic data help kar sakta hai. Receipt example: clean bill images hain, aur alag-alag counter backgrounds, folds, shadows ki library hai. Inko combine karke shop-counter jaisi images banao.</p>
+            <div class="formula"><code>synthetic receipt = clean bill + fold/blur + shadow background</code><ul>
+              <li><b>clean bill</b> = text aur label wahi rehta hai</li>
+              <li><b>fold/blur</b> = phone photo wali imperfection add karta hai</li>
+              <li><b>shadow background</b> = counter, plastic bag, hand shadow jaisi real cheezein</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Clean bill</th><th>Effect</th><th>Strength</th><th>New training example</th></tr>
+              <tr><td>Kirana bill #42</td><td>Left fold</td><td>25%</td><td class="good">Folded counter photo jaisa</td></tr>
+              <tr><td>Pharmacy bill #18</td><td>Tube-light glare</td><td>40%</td><td class="good">Glossy paper case</td></tr>
+              <tr><td>Cafe bill #07</td><td>Motion blur</td><td>15%</td><td>Quick phone capture</td></tr>
+            </table></div>
+            <p>40% glare ka intuition: glare overlay ko medium-strong rakha. Real code brightness clipping aur text readability check karega.</p>
+
+            <h4>Chhote synthesis set ka khatra</h4>
+            <p>Synthetic data free lunch nahi. Agar tumhare paas sirf 30 glare overlays hain aur tum 4 lakh receipt images unhi overlays se bana doge, model unhi glare shapes ko memorize kar sakta hai. Dev mein naya shop light aaya, phir dhadham.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Synthesis source</th><th>Generated examples</th><th>Khatra</th><th>Better move</th></tr>
+              <tr><td>30 glare overlays</td><td>4,00,000</td><td class="bad">Same shine pattern overfit</td><td>Many shops, bulbs, angles</td></tr>
+              <tr><td>12 counter backgrounds</td><td>80,000 images</td><td class="bad">Table texture memorize</td><td>Metal, wood, cloth, plastic variety</td></tr>
+              <tr><td>8 crumple masks</td><td>50,000 bills</td><td>Medium</td><td class="good">Add real folded receipts</td></tr>
+            </table></div>
+            <p>Variety matters. Synthetic data tab kaam karta hai jab synthetic variation real world ki variation ko cover kare.</p>
+
+            <h4>Dev jaisa banana vs aur data jama karna</h4>
+            <div class="compare-grid">
+              <div><b>Target data collect</b>Best quality signal. Mehenga ho sakta hai, permission/privacy issues aa sakte hain.</div>
+              <div><b>Augment/synthesize</b>Fast, cheap, par real variation miss ho sakti hai.</div>
+              <div><b>Reweight training</b>Target-like examples ko training mein zyada importance do. Useful jab target data thoda hai.</div>
+              <div><b>Pipeline change</b>Kabhi issue mic normalization, white balance, ya crop logic hota hai.</div>
+            </div>
+            <p>Practical loop: categories rank karo, high-impact category pe real/synthetic data try karo, dev pe measure karo.</p>
+
+            <h4>Worked mini-plan: shop receipt OCR</h4>
+            <p>Numbers: train-dev error 7%, dev shop-counter error 19%. Error analysis mein 100 dev mistakes: 38 glare, 22 folded paper, 16 mixed-language item names, 24 miscellaneous.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Category</th><th>Count</th><th>Ceiling on mismatch gap</th><th>Data action</th></tr>
+              <tr><td>Glare</td><td>38</td><td>38% of 12-point gap = 4.56 points</td><td class="good">Collect glossy counter bills</td></tr>
+              <tr><td>Folded paper</td><td>22</td><td>2.64 points</td><td class="good">Fold/crumple augmentation</td></tr>
+              <tr><td>Mixed item names</td><td>16</td><td>1.92 points</td><td>Vocabulary data</td></tr>
+            </table></div>
+            <p>Gap 19 − 7 = 12 points. Glare ka max impact 4.56 points — sprint planning ke kaam ka number.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Synthetic examples itne clean mat banao ki woh real se alag hi distribution ban jaaye. “Almost real” chahiye, cartoon version nahi.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Data mismatch fix ka pehla step model nahi, aankh hai. Train aur dev ko side-by-side dekho, phir training ko target jaisa banao.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Kya synthetic data hamesha real data se worse hai?</summary><p>Nahi. Good synthesis bahut useful ho sakti hai, especially audio noise, image crop, brightness, simulation. Par uski variety aur realism check karna padta hai.</p></details>
+            <details class="qa"><summary>Target data bahut kam hai. Train mein daalun ya dev mein?</summary><p>Thoda dev/test ke liye bachao. Baaki train mein use karo. Compass ke bina improvement andhere mein teer hai.</p></details>
+            <details class="qa"><summary>Mujhe mismatch categories nahi mil rahi.</summary><p>Sample badhao, domain expert ko bithao, metadata dekho: device, time, location, user type. Kabhi mismatch hidden metadata mein hota hai.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Train-dev 6%, dev 18%. 100 dev errors mein 35 "glare" cases. Mismatch gap ka ceiling?</summary><p>Mismatch gap = 18 − 6 = 12 points. Glare ceiling = 35% × 12 = 4.2 points. <b>Final answer: max around 4.2 points</b>.</p></details>
+              <details class="qa"><summary>Sirf 25 shadow overlays se 2 lakh synthetic receipts banaye. Risk?</summary><p>Model un 25 exact shadow patterns pe overfit kar sakta hai. More varied shop lighting chahiye. <b>Final answer: small-source overfitting risk</b>.</p></details>
+              <details class="qa"><summary>Train bills scanner se, dev bills phone camera se. First action?</summary><p>Scanner vs phone examples side-by-side dekho: fold, glare, background, blur. Phir phone-style data collect/augment karo. <b>Final answer: mismatch audit first</b>.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="p7"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-mismatched-distributions.html"><small>← Pichhla</small>Training aur testing alag distributions pe</a>
+          <a class="pager-next" href="dl-transfer-multitask.html"><small>Agla →</small>Transfer learning aur multi-task learning</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

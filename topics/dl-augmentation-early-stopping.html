@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Data augmentation aur early stopping: Muft ka data aur sahi waqt pe rukna. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Data augmentation aur early stopping (DL · 2) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-improving-networks.html">DL · 2: Improving Deep Neural Networks</a> › Topic 4 / 15</nav>
+        <p class="eyebrow">DL · 2 · TOPIC 04 · REGULARIZATION</p>
+        <h1>Data augmentation aur early stopping</h1>
+        <p>Muft ka data aur sahi waqt pe rukna</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 2 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="i1" href="dl-train-dev-test-bias-variance.html"><span>01</span>Train/dev/test aur bias-variance</a>
+            <a data-topic-link="i2" href="dl-l2-regularization.html"><span>02</span>L2 regularization</a>
+            <a data-topic-link="i3" href="dl-dropout.html"><span>03</span>Dropout</a>
+            <a data-topic-link="i4" class="current" aria-current="page" href="dl-augmentation-early-stopping.html"><span>04</span>Data augmentation aur early stopping</a>
+            <a data-topic-link="i5" href="dl-normalizing-inputs.html"><span>05</span>Inputs normalize karna</a>
+            <a data-topic-link="i6" href="dl-vanishing-exploding-init.html"><span>06</span>Vanishing/exploding gradients aur weight initialization</a>
+            <a data-topic-link="i7" href="dl-gradient-checking.html"><span>07</span>Gradient checking</a>
+            <a data-topic-link="i8" href="dl-mini-batch.html"><span>08</span>Mini-batch gradient descent</a>
+            <a data-topic-link="i9" href="dl-exponentially-weighted-averages.html"><span>09</span>Exponentially weighted averages</a>
+            <a data-topic-link="i10" href="dl-momentum-rmsprop-adam.html"><span>10</span>Momentum, RMSprop aur Adam</a>
+            <a data-topic-link="i11" href="dl-learning-rate-decay-local-optima.html"><span>11</span>Learning rate decay aur local optima ka sach</a>
+            <a data-topic-link="i12" href="dl-hyperparameter-tuning.html"><span>12</span>Hyperparameter tuning ka tareeka</a>
+            <a data-topic-link="i13" href="dl-batch-normalization.html"><span>13</span>Batch normalization</a>
+            <a data-topic-link="i14" href="dl-softmax-regression.html"><span>14</span>Softmax regression</a>
+            <a data-topic-link="i15" href="dl-frameworks-tensorflow.html"><span>15</span>Deep learning frameworks aur TensorFlow</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15"><span>DL · 2 progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Do aur hathiyaar overfitting ke khilaaf — ek sasta aur asardaar, doosra aasan par ek chhupi kamzori ke saath.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Augmentation: flip, crop, rotate, distortion</li><li>Early stopping: dev error ka graph dekh ke rukna</li><li>Early stopping ki kamzori: do kaam ek knob se (orthogonalization)</li><li>L2 vs early stopping kab</li></ul></details>
+        <article class="lesson-card single" id="i4">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Data kam hai, model photo training pe perfect hai, dev pe nautanki. Aur photos collect karna mehenga hai.</p>
+              <p class="msg dost">To data ko gym bhejo. Same photo ke thode naye versions banao: flip, crop, rotate. Isko <strong>data augmentation</strong> bolte hain.</p>
+              <p class="msg me">Aur early stopping?</p>
+              <p class="msg dost">Woh train ko sahi station pe utarna hai. Dev error badhne lage to bol do: bas bhai, ab aur ratta mat maar.</p>
+            </div>
+            <h4>Augmentation: muft ka data, par sensible</h4>
+            <p>Augmentation existing examples ko realistic tarah se change karta hai. Agar model ko dogs recognize karna hai, dog left dekhe ya right, thoda crop ho, halka rotate ho — label dog hi rahega. Ye model ko noise aur small changes se robust banata hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Augmentation</th><th>Kab useful</th><th>Kab dikkat</th></tr>
+              <tr><td>Horizontal flip</td><td>Cars, animals, many objects</td><td>Text, traffic signs jahan direction meaning badle</td></tr>
+              <tr><td>Random crop</td><td>Object thoda idhar-udhar ho</td><td>Object ka important part kat jaye</td></tr>
+              <tr><td>Small rotate</td><td>Phone photo thoda tilted</td><td>Digits 6/9 jaisi classes confuse ho sakti</td></tr>
+              <tr><td>Color / distortion</td><td>Lighting change handle karna</td><td>Medical images mein color clinically important ho sakta</td></tr>
+            </table></div>
+            <figure class="figure">
+              <svg viewBox="0 0 430 190" role="img" aria-label="Ek image se flip crop aur rotate versions bante hain">
+                <rect x="25" y="50" width="80" height="80" rx="10" fill="#edf3ff" stroke="#3567e8"/>
+                <circle cx="65" cy="90" r="24" fill="#fff3ec" stroke="#e0703a"/>
+                <path d="M116,90 L160,90" stroke="#8a96aa" stroke-width="2"/>
+                <rect x="175" y="50" width="70" height="80" rx="10" fill="#e9f7f3" stroke="#159477"/>
+                <circle cx="210" cy="90" r="21" fill="#fff3ec" stroke="#e0703a"/>
+                <rect x="275" y="60" width="80" height="60" rx="10" fill="#f2edff" stroke="#7653d6"/>
+                <circle cx="315" cy="90" r="22" fill="#fff3ec" stroke="#e0703a"/>
+                <g font-size="11" text-anchor="middle" fill="#24324a">
+                  <text x="65" y="145">original</text><text x="210" y="145">crop</text><text x="315" y="145">flip/rotate</text>
+                </g>
+              </svg>
+              <div class="cap">Augmentation ka rule: badlav real world jaisa ho, label na badle.</div>
+            </figure>
+            <h4>Numbers: dataset ko “effective” bada banana</h4>
+            <p>Agar 5,000 photos hain aur har epoch mein har photo ka random crop/flip naya banta hai, to disk pe 50,000 files banana zaroori nahi. Data loader on-the-fly naye versions deta rahega. Model ko repeated same pixels kam milenge.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Original photos</th><th>Har photo ke random versions</th><th>Ek epoch mein seen examples</th></tr>
+              <tr><td>5,000</td><td>1 per epoch</td><td>5,000</td></tr>
+              <tr><td>5,000</td><td>10 epochs mein average 10 variants</td><td class="good">50,000 experiences jaisa</td></tr>
+            </table></div>
+            <pre class="code">augment = tf.keras.Sequential([
+    tf.keras.layers.RandomFlip("horizontal"),
+    tf.keras.layers.RandomRotation(0.05),
+    tf.keras.layers.RandomZoom(0.1),
+])  <span class="cm"># label same rahe, bas image thodi badle</span></pre>
+            <h4>Early stopping: dev error ka signal</h4>
+            <p>Training error aksar dheere-dheere ghat-ta rehta hai. Par dev error ek point ke baad badhne lag sakta hai, kyunki model training examples ko ratna shuru karta hai. Early stopping us best dev point pe training rok deta hai, ya best weights save kar leta hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Epoch</th><th>Train error</th><th>Dev error</th><th>Decision</th></tr>
+              <tr><td>1</td><td>18%</td><td>20%</td><td>Train more</td></tr>
+              <tr><td>5</td><td>8%</td><td class="good">10%</td><td>Best so far</td></tr>
+              <tr><td>9</td><td>4%</td><td>13%</td><td class="bad">Overfit start</td></tr>
+            </table></div>
+            <div class="formula"><code>Best epoch = jis epoch par dev error sabse kam ho</code><ul>
+              <li><b>Train error</b> = padhai notebook pe galti</li>
+              <li><b>Dev error</b> = mock test pe galti, model selection yahin se</li>
+              <li><b>Patience</b> = kitne epochs tak wait karna before stopping</li>
+            </ul></div>
+            <h4>Early stopping ki chhupi kamzori: ek knob, do kaam</h4>
+            <p>Deep learning mein ek clean habit hai: alag problem ke liye alag knob. Training cost ghataana optimization ka kaam hai. Overfitting rokna regularization ka kaam. Early stopping dono ko ek saath mix kar deta hai: tum training bhi rok rahe ho aur regularization bhi kar rahe ho.</p>
+            <div class="lesson-callout"><b>Orthogonalization ka matlab:</b> Agar high bias hai to optimizer/architecture/epochs handle karein. Agar high variance hai to L2/dropout/data handle karein. Early stopping convenient hai, par diagnosis thoda blur kar deta hai.</div>
+            <h4>L2 vs early stopping kab?</h4>
+            <div class="compare-grid">
+              <div><b>L2</b>Thoda λ tune karna padega, par training ko fully converge hone do. Clean regularization knob.</div>
+              <div><b>Early stopping</b>Fast aur easy. Jab compute limited ho ya quick baseline banana ho, kaafi practical.</div>
+            </div>
+            <p>Asli life mein dono use hote hain. Par beginner ke liye mental model: pehle L2/dropout/augmentation jaise regularizers samjho. Early stopping ko “training ka safety brake” samjho, magic cure nahi.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Augmentation aisa mat karo jo label badal de. Agar “6” ko 180° rotate karke “9” jaisa bana diya, model ko galat lesson mil gaya.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Augmentation model ko duniya ke natural variations dikhata hai; early stopping usse ratta maarne se pehle rokta hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Augmentation se real new information aati hai?</summary><p>Bilkul new object nahi aata, par model ko invariance milti hai: thoda shift, light, rotation badle to answer same. Ye practical mein bahut valuable hai.</p></details>
+            <details class="qa"><summary>Early stopping mein test error dekh ke ruk sakte?</summary><p>Nahi. Stop karne ke liye dev error. Test set final sealed report card hai.</p></details>
+            <details class="qa"><summary>L2 tune karna mehenga hai. Early stopping chalega?</summary><p>Haan, especially quick experiments mein. Bas yaad rakho ki ye optimization aur regularization ko mix karta hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Dev errors: epoch 1 = 18%, 2 = 14%, 3 = 12%, 4 = 13%. Best epoch?</summary><p>Sabse kam 12% epoch 3 pe hai. <b>final answer: epoch 3</b>.</p></details>
+              <details class="qa"><summary>Traffic sign classifier mein horizontal flip safe hai?</summary><p>Aksar nahi. Arrow ya text ka meaning badal sakta hai. Domain samajh ke augmentation choose karo.</p></details>
+              <details class="qa"><summary>Early stopping ko regularization kyu bol sakte hain?</summary><p>Kyuki training jaldi rokne se weights fully data ko rat nahi paate, overfitting kam ho sakti hai.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="i4"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-dropout.html"><small>← Pichhla</small>Dropout</a>
+          <a class="pager-next" href="dl-normalizing-inputs.html"><small>Agla →</small>Inputs normalize karna</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

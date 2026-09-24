@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Continuous states aur Deep Q-Network: Lunar lander, ε-greedy, soft update. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Continuous states aur Deep Q-Network (ML · 3) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../unsupervised.html">ML · 3: Unsupervised Learning, Recommenders, RL</a> › Topic 13 / 13</nav>
+        <p class="eyebrow">ML · 3 · TOPIC 13 · REINFORCEMENT LEARNING</p>
+        <h1>Continuous states aur Deep Q-Network</h1>
+        <p>Lunar lander, ε-greedy, soft update</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 3 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="u1" href="unsupervised-clustering.html"><span>01</span>Unsupervised learning aur clustering</a>
+            <a data-topic-link="u2" href="k-means.html"><span>02</span>K-means algorithm</a>
+            <a data-topic-link="u3" href="k-means-cost-choose-k.html"><span>03</span>K-means cost, initialization aur K chunna</a>
+            <a data-topic-link="u4" href="anomaly-gaussian.html"><span>04</span>Anomaly detection aur Gaussian</a>
+            <a data-topic-link="u5" href="anomaly-algorithm.html"><span>05</span>Anomaly detection algorithm aur evaluation</a>
+            <a data-topic-link="u6" href="recommender-features.html"><span>06</span>Recommender: item features ke saath</a>
+            <a data-topic-link="u7" href="collaborative-filtering.html"><span>07</span>Collaborative filtering aur binary labels</a>
+            <a data-topic-link="u8" href="mean-normalization.html"><span>08</span>Mean normalization, TensorFlow aur related items</a>
+            <a data-topic-link="u9" href="content-based-filtering.html"><span>09</span>Content-based filtering aur deep learning</a>
+            <a data-topic-link="u10" href="pca.html"><span>10</span>PCA — bahut features ko kam mein samet-na</a>
+            <a data-topic-link="u11" href="reinforcement-learning-basics.html"><span>11</span>Reinforcement learning basics</a>
+            <a data-topic-link="u12" href="q-function-bellman.html"><span>12</span>Q-function aur Bellman equation</a>
+            <a data-topic-link="u13" class="current" aria-current="page" href="deep-q-network.html"><span>13</span>Continuous states aur Deep Q-Network</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="u1,u2,u3,u4,u5,u6,u7,u8,u9,u10,u11,u12,u13"><span>ML · 3 progress</span><strong data-progress-label>0 / 13 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Asli duniya ke RL ka tareeka — aur poore course ko jodne wala aakhri topic.</div>
+        
+        
+        <article class="lesson-card single" id="u13">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Gali mein 5 ghar the, table ban gayi. Asli robot ya game mein to lakhon states hongi?</p>
+              <p class="msg dost">Lakhon bhi kam bol diya — continuous states mein practically infinite! Chaand pe utarne wala chhota spaceship socho (lunar lander game). State: x position, y position, x speed, y speed, kitna tedha, tedha hone ki speed, aur dono pair zameen ko chhoo rahe hain ya nahi. <strong>8 numbers</strong>, aur kai numbers decimals. Table banana namumkin.</p>
+              <p class="msg me">To Q kaise yaad rakhein?</p>
+              <p class="msg dost"><strong>Neural network</strong> se! Table ki jagah ek network jo state dekh ke har action ka Q bata de. Isko <strong>Deep Q-Network (DQN)</strong> kehte hain.</p>
+            </div>
+            <h4>Lunar lander</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Actions (4)</th><th>Rewards (examples)</th></tr>
+              <tr><td>Kuch mat karo</td><td>Landing pad pe sahi utra: +100 se +140</td></tr>
+              <tr><td>Left engine chalao</td><td>Pad ki taraf aaya: + / door gaya: −</td></tr>
+              <tr><td>Main (neeche wala) engine</td><td>Crash: −100 · Aaram se ruka: +100</td></tr>
+              <tr><td>Right engine chalao</td><td>Har pair zameen pe: +10 · Main engine har frame: −0.3 (fuel)</td></tr>
+            </table></div>
+            <h4>Network ka design</h4>
+            <div class="visual-flow"><span>State s<br><small>8 numbers</small></span><b>→</b><span>Hidden 64 (ReLU)</span><b>→</b><span>Hidden 64 (ReLU)</span><b>→</b><span class="flow-highlight">4 outputs: Q(s, har action)</span></div>
+            <p>Ek baar network chalao aur chaaron actions ke Q ek saath mil jaate hain — max wala chuno. (Shuru mein state + action dono input dene ka idea aa sakta hai, par 4 outputs wala design zyada efficient hai.)</p>
+            <h4>Training data kahan se? Bellman se khud banao!</h4>
+            <div class="chat">
+              <p class="msg dost">Lander ko khelne do. Har step pe note karo: (s, a, R(s), s') — “yahan tha, ye kiya, itna mila, yahan pahuncha”. Is tuple ko <strong>experience</strong> kehte hain. Aakhri 10,000 experiences ek dabbe mein rakho — <strong>replay buffer</strong>.</p>
+              <p class="msg dost">Ab supervised learning jaisa banao: input x = s (aur a), target y = R(s) + γ × max Q(s', a') — ye Q current network se hi nikaalo. Phir network ko x → y pe train karo. Network thoda better hua → agli baar targets better → aur better. Bellman ko baar baar lagaana.</p>
+            </div>
+            <div class="visual-flow"><span>Khelo, experiences jama karo</span><b>→</b><span>Buffer se (s, a, R, s') lo</span><b>→</b><span>y = R + γ·max Q(s')</span><b>→</b><span class="flow-highlight">Network ko y pe train</span><b>↻</b></div>
+            <h4>ε-greedy — naya try karo ya jaana-pehchana?</h4>
+            <div class="chat">
+              <p class="msg me">Hamesha best Q wala action hi kyu na lein?</p>
+              <p class="msg dost">Shuru mein network ka andaaza random hai. Maan lo usne galti se socha “main engine = bekaar” — to kabhi try hi nahi karega aur kabhi seekhega hi nahi ki woh zaroori hai! Naye restaurant ki tarah: hamesha purane favourite mein gaye to naya achha kabhi nahi milega.</p>
+              <p class="msg dost"><strong>ε-greedy:</strong> 95% baar best action (<em>exploitation</em>), 5% baar random action (<em>exploration</em>). ε = 0.05. Aksar shuru mein ε = 1 (sab random — bachcha duniya explore kar raha), aur dheere dheere 0.01 tak ghatao.</p>
+            </div>
+            <h4>Do aur sudhaar</h4>
+            <div class="compare-grid">
+              <div><b>Mini-batch</b>Har step pe poore 10,000 experiences pe train karna slow. Random 1000 lo aur unpe update. Thoda shor wala par bahut fast. (Supervised learning mein bhi yahi trick use hoti hai.)</div>
+              <div><b>Soft update (target network)</b>Naye network se purana ek jhatke mein replace karne se targets achanak badalte hain aur training hil jaati hai. Isliye dheere: Q_purana = 0.01 × Q_naya + 0.99 × Q_purana. Stable learning.</div>
+            </div>
+            <h4>RL ki limitations — sach bolna zaroori</h4>
+            <ul>
+              <li>Simulation (game) mein kaam karna, asli robot pe kaam karne se bahut aasan hai.</li>
+              <li>Supervised aur unsupervised learning ke mukable abhi practical applications kam hain.</li>
+              <li>Phir bhi research mein bahut exciting hai, aur future mein bada potential hai. Bas hype aur reality ko alag rakhna.</li>
+            </ul>
+            <div class="lesson-callout"><b>Poore course ki badi picture:</b> Supervised = answers se seekho (regression, classification, neural nets, trees). Unsupervised = bina answers ke structure dhundho (clustering, anomaly, PCA). Recommenders = preferences se ranking. RL = actions aur rewards se strategy seekho. Sab ke peeche wahi ek idea: <em>ek cost/goal define karo, aur gradient/feedback se dheere dheere sudharo.</em></div>
+            <div class="oneliner"><b>Yaad rakhna:</b> DQN = neural network jo Q values yaad rakhta hai; training data Bellman se, exploration ε-greedy se, stability mini-batch + soft update se.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Target y bhi usi network se aata hai jo train ho raha — ye ghumaav wala nahi?</summary><p>Haan, isliye stability tricks (target network + soft update, replay buffer) zaroori hain. Dheere badalne wale targets se network apna hi “peecha nahi karta”.</p></details>
+            <details class="qa"><summary>Replay buffer kyu? Seedha abhi ke experience se kyu nahi?</summary><p>Lagatar steps ek jaise hote hain (ek hi situation ke paas). Random purane experiences milane se data zyada variety wala hota hai aur har experience kai baar kaam aata hai.</p></details>
+            <details class="qa"><summary>Lunar lander kaise try karun?</summary><p>Python ki <code>gymnasium</code> library mein “LunarLander” environment hai. Course lab mein bhi yahi banate hain. Pehle trained agent dekhna, phir random agent — difference dekh ke maza aata hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>ε = 0.1 ka matlab?</summary><p>10% baar random action (exploration).</p></details>
+              <details class="qa"><summary>Soft update kyu?</summary><p>Targets dheere badlein, training stable rahe.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="u13"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="q-function-bellman.html"><small>← Pichhla</small>Q-function aur Bellman equation</a>
+          <a class="pager-next" href="dl-what-is-deep-learning.html"><small>Agla · DL · 1 →</small>Deep learning kya hai, aur ab hi kyu chal pada?</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

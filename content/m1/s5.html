@@ -1,0 +1,57 @@
+
+            <div class="chat">
+              <p class="msg me">Asli life mein price sirf size se to decide nahi hota.</p>
+              <p class="msg dost">Bilkul. Bedrooms, floors, ghar kitna purana hai — sab matter karta hai. To har cheez ko ek <strong>feature</strong> banao, aur har feature ko uska apna <strong>weight</strong> do.</p>
+              <p class="msg me">Formula lamba ho jayega?</p>
+              <p class="msg dost">Thoda. Par idea wahi: har feature × uska weight, sab jodo, + b. Jaise dukaan ka bill — har item × uski quantity, sab jodo, + delivery charge.</p>
+            </div>
+            <div class="formula"><code>f(x) = w₁x₁ + w₂x₂ + w₃x₃ + w₄x₄ + b</code><ul><li>x₁ = size, x₂ = bedrooms, x₃ = floors, x₄ = umar (saal). Har x ka apna w.</li></ul></div>
+            <p>Haan, formula lamba dikhta hai. Par asli kaam wahi dukaan-bill wala hai: har clue ka apna rate, sabka total.</p>
+            <p>Maan lo model ne seekha: <strong>price = 0.04×size + 3×bedrooms + 2×floors − 0.5×umar + 10</strong> (lakh mein). Ghar: 1200 sq ft, 3 bedroom, 2 floor, 10 saal purana.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Feature</th><th>Weight × value</th><th>Contribution</th></tr>
+              <tr><td>Size</td><td>0.04 × 1200</td><td>+48</td></tr>
+              <tr><td>Bedrooms</td><td>3 × 3</td><td>+9</td></tr>
+              <tr><td>Floors</td><td>2 × 2</td><td>+4</td></tr>
+              <tr><td>Umar</td><td>−0.5 × 10</td><td>−5</td></tr>
+              <tr><td>b</td><td></td><td>+10</td></tr>
+              <tr><td><b>Total</b></td><td></td><td class="good">66 lakh</td></tr>
+            </table></div>
+            <p><strong>Weights padhna seekho:</strong> umar ka weight minus hai → har saal purana hone pe 0.5 lakh kam. Bedroom ka +3 → har extra bedroom 3 lakh zyada.</p>            <figure class="figure">
+              <svg viewBox="0 0 420 170" role="img" aria-label="Multiple features ke contributions stacked blocks: size, bedrooms, floors, age, bias">
+                <rect x="20" y="35" width="192" height="34" rx="6" fill="#edf3ff"/><text x="116" y="57" font-size="11" text-anchor="middle" fill="#3567e8">size +48</text>
+                <rect x="214" y="35" width="36" height="34" rx="6" fill="#e9f7f3"/><text x="232" y="57" font-size="11" text-anchor="middle" fill="#159477">+9</text>
+                <rect x="252" y="35" width="18" height="34" rx="6" fill="#e9f7f3"/><text x="261" y="57" font-size="11" text-anchor="middle" fill="#159477">+4</text>
+                <rect x="272" y="35" width="20" height="34" rx="6" fill="#fff3ec"/><text x="282" y="57" font-size="11" text-anchor="middle" fill="#c2410c">−5</text>
+                <rect x="294" y="35" width="40" height="34" rx="6" fill="#f2edff"/><text x="314" y="57" font-size="11" text-anchor="middle" fill="#7653d6">b +10</text>
+                <line x1="20" y1="95" x2="334" y2="95" stroke="#b8c2d3"/><text x="334" y="115" font-size="11" text-anchor="end" fill="#17223b">Total = 66 lakh</text>
+                <text x="20" y="25" font-size="11" fill="#7a879b">Har block final prediction mein apna contribution daalta hai</text>
+              </svg>
+              <div class="cap">Prediction ek total bill jaisa hai: kuch features add karte hain, purana ghar jaise kuch minus bhi kar sakte hain.</div>
+            </figure>
+            <h4>Kai ghar ek saath</h4>
+            <p>Ab wahi formula 3 gharon pe lagao. Ye table sirf dot product ko khol ke dikhata hai, taaki NumPy wali line black box na lage.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Ghar</th><th>Features (size, bed, floor, umar)</th><th>Hisaab</th><th>Prediction</th></tr>
+              <tr><td>A</td><td>[1200, 3, 2, 10]</td><td>48 + 9 + 4 − 5 + 10</td><td>66 lakh</td></tr>
+              <tr><td>B</td><td>[800, 2, 1, 5]</td><td>32 + 6 + 2 − 2.5 + 10</td><td>47.5 lakh</td></tr>
+              <tr><td>C</td><td>[1500, 4, 2, 0]</td><td>60 + 12 + 4 + 0 + 10</td><td>86 lakh</td></tr>
+            </table></div>
+            <p>Ab tak theek? Bas har row ke saath wahi bill-wala hisaab repeat ho raha hai. Vectorization bas in rows ko ek saath calculate kar deta hai.</p>
+
+            <h4>Vector aur vectorization</h4>
+            <p>Itne saare w aur x alag likhna thaka deta hai. To inko <strong>list</strong> bana do: w = [0.04, 3, 2, −0.5], x = [1200, 3, 2, 10]. Numbers ki is list ko <strong>vector</strong> kehte hain. “Dot product” = pair-by-pair multiply karo aur sab jodo — wahi jo upar table mein kiya!</p>
+<pre class="code">import numpy as np
+w = np.array([0.04, 3, 2, -0.5])
+x = np.array([1200, 3, 2, 10])
+b = 10
+price = np.dot(w, x) + b   <span class="cm"># 66.0 — ek line mein poora hisaab</span></pre>
+            <p><strong>Vectorization kyu?</strong> 100 rotiyan banana hai. Ek chhote tawe pe ek-ek (for loop) ya bade tandoor mein ek saath (vectorized)? Computer ka hardware ek saath bahut saari calculations kar sakta hai. np.dot use karo, loop nahi — code chhota bhi aur kai guna fast bhi.</p>
+            <p>Gradient descent bilkul same chalta hai — bas ab har w₁, w₂, w₃… ko uske apne slope se update karte hain.</p>
+            <div class="lesson-callout"><b>Normal equation (side note):</b> Sirf linear regression ke liye ek direct formula bhi hai jo bina steps ke w, b de deta hai. Par ye doosre models pe kaam nahi karta aur features bahut zyada ho to slow hai. Libraries kabhi andar use karti hain; tumhare liye gradient descent samajhna zyada kaam ka hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Multiple features mein bhi model bill jaisa hai — har feature ka contribution jodo, phir b add karo.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>x₁ aur x⁽¹⁾ — dono mein 1 hai, farak kya?</summary><p>Neeche chhota wala (x₁) = <strong>kaunsa feature</strong> (column), jaise size. Upar bracket wala (x⁽¹⁾) = <strong>kaunsa example</strong> (row), jaise pehla ghar. To x₂⁽³⁾ = teesre ghar ke bedrooms.</p></details>
+            <details class="qa"><summary>Vector sunke physics wala arrow yaad aata hai 😅</summary><p>Yahan vector bas numbers ki ek line mein likhi list hai. Koi arrow, koi direction nahi.</p></details>
+            <details class="qa"><summary>Bada weight matlab zyada important feature?</summary><p>Careful! Size ka weight 0.04 chhota dikhta hai, par size khud 1200 jaisa bada number hai, to uska contribution 48 hai — sabse bada. Weights compare karne se pehle features ko same scale pe laana padta hai (next topic).</p></details>
+            <details class="qa"><summary>Kitne features daal sakte hain?</summary><p>Bahut saare. Par bekaar features noise laate hain aur model ratne lagta hai (overfitting, topic 11). Quality &gt; quantity.</p></details>            <details class="qa"><summary>Agar ek feature missing ho to?</summary><p>Real projects mein ye common hai. Ya to missing value ko sensible default/median se bharo, ya “missing hai” naam ka extra haan/na feature add karo. Bas training aur prediction dono jagah same rule lagna chahiye.</p></details>

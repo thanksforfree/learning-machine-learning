@@ -1,0 +1,79 @@
+            <div class="chat">
+              <p class="msg me">Mere paas do models hain. Ek ka precision high, doosre ka recall high. Winner kaun?</p>
+              <p class="msg dost">Agar har meeting mein ye discussion 40 minute chal raha hai, to tumhe metric problem hai, model problem nahi.</p>
+              <p class="msg me">Metric problem?</p>
+              <p class="msg dost">Haan. Team ko ek scoreboard chahiye. Warna har insaan apni favourite number leke argument jeetne aayega.</p>
+              <p class="msg me">To ek hi number bana dein?</p>
+              <p class="msg dost">Mostly yes. Ek <strong>optimizing metric</strong> rakho jisko improve karna hai. Baaki constraints ko “itna to hona hi chahiye” bana do.</p>
+            </div>
+
+            <h4>Ek number kyu?</h4>
+            <p>ML project mein speed bahut matter karti hai. Tum 20 models train karoge. Agar har model ke liye 5 numbers compare karne pad rahe hain, decision slow ho jaata hai. Ek number wala metric tumhe quick “A better than B” bolne deta hai.</p>
+            <p>Ye number perfect sach nahi hota. Ye team ka compass hota hai. Compass thoda rough ho sakta hai, par direction clear honi chahiye.</p>
+
+            <h4>Precision, recall aur F1</h4>
+            <p>Rare positive problems mein accuracy dhokha deti hai. UPI fraud mein 99.7% transactions genuine hain. “Sabko genuine bolo” to accuracy high, par fraud pakda zero. Yahan precision aur recall kaam aate hain.</p>
+            <div class="formula"><code>precision = TP / (TP + FP)
+recall = TP / (TP + FN)
+F1 = 2 × precision × recall / (precision + recall)</code><ul>
+              <li><b>TP</b> = fraud tha, model ne fraud bola</li>
+              <li><b>FP</b> = genuine tha, model ne fraud bola; customer irritate</li>
+              <li><b>FN</b> = fraud tha, model miss kar gaya; paisa gaya</li>
+              <li><b>F1</b> = precision aur recall ka balanced single number</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Model</th><th>TP</th><th>FP</th><th>FN</th><th>Precision</th><th>Recall</th><th>F1</th></tr>
+              <tr><td>A</td><td>80</td><td>20</td><td>80</td><td>80/100 = 80%</td><td>80/160 = 50%</td><td>2×0.8×0.5/1.3 = <b>61.5%</b></td></tr>
+              <tr><td>B</td><td>120</td><td>80</td><td>40</td><td>120/200 = 60%</td><td>120/160 = 75%</td><td>2×0.6×0.75/1.35 = <b>66.7%</b></td></tr>
+            </table></div>
+            <p>F1 ke hisaab se B jeeta. Lekin agar FP ka cost bahut high hai, tum F1 ke bajay precision constraint laga sakte ho. Metric business pain se judna chahiye, ego se nahi.</p>
+
+            <h4>Kai customer segments ka average</h4>
+            <p>Grocery recommendation app bana rahe ho. Dev set mein naye users, weekly buyers, festival shoppers, aur wholesale buyers hain. Har segment ka error alag aa sakta hai. Single metric ke liye average lo, par individual rows bhi dekhte raho.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Segment</th><th>Error</th><th>Note</th></tr>
+              <tr><td>Naye users</td><td>6%</td><td>History kam</td></tr>
+              <tr><td>Weekly buyers</td><td>4%</td><td class="good">Data stable</td></tr>
+              <tr><td>Festival shoppers</td><td>11%</td><td class="bad">Seasonal basket alag</td></tr>
+              <tr><td>Wholesale buyers</td><td>7%</td><td>Bulk pattern</td></tr>
+              <tr><td><b>Average</b></td><td><b>(6+4+11+7)/4 = 7%</b></td><td class="good">Single score</td></tr>
+            </table></div>
+            <p>Average metric useful hai, par "Festival shoppers 11%" row ko ignore mat karo. Product mein ek segment ko consistently kharab experience mil raha ho to team ko pata hona chahiye.</p>
+
+            <h4>Satisficing vs optimizing</h4>
+            <p>Har number ko maximize karna zaroori nahi. Kuch numbers bas acceptable limit ke andar hone chahiye.</p>
+            <div class="compare-grid">
+              <div><b>Optimizing metric</b>Isko jitna ho sake improve karna hai. Jaise F1 ya average accuracy.</div>
+              <div><b>Satisficing metric</b>Bas threshold pass karo. Jaise prediction 100 ms se kam, model size 30 MB se kam.</div>
+            </div>
+            <p>Example: kirana invoice scanner app bill ki line-items padhkar accounting entry banata hai. Main goal extraction accuracy hai. Par agar bahut bills manual review mein chale gaye ya scan bahut slow hua, shopkeeper use nahi karega.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Model</th><th>Extraction accuracy</th><th>Manual review</th><th>Latency</th><th>Decision</th></tr>
+              <tr><td>A</td><td>94%</td><td>3.5%</td><td>420 ms</td><td class="good">Pass: optimize accuracy</td></tr>
+              <tr><td>B</td><td>95%</td><td>7.2%</td><td>390 ms</td><td class="bad">Reject: review limit fail</td></tr>
+              <tr><td>C</td><td>93%</td><td>2.0%</td><td>900 ms</td><td class="bad">Reject: latency limit fail</td></tr>
+            </table></div>
+            <p>Yahan rule: maximize extraction accuracy, subject to manual review &lt; 5% and latency &lt; 700 ms. Bas. Debate khatam.</p>
+
+            <h4>N metrics ka simple rule</h4>
+            <p>Agar N metrics hain, ek ko optimizing banao, baaki N − 1 ko satisficing. Isse team ko pata rahega ki hill kis direction mein chadhna hai, aur kin khaiyon mein nahi girna.</p>
+            <div class="visual-flow">
+              <span>Accuracy/F1<br><small>optimize</small></span><b>+</b>
+              <span>Latency<br><small>&lt; limit</small></span><b>+</b>
+              <span>Memory<br><small>&lt; limit</small></span><b>+</b>
+              <span class="flow-highlight">Winner<br><small>clear choice</small></span>
+            </div>
+            <div class="mistake"><b>Dhyan rakhna:</b> “Accuracy bhi, latency bhi, fairness bhi, size bhi — sab improve karo” bolna strategy nahi hai. Pehle decide karo kaunsa score optimize hoga aur kaunse gate pass karne hain.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Metric meeting ko chhota karta hai. Ek scoreboard banao, constraints likho, phir experiments fast chalao.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>F1 hamesha best metric hai?</summary><p>Nahi. F1 precision aur recall ko equal weight deta hai. Agar cancer screening mein recall bahut zyada important hai, F1 se zyada recall-constrained metric better ho sakta hai.</p></details>
+            <details class="qa"><summary>Average segment error se problem chhup sakti hai?</summary><p>Haan. Isliye optimizing metric average ho sakta hai, par dashboard mein per-segment breakdown zaroor rakho. Metric decision ke liye hai, aankh band karne ke liye nahi.</p></details>
+            <details class="qa"><summary>Thresholds kaise set karein?</summary><p>User pain aur system limits se. Agar app 200 ms ke baad slow feel hota hai, latency threshold 200 ms nahi, thoda safe 150 ms rakho.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Model ne 50 fraud pakde, 10 genuine ko fraud bola, aur 25 fraud miss kiye. Precision, recall, F1?</summary><p>Precision = 50/(50+10) = 83.3%. Recall = 50/(50+25) = 66.7%. F1 = 2×0.833×0.667/(1.5) ≈ 74.1%. <b>Final answer: F1 ≈ 74%</b>.</p></details>
+              <details class="qa"><summary>Delivery ETA model: error kam karna hai, par response 80 ms se kam aur model 20 MB se kam hona chahiye. Optimizing kya?</summary><p>Optimizing metric ETA error hoga. Latency &lt; 80 ms aur size &lt; 20 MB satisficing constraints. <b>Final answer: 1 optimizing, 2 satisficing</b>.</p></details>
+              <details class="qa"><summary>Chaar customer segments ke errors 3%, 8%, 5%, 12%. Average?</summary><p>(3 + 8 + 5 + 12) / 4 = 28/4 = 7%. <b>Final answer: 7%</b>.</p></details>
+            </div>

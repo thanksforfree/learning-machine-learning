@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Activation functions: Sigmoid, ReLU, linear — kab kaunsa. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Activation functions (ML · 2) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a class="active" href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../ml.html">Machine Learning Specialization</a> › <a href="../advanced.html">ML · 2: Advanced Learning Algorithms</a> › Topic 4 / 12</nav>
+        <p class="eyebrow">ML · 2 · TOPIC 04 · NEURAL NETWORKS</p>
+        <h1>Activation functions</h1>
+        <p>Sigmoid, ReLU, linear — kab kaunsa</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>ML · 2 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="a1" href="neural-network-idea.html"><span>01</span>Neural network ka idea</a>
+            <a data-topic-link="a2" href="forward-propagation.html"><span>02</span>Forward propagation</a>
+            <a data-topic-link="a3" href="tensorflow.html"><span>03</span>TensorFlow mein network banana</a>
+            <a data-topic-link="a4" class="current" aria-current="page" href="activation-functions.html"><span>04</span>Activation functions</a>
+            <a data-topic-link="a5" href="softmax-multiclass.html"><span>05</span>Multiclass aur softmax</a>
+            <a data-topic-link="a6" href="backprop-adam.html"><span>06</span>Backpropagation aur Adam</a>
+            <a data-topic-link="a7" href="train-cv-test.html"><span>07</span>Training, CV aur test set</a>
+            <a data-topic-link="a8" href="bias-variance.html"><span>08</span>Bias aur variance</a>
+            <a data-topic-link="a9" href="ml-development-cycle.html"><span>09</span>ML development cycle</a>
+            <a data-topic-link="a10" href="precision-recall.html"><span>10</span>Precision, recall aur F1</a>
+            <a data-topic-link="a11" href="decision-trees.html"><span>11</span>Decision tree, entropy aur information gain</a>
+            <a data-topic-link="a12" href="random-forest-xgboost.html"><span>12</span>Random forest aur XGBoost</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12"><span>ML · 2 progress</span><strong data-progress-label>0 / 12 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Activation ke bina neural network sirf ek seedhi line hai. Sahi choice training speed aur output dono decide karti hai.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z2" href="maths-graphs.html"><small>Maths</small>Graph, line aur slope</a></div></div>
+        
+        <article class="lesson-card single" id="a4">
+          <div class="lesson-body">
+
+            <div class="chat">
+              <p class="msg me">Code mein “relu” likha tha. Sigmoid hi har jagah laga dete, simple rehta na?</p>
+              <p class="msg dost">Kaash! Activation function decide karta hai neuron apna z kis shape mein bahar bheje. Teen common options hain, aur har ek ka apna mood aur kaam hai.</p>
+            </div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Naam</th><th>Kya karta hai</th><th>Output range</th><th>Kahan use</th></tr>
+              <tr><td><b>Sigmoid</b></td><td>S-shape, 0–1 mein daba deta</td><td>0 se 1</td><td>Output layer jab answer haan/na ho</td></tr>
+              <tr><td><b>ReLU</b></td><td>Negative → 0, positive → waisa hi</td><td>0 se ∞</td><td>Hidden layers ka default. Output jab answer negative na ho sake (price)</td></tr>
+              <tr><td><b>Linear</b></td><td>Kuch nahi, z hi output</td><td>−∞ se ∞</td><td>Output jab answer + ya − dono ho sake (kal ka profit/loss)</td></tr>
+            </table></div>
+            <p><strong>ReLU example:</strong> z = −3 ho to 0, z = 0 ho to 0, z = 2.5 ho to 2.5. Socho traffic signal ka “go” gate: negative ya zero pe gate band, positive pe jitna signal aaya utna pass.</p>
+            <h4>Sabse important sawaal: activation zaroori hi kyu hai?</h4>
+            <div class="chat">
+              <p class="msg me">Har jagah linear rakh dein to kya problem?</p>
+              <p class="msg dost">Socho: “kisi number ko 2 se multiply karo, phir 3 se, phir 5 se” — ye 10 layers bhi mil ke bas “30 se multiply” ek hi step hai. Waise hi linear layers kitni bhi stack karo, sab mil ke <strong>ek hi seedhi line</strong> ban jaati hain. Network ka size bekaar gaya.</p>
+              <p class="msg dost">ReLU jaisa non-linear activation har layer ko thoda “modne” (bend karne) ki power deta hai. Bahut saare chhote mod mil ke koi bhi complex curve bana sakte hain.</p>
+            </div>
+            <p><strong>Hidden layers mein sigmoid kyu nahi?</strong> Sigmoid dono side pe flat ho jaata hai → wahan slope almost 0 → gradient descent bahut slow. ReLU simple aur fast hai.</p>
+
+            <h4>Ek hi z, teen activations</h4>
+            <div class="chat"><p class="msg me">Activation ko shape bol rahe ho, par output actually kitna badalta hai?</p><p class="msg dost">Chalo same z values pe teen functions chala ke dekhte hain. Numbers dekhoge to intuition pakki ho jayegi.</p></div>
+            <div class="table-wrap"><table class="calc"><tr><th>z</th><th>Sigmoid</th><th>ReLU</th><th>Linear</th><th>Feel</th></tr><tr><td>−2</td><td>0.12</td><td>0</td><td>−2</td><td>Sigmoid small chance, ReLU gate band</td></tr><tr><td>0</td><td>0.50</td><td>0</td><td>0</td><td>Sigmoid beech mein neutral</td></tr><tr><td>3</td><td>0.95</td><td>3</td><td>3</td><td>Positive signal pass</td></tr></table></div>
+            <p>Hidden layer mein hume signals ko bend karna hota hai, isliye ReLU ka “negative hatao, positive rakho” kaafi useful hai. Output layer mein hume answer ki type respect karni hoti hai.</p>
+            <div class="compare-grid"><div><b>Probability chahiye</b>0 se 1 ke beech answer: sigmoid ya softmax.</div><div><b>Raw number chahiye</b>Temperature change, profit/loss jaise plus-minus answer: linear.</div></div>
+            <h4>Output layer ka final decision tree</h4>
+            <p>Activation choose karte waqt bas answer ki nature dekho. Ye chhota table confusion bachata hai:</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Problem</th><th>Answer range</th><th>Output activation</th><th>Typical loss</th></tr><tr><td>Spam hai?</td><td>0–1 chance</td><td>Sigmoid</td><td>Binary crossentropy</td></tr><tr><td>Digit 0–9</td><td>10 chances, total 1</td><td>Softmax</td><td>Categorical crossentropy</td></tr><tr><td>Kal profit/loss</td><td>−∞ to ∞</td><td>Linear</td><td>MSE/MAE</td></tr><tr><td>Views count</td><td>0 ya positive</td><td>ReLU/linear</td><td>MSE/Poisson</td></tr></table></div>
+            <p>Haan, exceptions hoti hain. Par beginner ke liye ye table 90% practical choices cover kar deta hai.</p>
+            <div class="lesson-callout"><b>Beginner checkpoint:</b> Hidden activation model ki learning power decide karta hai; output activation answer ki range decide karta hai. Dono ko same problem mat samjho.</div>
+            <p>Activation ka choice training speed bhi affect karta hai. ReLU ka derivative positive side pe simple 1 hota hai, isliye gradient ka signal kaafi clean pass hota hai. Sigmoid edges pe almost flat ho jaata hai, wahan learning “so jaati” hai.</p>
+            <p>Rule yaad rakho: hidden layers ko flexibility chahiye, output layer ko valid answer range chahiye. Dono decisions alag-alag socho.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Hidden layers → ReLU. Output layer → answer ki type dekh ke (haan/na → sigmoid, koi bhi number → linear, sirf positive → ReLU).</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Output layer ka activation ek line mein kaise yaad rakhun?</summary><p>“Answer kaisa dikhta hai?” Haan/na → sigmoid. Kabhi negative nahi → ReLU. Plus-minus dono → linear. Kai categories mein se ek → softmax (next topic).</p></details>
+            <details class="qa"><summary>ReLU ka 0 wala flat hissa problem nahi karta?</summary><p>Kabhi kabhi kuch neurons “so jaate hain” (hamesha 0). Par practice mein ReLU simple, fast aur kaafi reliable hai, isliye default ban gaya. Agar issue aaye to Leaky ReLU jaise variants try karte hain.</p></details>
+
+            <details class="qa"><summary>Sigmoid hidden layer mein kabhi use hota hai?</summary><p>Ho sakta hai, par deep networks mein aksar slow kar deta hai kyunki edges pe slope bahut chhota ho jaata hai. Isliye hidden layers mein ReLU family zyada common hai.</p></details>
+            <details class="qa"><summary>Output price ke liye ReLU ya linear?</summary><p>Dono try ho sakte hain. Price negative nahi ho sakta, isliye ReLU safe lagta hai. Par kai log linear output rakhte hain aur data/loss se model ko sensible range sikha dete hain.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Ghar ka price (kabhi negative nahi) — output activation?</summary><p><b>ReLU</b> (linear bhi chal jaata hai).</p></details>
+              <details class="qa"><summary>ReLU(−2) aur ReLU(3)?</summary><p>0 aur 3.</p></details>
+            </div>
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="a4"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="tensorflow.html"><small>← Pichhla</small>TensorFlow mein network banana</a>
+          <a class="pager-next" href="softmax-multiclass.html"><small>Agla →</small>Multiclass aur softmax</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

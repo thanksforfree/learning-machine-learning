@@ -1,0 +1,80 @@
+            <div class="chat">
+              <p class="msg me">Dost, network train ho gaya. Accuracy bhi ek number aa gaya. Ab khush ho jaun?</p>
+              <p class="msg dost">Thoda ruk. Exam wali analogy le: practice notebook pe 99% score ka matlab board exam mein bhi 99% hoga, ye guarantee nahi.</p>
+              <p class="msg me">To phir model ko honest tareeke se kaise pakdein?</p>
+              <p class="msg dost">Data ko teen dabbon mein baanto: <strong>train</strong> padhai ke liye, <strong>dev</strong> model chunne ke liye, aur <strong>test</strong> final report card ke liye.</p>
+            </div>
+            <h4>Data split: purana rule vs big data rule</h4>
+            <p>Pehle datasets chhote hote the, isliye 60/20/20 split popular tha. Matlab 60% training, 20% dev, 20% test. Par agar tumhare paas 10 lakh examples hain, to dev/test ko 2 lakh examples dena aksar zaroori nahi. 10,000 dev examples bhi model compare karne ke liye kaafi stable ho sakte hain.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Total data</th><th>Purana 60/20/20</th><th>Bade data ka 98/1/1</th><th>Feel</th></tr>
+              <tr><td>10,000</td><td>6,000 / 2,000 / 2,000</td><td>9,800 / 100 / 100</td><td class="bad">Dev/test chhote pad sakte</td></tr>
+              <tr><td>10,00,000</td><td>6,00,000 / 2,00,000 / 2,00,000</td><td>9,80,000 / 10,000 / 10,000</td><td class="good">Training ko zyada data mila ✓</td></tr>
+            </table></div>
+            <p>Rule ratna nahi hai. Sawaal ye hai: dev set itna bada ho ki do models ka farak reliably dikh jaye, aur test set itna ho ki final number pe bharosa aaye.</p>
+            <h4>Dev aur test same duniya se aane chahiye</h4>
+            <p>Socho tum Zomato review classifier bana rahe ho. Dev set Delhi ke restaurant reviews se hai, test set Mumbai slang wale reviews se. Ab dev pe best model choose karoge, par test pe alag game niklega. Ye aisa hai jaise practice spin bowling pe ki aur final mein fast bouncer aa gaya.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 420 170" role="img" aria-label="Train data mixed hai, dev aur test same future user distribution se hain">
+                <rect x="25" y="35" width="110" height="70" rx="12" fill="#edf3ff" stroke="#3567e8"/>
+                <rect x="155" y="35" width="110" height="70" rx="12" fill="#e9f7f3" stroke="#159477"/>
+                <rect x="285" y="35" width="110" height="70" rx="12" fill="#e9f7f3" stroke="#159477"/>
+                <g font-size="11" text-anchor="middle" fill="#24324a">
+                  <text x="80" y="62">Train</text><text x="80" y="82">jitna ho sake</text>
+                  <text x="210" y="62">Dev</text><text x="210" y="82">future users</text>
+                  <text x="340" y="62">Test</text><text x="340" y="82">same future users</text>
+                </g>
+                <path d="M210,112 C220,145 330,145 340,112" fill="none" stroke="#159477" stroke-width="2"/>
+                <text x="275" y="158" font-size="11" text-anchor="middle" fill="#159477">dev-test same distribution</text>
+              </svg>
+              <div class="cap">Train thoda mixed ho sakta hai; dev/test woh duniya honi chahiye jahan model chalega.</div>
+            </figure>
+            <div class="mistake"><b>Dhyan rakhna:</b> Dev set ko baar-baar dekh ke model tune karte ho. Isliye test set ko end tak “sealed envelope” rakho. Test pe tune karna cheating jaisa hai.</div>
+            <h4>Sirf dev set, test nahi — kab chalega?</h4>
+            <p>Kabhi project research/learning stage mein hota hai. Tumhe bas model A vs B choose karna hai, public final number report nahi karna. Tab train/dev split se kaam chal sakta hai. Par product launch, paper, client demo, ya benchmark report karna ho, to test set alag rakho.</p>
+            <div class="compare-grid">
+              <div><b>Dev set</b>Roz ka mock test. Ispe architecture, λ, learning rate, dropout sab choose karte ho.</div>
+              <div><b>Test set</b>Final board exam. Iska number tab bolo jab decisions freeze ho chuke hon.</div>
+            </div>
+            <h4>Bias-variance diagnosis numbers se</h4>
+            <p>Deep learning mein sirf train vs dev gap nahi dekhte. Pehle Bayes error ya human-level error ka andaaza chahiye. Ye woh error hai jo data ke noise ki wajah se practically avoid nahi hota.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Bayes / human</th><th>Train error</th><th>Dev error</th><th>Diagnosis</th></tr>
+              <tr><td>2%</td><td>14%</td><td>17%</td><td class="bad">High bias: train hi weak</td></tr>
+              <tr><td>2%</td><td>4%</td><td>13%</td><td class="bad">High variance: train ratta, dev pe fail</td></tr>
+              <tr><td>7%</td><td>9%</td><td>10%</td><td class="good">Kaafi theek; Bayes ke paas</td></tr>
+              <tr><td>2%</td><td>10%</td><td>18%</td><td class="bad">Bias bhi, variance bhi</td></tr>
+            </table></div>
+            <div class="formula"><code>Avoidable bias ≈ train error − Bayes error
+Variance gap ≈ dev error − train error</code><ul>
+              <li><b>Bayes error</b> = best possible error ka andaaza, jaise expert human ki galti</li>
+              <li><b>Avoidable bias</b> bada = model training data pe bhi pattern nahi pakad raha</li>
+              <li><b>Variance gap</b> bada = model training examples ko zyada yaad kar raha</li>
+            </ul></div>
+            <h4>Basic recipe: pehle bimaari, phir dawa</h4>
+            <div class="visual-flow"><span>Train error dekho<br><small>Bayes se compare</small></span><b>→</b><span>Dev gap dekho</span><b>→</b><span class="flow-highlight">Action choose karo</span></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Problem</th><th>Pehla try</th><th>Doosra try</th></tr>
+              <tr><td>High bias</td><td>Bada network</td><td>Zyada train karo, better optimizer, architecture change</td></tr>
+              <tr><td>High variance</td><td>Zyada data</td><td>L2, dropout, augmentation, chhota network</td></tr>
+            </table></div>
+            <p>Deep learning ka nice part: bada network bias ko ghata sakta hai, aur regularization/data variance ko ghata sakte hain. Matlab dono knobs alag-alag mil jaate hain.</p>
+            <h4>Bias-variance trade-off kam kyu feel hota hai</h4>
+            <p>Classical ML mein model complex karo to bias ghatta, variance badhta. Jaise chhoti chadar: pair dhako to sar khul gaya. Deep learning mein huge network + regularization + data ke saath chadar badi ho gayi. Bada network train error improve kar sakta hai, aur agar dev gap badhe to data/dropout/L2 se sambhal sakte ho.</p>
+            <pre class="code">            train_err = 0.10
+            dev_err = 0.18
+            bayes_err = 0.02
+
+            avoidable_bias = train_err - bayes_err  <span class="cm"># 0.08: train pe abhi kaam baaki</span>
+            variance_gap = dev_err - train_err      <span class="cm"># 0.08: dev gap bhi bada</span></pre>
+            <div class="oneliner"><b>Yaad rakhna:</b> Train/dev/test split evaluation ka plumbing hai; bias-variance diagnosis us plumbing se nikla hua doctor report.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Dev set ko validation set bhi bolte hain?</summary><p>Haan. Deep learning papers mein “dev”, “validation”, “CV” aksar same idea ke naam hain: model choose karne wala set.</p></details>
+            <details class="qa"><summary>Bayes error exact kaise pata chalega?</summary><p>Exact nahi pata hota. Human expert, label noise, ya domain knowledge se rough estimate banate hain. Rough bhi useful hai, kyunki train error 10% achha hai ya bura, context se hi pata chalega.</p></details>
+            <details class="qa"><summary>Agar dev aur test distribution accidentally alag nikal gaye?</summary><p>Test number confusing ho jayega. Pehle decide karo real target distribution kya hai, phir dev/test dono ko usi source se dubara banana better hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>10,00,000 examples hain. 98/1/1 split mein train/dev/test kitne?</summary><p>Train 9,80,000; dev 10,000; test 10,000. <b>final answer: 9.8 lakh / 10k / 10k</b>.</p></details>
+              <details class="qa"><summary>Bayes 3%, train 5%, dev 14%. Sabse badi problem?</summary><p>Train Bayes ke paas hai, par dev gap 9% hai. Ye <b>high variance</b> hai.</p></details>
+              <details class="qa"><summary>Sirf model choose karna hai, public final score nahi dena. Test set zaroori?</summary><p>Strictly zaroori nahi. Train/dev se kaam chal sakta hai, par final claim ke liye test set rakhna safer hai.</p></details>
+            </div>

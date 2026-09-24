@@ -1,0 +1,74 @@
+            <div class="chat">
+              <p class="msg me">GRU gates samajh aa gaye. LSTM phir kyun famous hai?</p>
+              <p class="msg dost">LSTM thoda zyada detailed control deta hai: kya naya likhna, kya purana bhoolna, aur bahar kya dikhana. Jaise phone mein gallery, archive, aur screen brightness teen alag controls.</p>
+              <p class="msg me">Teen gates, matlab teen switches?</p>
+              <p class="msg dost">Haan, soft switches. 0 se 1 ke beech. Aur isi wajah se LSTM long sequences mein kaafi reliable raha.</p>
+            </div>
+            <h4>LSTM ke gates: update, forget, output</h4>
+            <p><strong>LSTM</strong> ka cell state c⟨t⟩ ek conveyor belt jaisa hai. Information relatively smooth tarike se aage ja sakti hai. Gates decide karte hain belt pe kya add, kya remove, kya output.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Gate</th><th>Symbol</th><th>Kaam</th><th>Everyday feel</th></tr>
+              <tr><td>Update</td><td>Γᵤ</td><td>Nayi candidate memory kitni likhni</td><td>Notebook mein naya point add?</td></tr>
+              <tr><td>Forget</td><td>Γf</td><td>Purani memory kitni rakhni</td><td>Old reminder delete?</td></tr>
+              <tr><td>Output</td><td>Γₒ</td><td>Cell ka kitna hissa hidden output bane</td><td>Screen pe kya dikhana?</td></tr>
+            </table></div>
+            <figure class="figure">
+              <svg viewBox="0 0 560 205" role="img" aria-label="LSTM cell state par gates control kar rahe hain">
+                <path d="M70 70 H490" stroke="#159477" stroke-width="8" stroke-linecap="round"/>
+                <rect x="110" y="105" width="90" height="42" rx="10" fill="#edf3ff" stroke="#3567e8"/><text x="132" y="131" font-size="11">Γf keep</text>
+                <rect x="235" y="105" width="90" height="42" rx="10" fill="#f2edff" stroke="#7653d6"/><text x="255" y="131" font-size="11">Γᵤ add</text>
+                <rect x="360" y="105" width="90" height="42" rx="10" fill="#fff3ec" stroke="#e0703a"/><text x="378" y="131" font-size="11">Γₒ show</text>
+                <text x="70" y="50" font-size="11" fill="#159477">c⟨t−1⟩</text><text x="455" y="50" font-size="11" fill="#159477">c⟨t⟩</text>
+              </svg>
+              <div class="cap">Cell state main memory line hai; gates us par traffic control karte hain.</div>
+            </figure>
+            <h4>Core equations</h4>
+            <div class="formula"><code>c̃⟨t⟩ = tanh(W_c [a⟨t−1⟩, x⟨t⟩] + b_c)
+c⟨t⟩ = Γᵤ * c̃⟨t⟩ + Γf * c⟨t−1⟩
+a⟨t⟩ = Γₒ * tanh(c⟨t⟩)</code><ul>
+              <li><b>c̃⟨t⟩</b> = candidate memory.</li>
+              <li><b>Γᵤ</b> = candidate ko kitna add karna.</li>
+              <li><b>Γf</b> = old cell ko kitna keep karna.</li>
+              <li><b>Γₒ</b> = hidden output mein kitna reveal karna.</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Value</th><th>Number</th></tr>
+              <tr><td>Γᵤ, c̃</td><td>0.7, 0.5</td></tr>
+              <tr><td>Γf, c old</td><td>0.8, 0.4</td></tr>
+              <tr><td>c new</td><td>0.7×0.5 + 0.8×0.4 = <b>0.67</b></td></tr>
+              <tr><td>Γₒ</td><td>0.6</td></tr>
+              <tr><td>a new</td><td>0.6×tanh(0.67) = 0.6×0.585 = <b>0.351</b></td></tr>
+            </table></div>
+            <h4>Peephole connection ka chhota zikr</h4>
+            <p>Kuch LSTM versions gates ko cell state c bhi dekhne dete hain. Jaise gate bolta hai: “andar memory already kitni bhari hai, uske hisaab se open/close karun.” Isko peephole connection kehte hain. Basic idea same rehta hai; bas gate ko extra clue milta hai.</p>
+            <h4>GRU ya LSTM — kab kya?</h4>
+            <div class="compare-grid">
+              <div><b>GRU</b><br>Thoda simpler, fewer gates, training fast ho sakti hai. Data chhota ho ya quick baseline chahiye, good choice.</div>
+              <div><b>LSTM</b><br>Zyada knobs, long dependencies pe historically strong. Jab sequence tough ho aur compute manageable ho, try karne layak.</div>
+            </div>
+            <p>Truth: pehle dono try karna normal hai. Koi universal winner nahi. Dataset, tuning, aur task matter karte hain.</p>
+            <h4>Bidirectional RNN: dono disha ka context</h4>
+            <p>NER mein “bank” ka meaning future word se clear ho sakta hai: “bank mein paisa” vs “river bank par”. Bidirectional RNN ek RNN left-to-right chalata hai, aur ek right-to-left. Har position pe dono memories combine.</p>
+            <div class="formula"><code>prediction at t uses [a_forward⟨t⟩, a_backward⟨t⟩]</code><ul>
+              <li>Forward memory past dekhti hai.</li>
+              <li>Backward memory future dekhti hai.</li>
+              <li>Limitation: poora sequence available hona chahiye. Live speech streaming mein future wait karna pad sakta hai.</li>
+            </ul></div>
+            <h4>Deep RNN: layers stack</h4>
+            <p>Ek RNN layer low-level patterns pakad sakti hai, next layer higher pattern. Jaise first layer syllables/small phrases, second layer meaning chunks. RNNs ko stack kar sakte ho, par aam taur pe 2–3 layers kaafi hoti hain; bahut deep recurrent stack train karna heavy ho sakta hai.</p>
+            <pre class="code">x = inputs
+for layer in rnn_layers:
+    x = layer(x)          <span class="cm"># har layer poori sequence return kare</span>
+logits = output_layer(x)  <span class="cm"># task ke hisaab se last ya all steps</span></pre>
+            <div class="mistake"><b>Dhyan rakhna:</b> Bidirectional RNN ko future context chahiye. Agar tum real-time trigger word detect kar rahe ho, full future wait nahi kar sakte.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> LSTM cell state ko update, forget, output gates se control karta hai; BRNN future bhi dekhta hai; deep RNN layers stack karta hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Forget gate 0 ho toh kya?</summary><p>Old cell state ka woh hissa erase ho jaata hai. Γf 1 ke paas ho toh old info keep hoti hai.</p></details>
+            <details class="qa"><summary>LSTM mein hidden state aur cell state dono kyu?</summary><p>Cell state long-term notebook hai. Hidden state current step ka visible summary hai jo output aur next computations mein jaata hai.</p></details>
+            <details class="qa"><summary>Deep RNN 10 layers kyu nahi?</summary><p>Kar sakte ho, par recurrent training already heavy hai. Bahut layers gradients aur compute ko tough bana sakti hain. Practical start 2–3 se.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Γᵤ=0.4, c̃=0.9, Γf=0.5, c old=0.2. c new?</summary><p>0.4×0.9 + 0.5×0.2 = 0.36 + 0.10 = <b>0.46</b>.</p></details>
+              <details class="qa"><summary>Streaming app mein BRNN ka issue kya hai?</summary><p>BRNN future tokens bhi chahta hai. Live stream mein future abhi aaya nahi, isliye latency ya wait lagega.</p></details>
+              <details class="qa"><summary>Output gate ka kaam ek line mein?</summary><p>Cell memory ka kitna hissa hidden output a⟨t⟩ mein dikhana hai, ye decide karta hai.</p></details>
+            </div>

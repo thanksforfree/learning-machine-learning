@@ -1,0 +1,98 @@
+            <div class="chat">
+              <p class="msg me">Sliding windows mein har jagah dekhna padta tha. YOLO ka naam kyun famous hai?</p>
+              <p class="msg dost">Kyuki YOLO bolta hai: “You Only Look Once.” Ek image, ek forward pass, aur saare boxes + classes. Jaise traffic police ek baar CCTV screen dekhe aur bole: car yahan, bike yahan, bus yahan.</p>
+              <p class="msg me">Ek baar dekh ke kaise itne objects?</p>
+              <p class="msg dost">Image ko grid mein baanto. Har cell apne area mein object ka center aaye to us object ki zimmedari leta hai.</p>
+            </div>
+
+            <h4>Grid: image ko mohalla-wise baant do</h4>
+            <p>Maan lo image ko 4×4 grid mein baanta. Agar kisi object ka center right-middle cell mein hai, to wahi cell us object ka output predict karega. Object ka box cell se bahar bhi ja sakta hai — zimmedari center se decide hoti hai.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 420 260" role="img" aria-label="3 by 3 YOLO grid with object center in one cell">
+                <rect x="70" y="30" width="240" height="180" rx="8" fill="#edf3ff" stroke="#b8c2d3" stroke-width="2"/>
+                <g stroke="#8a96aa" stroke-width="1.5">
+                  <line x1="130" y1="30" x2="130" y2="210"/><line x1="190" y1="30" x2="190" y2="210"/><line x1="250" y1="30" x2="250" y2="210"/>
+                  <line x1="70" y1="75" x2="310" y2="75"/><line x1="70" y1="120" x2="310" y2="120"/><line x1="70" y1="165" x2="310" y2="165"/>
+                </g>
+                <rect x="205" y="105" width="92" height="58" fill="none" stroke="#e0703a" stroke-width="3"/>
+                <circle cx="251" cy="134" r="5" fill="#c2410c"/>
+                <rect x="250" y="120" width="60" height="45" fill="#fff3ec" opacity="0.65"/>
+                <text x="190" y="236" font-size="11" text-anchor="middle" fill="#4b5871">center jis cell mein, prediction us cell ki</text>
+              </svg>
+              <div class="cap">Box bada ho sakta hai, par owner cell center se decide hota hai.</div>
+            </figure>
+
+            <h4>Har cell ka output</h4>
+            <p>Ek anchor ke liye cell output familiar vector jaisa hai:</p>
+            <div class="formula"><code>[p_c, b_x, b_y, b_h, b_w, c₁, c₂, c₃]</code><ul>
+              <li><b>p_c</b> = is anchor/cell mein object hai?</li>
+              <li><b>b_x,b_y</b> = cell ke andar center position. Aksar 0 se 1 ke beech.</li>
+              <li><b>b_h,b_w</b> = box height/width grid cell ke comparison mein. Ye 1 se bade ho sakte hain, kyunki object cell se bahar nikal sakta hai.</li>
+              <li><b>c₁,c₂,c₃</b> = class probabilities, jaise pedestrian/car/bike.</li>
+            </ul></div>
+            <p>Agar cell 80×60 pixels ka hai aur object box 120×90 pixels ka hai, to b_w=120/80=1.5 aur b_h=90/60=1.5. Isme kuch galat nahi — dabba cell se bada hai.</p>
+
+            <h4>IoU: do boxes kitne overlap karte hain?</h4>
+            <p><strong>Intersection over Union</strong> box quality check karta hai. Common area ko total covered area se divide karo. 1 matlab perfect same, 0 matlab touch bhi nahi.</p>
+            <div class="formula"><code>IoU = overlap area ÷ union area</code><ul>
+              <li><b>overlap</b> = dono boxes ka common hissa</li>
+              <li><b>union</b> = box A area + box B area − overlap</li>
+            </ul></div>
+            <p>Worked example: Box A = (20,20) se (80,80), Box B = (30,30) se (90,90).</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Step</th><th>Calculation</th><th>Value</th></tr>
+              <tr><td>A area</td><td>60 × 60</td><td>3600</td></tr>
+              <tr><td>B area</td><td>60 × 60</td><td>3600</td></tr>
+              <tr><td>Overlap</td><td>(80−30) × (80−30)</td><td>2500</td></tr>
+              <tr><td>Union</td><td>3600 + 3600 − 2500</td><td>4700</td></tr>
+              <tr><td>IoU</td><td>2500 ÷ 4700</td><td class="good">0.532</td></tr>
+            </table></div>
+            <p>Agar threshold 0.5 hai, to 0.532 pass. Agar threshold 0.75 hai, to fail. Same prediction, stricter exam.</p>
+
+            <h4>Non-max suppression: duplicate boxes hatao</h4>
+            <p>YOLO aksar ek hi car ke around 3-4 boxes de deta hai. Non-max suppression (NMS) bolta hai: “sabse confident box rakho, uske bahut similar boxes hatao.”</p>
+            <div class="visual-flow"><span>Low score boxes hatao</span><b>→</b><span>Highest score choose</span><b>→</b><span>High IoU duplicates delete</span><b>↻</b><span class="flow-highlight">Repeat</span></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Box</th><th>Class</th><th>Score</th><th>Best box se IoU</th><th>NMS decision</th></tr>
+              <tr><td>A</td><td>car</td><td>0.92</td><td>—</td><td class="good">rakho</td></tr>
+              <tr><td>B</td><td>car</td><td>0.81</td><td>0.64</td><td class="bad">hatao (duplicate)</td></tr>
+              <tr><td>C</td><td>car</td><td>0.74</td><td>0.18</td><td class="good">rakho (alag car)</td></tr>
+            </table></div>
+
+            <h4>Anchor boxes: ek cell, do objects</h4>
+            <p>Problem: ek cell mein pedestrian aur car dono ke centers aa gaye. Single output hota to fight ho jaati. Anchor boxes fix shapes ke templates hote hain — jaise tall-thin anchor pedestrian ke liye, wide anchor car ke liye.</p>
+            <p>Har cell ab ek nahi, B anchors ke outputs predict karta hai. Training mein object us anchor ko assign hota hai jiska shape uske box se best match karta hai (IoU high).</p>
+            <div class="compare-grid">
+              <div><b>Anchor 1</b>Tall box. Pedestrian, pole, bottle jaise shapes.</div>
+              <div><b>Anchor 2</b>Wide box. Car, bus, sofa jaise shapes.</div>
+            </div>
+
+            <h4>Poora YOLO tensor: 4×4×3×7</h4>
+            <p>Mini setup lo: grid 4×4, anchors 3, classes 2. Har anchor output size = 7. Total output tensor:</p>
+            <div class="formula"><code>4 × 4 × 3 × 7 = 336 numbers</code><ul>
+              <li><b>4×4</b> = grid cells</li>
+              <li><b>3</b> = anchors per cell</li>
+              <li><b>7</b> = p_c + 4 box numbers + 2 class numbers</li>
+            </ul></div>
+            <p>Training mein target tensor bhi isi shape ka banta hai. Prediction time pe model scores deta hai, phir threshold + NMS se final clean boxes milte hain.</p>
+            <pre class="code"># YOLO prediction ka high-level flow
+pred = model(image)              <span class="cm"># shape: S, S, B, 5+C</span>
+boxes = decode_boxes(pred)       <span class="cm"># bx,by,bh,bw ko image coords mein lao</span>
+boxes = keep_score_above(boxes, 0.4)
+final = non_max_suppression(boxes, iou_threshold=0.5)</pre>
+
+            <div class="mistake"><b>Dhyan rakhna:</b> Class probability aur box confidence ko mix mat karo. Aksar final score = p_c × class probability hota hai. Box confident hai par class uncertain hai to final score low ho sakta hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> YOLO image ko grid mein baantta hai, anchors se multiple shapes handle karta hai, IoU se quality naapta hai, aur NMS se duplicates saaf karta hai.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Object ka center boundary pe ho to kaunsa cell?</summary><p>Implementation ek consistent rule use karti hai, jaise floor operation. Important baat: training aur prediction mein same coordinate convention follow ho.</p></details>
+            <details class="qa"><summary>bₕ,b_w 1 se bade kyu allowed?</summary><p>Kyuki cell sirf owner decide karta hai. Object cell se bahar expand ho sakta hai. Ek bus ka center cell mein ho sakta hai, par bus teen cells tak fail sakti hai.</p></details>
+            <details class="qa"><summary>NMS class-wise hota hai ya sab boxes pe?</summary><p>Aksar class-wise. Car box pedestrian box ko suppress na kare, warna overlapping log aur vehicles mein problem ho sakti hai.</p></details>
+            <details class="qa"><summary>Anchor boxes ka size kaise choose karte hain?</summary><p>Training data ke boxes dekh ke common shapes choose karte hain, jaise k-means type clustering. Beginner ke liye intuition: dataset mein jo shapes baar-baar aate hain, anchors un jaise hone chahiye.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Box A area 1000, Box B area 800, overlap 300. IoU?</summary><p>Union = 1000 + 800 − 300 = 1500. IoU = 300/1500 = <b>0.20</b>.</p></details>
+              <details class="qa"><summary>Grid 5×5, anchors 2, classes 4. Output tensor mein total numbers?</summary><p>Har anchor output = 5 + classes = 9. Total = 5×5×2×9 = <b>450 numbers</b>.</p></details>
+              <details class="qa"><summary>Ek cell mein car aur person dono ke center aa gaye. Anchor boxes kaise madad karte hain?</summary><p>Wide anchor car ko, tall anchor person ko represent kar sakta hai. Isse ek cell ke andar do alag outputs mil jaate hain.</p></details>
+            </div>

@@ -1,0 +1,75 @@
+            <div class="chat">
+              <p class="msg me">Convolution naam se lagta hai bahut heavy maths hoga.</p>
+              <p class="msg dost">Asal mein sliding dot product. Ek chhoti khidki photo pe ghoomti hai, har jagah chhota dot product karti hai.</p>
+              <p class="msg me">Jaise phone camera mein filter?</p>
+              <p class="msg dost">Bilkul. Filter ek chhota pattern detector hai — edge, corner, texture. CNN in filters ko khud seekhta hai.</p>
+            </div>
+            <h4>1D convolution — chalti hui khidki</h4>
+            <p>Signal lo <code>[2, 5, 1, 3, 4]</code> aur filter <code>[1, 0, −1]</code>. Khidki length 3 ki hai, stride 1.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Window</th><th>Dot with [1,0,−1]</th><th>Output</th></tr>
+              <tr><td>[2, 5, 1]</td><td>2×1 + 5×0 + 1×(−1)</td><td><b>1</b></td></tr>
+              <tr><td>[5, 1, 3]</td><td>5×1 + 1×0 + 3×(−1)</td><td><b>2</b></td></tr>
+              <tr><td>[1, 3, 4]</td><td>1×1 + 3×0 + 4×(−1)</td><td><b>−3</b></td></tr>
+            </table></div>
+            <p>Output length 3 hai, kyunki 5-length signal mein 3-length window sirf 3 valid positions pe fit hoti hai.</p>
+            <h4>2D convolution — patch × filter, phir sum</h4>
+            <p>Photo patch aur filter dono 3×3. Element-wise multiply karo, sab jodo.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Patch</th><th>Filter</th><th>Sum</th></tr>
+              <tr><td><code>[[1,2,0],<br>[3,1,1],<br>[2,0,1]]</code></td><td><code>[[0,1,0],<br>[1,0,-1],<br>[0,-1,0]]</code></td><td>0 + 2 + 0 + 3 + 0 − 1 + 0 + 0 + 0 = <b>4</b></td></tr>
+            </table></div>
+            <p>Ye filter upar/left ko positive aur right/bottom ko negative weight deta hai. Is tarah ka filter ek chhota contrast pattern pakad sakta hai.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 430 190" role="img" aria-label="A 3 by 3 filter sliding over a 5 by 5 image">
+                <rect x="40" y="35" width="150" height="150" fill="#edf3ff" stroke="#3567e8"/>
+                <g stroke="#b8c2d3"><line x1="70" y1="35" x2="70" y2="185"/><line x1="100" y1="35" x2="100" y2="185"/><line x1="130" y1="35" x2="130" y2="185"/><line x1="160" y1="35" x2="160" y2="185"/><line x1="40" y1="65" x2="190" y2="65"/><line x1="40" y1="95" x2="190" y2="95"/><line x1="40" y1="125" x2="190" y2="125"/><line x1="40" y1="155" x2="190" y2="155"/></g>
+                <rect x="40" y="35" width="90" height="90" fill="#fff3ec" stroke="#c2410c" stroke-width="3"/>
+                <rect x="260" y="65" width="90" height="90" fill="#f2edff" stroke="#7653d6" stroke-width="3"/>
+                <g stroke="#b8c2d3"><line x1="290" y1="65" x2="290" y2="155"/><line x1="320" y1="65" x2="320" y2="155"/><line x1="260" y1="95" x2="350" y2="95"/><line x1="260" y1="125" x2="350" y2="125"/></g>
+                <text x="85" y="25" font-size="11" text-anchor="middle" fill="#3567e8">image</text><text x="305" y="55" font-size="11" text-anchor="middle" fill="#7653d6">filter</text><text x="210" y="110" font-size="11" fill="#7a879b">dot product</text>
+              </svg>
+              <div class="cap">Filter har position pe same weights use karta hai. Isi ko parameter sharing bolte hain.</div>
+            </figure>
+            <h4>Filter / kernel ka matlab</h4>
+            <p>Filter chhoti number table hai. CNN ke first layers mein filters edges ya simple textures pakad sakte hain. Later layers mein combinations — eyes, wheels, patterns. Important: CNN mein filter ke numbers haath se nahi bharte; training unhe seekhti hai.</p>
+            <h4>Output size formula</h4>
+            <div class="formula"><code>output size = ⌊(n + 2p − f) / s⌋ + 1</code><ul>
+              <li><b>n</b> = input height/width.</li>
+              <li><b>p</b> = padding, border pe extra zeros.</li>
+              <li><b>f</b> = filter size.</li>
+              <li><b>s</b> = stride, khidki kitne kadam jump kare.</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Case</th><th>Formula</th><th>Output</th></tr>
+              <tr><td>n=5, p=0, f=3, s=1</td><td>⌊(5 + 0 − 3)/1⌋ + 1</td><td><b>3</b></td></tr>
+              <tr><td>n=7, p=1, f=3, s=2</td><td>⌊(7 + 2 − 3)/2⌋ + 1 = ⌊3⌋ + 1</td><td><b>4</b></td></tr>
+            </table></div>
+            <h4>3D convolution — RGB channels</h4>
+            <p>Colour photo shape <code>(height, width, 3)</code> hoti hai. Filter bhi full depth ka hota hai: agar patch 3×3×3 hai to filter bhi 3×3×3. Har channel pe multiply-sum hota hai, phir teen channels ke sums bhi add hote hain. Ek filter se output ka ek channel banta hai; 10 filters lagao to 10 output channels.</p>
+            <div class="visual-flow"><span>Patch<br><small>3×3×3</small></span><b>×</b><span>Filter<br><small>3×3×3</small></span><b>→</b><span class="flow-highlight">1 number</span></div>
+            <h4>Max pooling = sliding max</h4>
+            <p>Pooling mein weights nahi hote. Bas khidki mein sabse bada number lo. Example 2×2 window <code>[[1,5],[2,3]]</code> ka max = <strong>5</strong>. Ye feature map ko chhota karta hai aur small shifts se thoda robust banata hai.</p>
+<pre class="code">import numpy as np
+
+patch = np.array([[1, 2, 0],
+                  [3, 1, 1],
+                  [2, 0, 1]])
+filt = np.array([[0,  1,  0],
+                 [1,  0, -1],
+                 [0, -1,  0]])
+print(np.sum(patch * filt))      <span class="cm"># 4</span></pre>
+            <h4>Deep learning mein ye kahan milega?</h4>
+            <p>DL Course 4 ke edge detection, padding/stride, convolutional layers, pooling, YOLO, U-Net, face recognition, aur style transfer pages mein. CNN ka har block isi sliding dot product pe khada hai.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Filter depth input depth ke barabar hoti hai. RGB input pe 2D 3×3 filter nahi, actually 3×3×3 filter lagta hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Convolution = same chhota filter har jagah slide karo, patch ke saath dot product lo. Padding size bachata hai, stride size ghataata hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Convolution aur dot product mein relation?</summary><p>Har position pe patch ko flatten karo, filter ko flatten karo, dot product lo. Bas patch slide hota rehta hai.</p></details>
+            <details class="qa"><summary>Padding zeros kyu?</summary><p>Border pixels ko bhi fair chance dene ke liye, aur output size control karne ke liye. Same padding se height/width preserve ho sakti hai.</p></details>
+            <details class="qa"><summary>Max pooling train hota hai kya?</summary><p>Nahi. Uske learnable parameters nahi hote. Bas fixed rule: window mein max lo.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Signal <code>[1,2,3]</code>, filter <code>[2,1]</code>, stride 1. Output?</summary><p>Windows: [1,2] → 1×2 + 2×1 = 4. [2,3] → 2×2 + 3×1 = 7. Output <b>[4,7]</b>.</p></details>
+              <details class="qa"><summary>n=10, p=0, f=3, s=2. Output size?</summary><p>⌊(10 − 3)/2⌋ + 1 = ⌊3.5⌋ + 1 = <b>4</b>.</p></details>
+              <details class="qa"><summary>Input depth 16 hai, filter size 3×3. Ek filter ka shape?</summary><p>Filter full depth cover karega: <b>3×3×16</b>.</p></details>
+            </div>

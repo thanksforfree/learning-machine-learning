@@ -1,0 +1,84 @@
+            <div class="chat">
+              <p class="msg me">YOLO boxes de raha hai. Phir region proposals aur U-Net kyun?</p>
+              <p class="msg dost">Box kabhi enough hota hai, kabhi nahi. “Car yahan hai” traffic camera ke liye okay. Par doctor ko tumor ka exact shape chahiye, sirf rectangle nahi.</p>
+              <p class="msg me">Matlab har pixel ka label?</p>
+              <p class="msg dost">Haan. Ye semantic segmentation hai. Photo ke har pixel ko bolna: road, car, sky, tumor, background… full rangoli bharni padti hai.</p>
+            </div>
+
+            <h4>Region proposals: pehle possible areas suggest karo</h4>
+            <p>YOLO ek-shot style hai. Region proposal family thoda alag sochti hai: pehle image mein kuch “interesting regions” propose karo, phir un regions ko classify/refine karo.</p>
+            <div class="compare-grid">
+              <div><b>R-CNN</b>Region proposals nikalo, har crop ko CNN se classify karo. Accurate, par slow.</div>
+              <div><b>Fast R-CNN</b>Poori image ka feature map ek baar banao, proposals ko us map se classify karo. Reuse zyada.</div>
+              <div><b>Faster R-CNN</b>Proposal banana bhi neural network se. Region Proposal Network image ke andar candidate boxes suggest karta hai.</div>
+            </div>
+            <p>Simple analogy: kirana shop mein pehle shelf pe suspicious packets shortlist karo, phir har packet ka bill detail se check karo. Har item ko zero se scan nahi.</p>
+
+            <h4>Semantic segmentation: har pixel ki class</h4>
+            <p>Detection output boxes hai. Segmentation output image ke same height-width ka label map hai. Agar input 256×256 hai aur 4 classes hain, output shape <code>256×256×4</code> ho sakta hai — har pixel ke liye 4 class scores.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 430 190" role="img" aria-label="Image se pixel-wise segmentation map">
+                <rect x="40" y="40" width="120" height="90" rx="8" fill="#edf3ff" stroke="#b8c2d3" stroke-width="2"/>
+                <path d="M60,105 L78,82 H125 L148,105 Z" fill="#3567e8"/>
+                <rect x="56" y="103" width="96" height="18" rx="5" fill="#3567e8"/>
+                <circle cx="78" cy="124" r="7" fill="#4b5871"/><circle cx="132" cy="124" r="7" fill="#4b5871"/>
+                <text x="210" y="90" font-size="20" fill="#8a96aa">→</text>
+                <rect x="270" y="40" width="120" height="90" rx="8" fill="#e9f7f3" stroke="#159477" stroke-width="2"/>
+                <rect x="270" y="96" width="120" height="34" fill="#8a96aa" opacity="0.35"/>
+                <path d="M290,105 L308,82 H355 L378,105 Z" fill="#159477"/>
+                <rect x="286" y="103" width="96" height="18" rx="5" fill="#159477"/>
+                <g font-size="11" fill="#4b5871" text-anchor="middle"><text x="100" y="155">photo</text><text x="330" y="155">pixel labels</text></g>
+              </svg>
+              <div class="cap">Segmentation mein “andar ka shape” milta hai, sirf outer rectangle nahi.</div>
+            </figure>
+
+            <h4>Transpose convolution: chhoti map ko bada banana</h4>
+            <p>CNN downsampling se feature map chhota hota gaya. Segmentation mein output ko wapas image size tak bada banana hai. <strong>Transpose convolution</strong> ek learnable upsampling layer hai.</p>
+            <p>Shape formula ka simple version:</p>
+            <div class="formula"><code>output = (n − 1) × s + f − 2p</code><ul>
+              <li><b>n</b> = input size</li>
+              <li><b>s</b> = stride</li>
+              <li><b>f</b> = filter size</li>
+              <li><b>p</b> = padding</li>
+            </ul></div>
+            <p>Example: input size 5, stride 3, filter 4, padding 1:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Term</th><th>Value</th></tr>
+              <tr><td>(n − 1) × s</td><td>(5 − 1) × 3 = 12</td></tr>
+              <tr><td>+ f</td><td>12 + 4 = 16</td></tr>
+              <tr><td>− 2p</td><td>16 − 2 = <b>14</b></td></tr>
+            </table></div>
+            <p>Ek easy no-overlap picture: 2×3 input aur 2×2 all-ones kernel, stride 2. Har input number apna 2×2 block paint karta hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Input</th><th>Output blocks</th></tr>
+              <tr><td><code>[[1,2,3],[4,5,6]]</code></td><td><code>[[1,1,2,2,3,3],[1,1,2,2,3,3],[4,4,5,5,6,6],[4,4,5,5,6,6]]</code></td></tr>
+            </table></div>
+
+            <h4>U-Net: neeche jao, phir upar aao</h4>
+            <p>U-Net ka shape “U” jaisa hai. Left side encoder: image chhoti hoti jaati hai, channels badhte jaate hain. Right side decoder: feature map bada hota jaata hai, segmentation map banne lagta hai.</p>
+            <div class="visual-flow"><span>Input image</span><b>→</b><span>Downsample<br><small>context</small></span><b>→</b><span class="flow-highlight">bottleneck</span><b>→</b><span>Upsample<br><small>detail wapas</small></span><b>→</b><span>h×w×classes</span></div>
+            <p>Skip connections U-Net ka dil hain. Encoder ke early layers mein fine edges aur location detail hoti hai. Decoder ko jab output sharp banana hota hai, woh same level ke encoder features se shortcut le leta hai. Jaise rangoli banate waqt pehle outline save kar li, phir color bharte waqt outline dobara dekh li.</p>
+            <pre class="code"># U-Net block ka rough idea
+c1 = conv_block(inputs)
+p1 = max_pool(c1)
+c2 = conv_block(p1)
+u1 = transpose_conv(c2)          <span class="cm"># size bada karo</span>
+u1 = concatenate([u1, c1])       <span class="cm"># skip: old detail jodo</span>
+out = conv_1x1(u1, classes)      <span class="cm"># har pixel ke class scores</span></pre>
+
+            <h4>Output: h × w × classes</h4>
+            <p>Agar input 128×128 road image hai aur classes hain road, vehicle, person, background — output <code>128×128×4</code>. Har pixel pe softmax chalta hai. Pixel (20,50) pe [0.05, 0.80, 0.10, 0.05] mila to woh vehicle pixel hai.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Segmentation label image ko resize karte waqt normal blur interpolation mat laga dena. Labels class IDs hain, colors nahi. Nearest-neighbor resize use karo, warna 1 aur 2 ka mix 1.4 jaisa weird label ban sakta hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Detection box deta hai; segmentation har pixel ka label deti hai. U-Net downsampled context aur skipped fine detail ko jodke sharp masks banata hai.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Semantic aur instance segmentation mein farak?</summary><p>Semantic segmentation bolta hai “ye sab car pixels hain.” Instance segmentation alag-alag cars ko separate IDs bhi deta hai: car 1, car 2, car 3.</p></details>
+            <details class="qa"><summary>Transpose convolution normal resize se better hai?</summary><p>Resize fixed rule hai. Transpose convolution weights seekhta hai, to task ke hisaab se upsampling kar sakta hai. Kabhi dono combine bhi hote hain.</p></details>
+            <details class="qa"><summary>U-Net medical images mein popular kyu?</summary><p>Medical datasets aksar chhote hote hain, aur exact boundary important hoti hai. U-Net skip connections se detail bachata hai, isliye masks sharp milte hain.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Input size n=6, stride s=2, filter f=4, padding p=1. Transpose conv output size?</summary><p>(6−1)×2 + 4 − 2×1 = 10 + 4 − 2 = <b>12</b>.</p></details>
+              <details class="qa"><summary>256×256 image, 6 classes. Segmentation output shape?</summary><p>Har pixel ke liye 6 class scores, so <b>256×256×6</b>.</p></details>
+              <details class="qa"><summary>U-Net skip connection ka short reason?</summary><p>Decoder ko exact location/edge detail wapas milti hai. Sirf bottleneck se output blurry ho sakta hai.</p></details>
+            </div>

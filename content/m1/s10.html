@@ -1,0 +1,57 @@
+
+            <div class="chat">
+              <p class="msg me">Cost function wahi squared error wala use kar lein?</p>
+              <p class="msg dost">Sigmoid ke saath squared error lagao to katori nahi banti — lehrati hui zameen banti hai jisme bahut saare chhote gaddhe hote hain. Gradient descent kisi galat gaddhe mein phas sakta hai.</p>
+              <p class="msg me">To naya cost kaisa?</p>
+              <p class="msg dost">Idea bahut insaani hai. Ek dost bola “100% pakka kal baarish nahi hogi” aur baarish ho gayi — uski baat pe bharosa zero. Doosra bola “50-50 hai” — woh utna galat nahi tha. To: <strong>confident ho ke galat nikle to bahut badi saza</strong>, thoda unsure ho ke galat nikle to chhoti saza.</p>
+              <p class="msg me">Matlab overconfidence pe fine lag raha hai?</p>
+              <p class="msg dost">Bilkul. Log loss model ko bolta hai: “confident banna hai to sahi jagah ban, warna bill bada aayega.”</p>
+            </div>
+            <figure class="figure">
+              <svg viewBox="0 0 400 190" role="img" aria-label="Log loss curve: sahi class ko low probability dene par loss bahut badhta hai">
+                <line x1="35" y1="165" x2="375" y2="165" stroke="#b8c2d3"/><line x1="35" y1="20" x2="35" y2="165" stroke="#b8c2d3"/>
+                <path d="M45,35 C80,48 125,70 175,98 C230,128 300,150 365,160" fill="none" stroke="#3567e8" stroke-width="3"/>
+                <circle cx="60" cy="45" r="5" fill="#c2410c"/><text x="70" y="48" font-size="11" fill="#c2410c">low chance, high loss</text>
+                <circle cx="340" cy="156" r="5" fill="#159477"/><text x="250" y="152" font-size="11" fill="#159477">high chance, low loss</text>
+                <text x="375" y="182" font-size="11" text-anchor="end" fill="#7a879b">sahi answer ko diya chance →</text><text x="38" y="18" font-size="11" fill="#7a879b">loss</text>
+              </svg>
+              <div class="cap">Sahi class ko jitna kam chance doge, loss utna tez upar jaata hai.</div>
+            </figure>
+            <h4>Numbers dekho — email sach mein spam hai (y = 1)</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Model ne spam ka chance bola (f)</th><th>Loss = −log(f)</th><th>Matlab</th></tr>
+              <tr><td>0.99</td><td>0.01</td><td class="good">Shabash, almost zero saza</td></tr>
+              <tr><td>0.70</td><td>0.36</td><td>Theek-thaak</td></tr>
+              <tr><td>0.50</td><td>0.69</td><td>Confused tha</td></tr>
+              <tr><td>0.10</td><td>2.30</td><td class="bad">Galat</td></tr>
+              <tr><td>0.01</td><td>4.61</td><td class="bad">Confident + galat = bhaari saza</td></tr>
+            </table></div>
+            <p>Agar asli answer y = 0 hai (spam nahi), to ulta: loss = −log(1 − f). Model jitna zyada “spam” bolega, utni zyada saza.</p>
+            <div class="formula"><code>L = −y · log(f) − (1 − y) · log(1 − f)</code><ul>
+              <li><b>Trick:</b> y = 1 ho to doosra hissa (1 − y = 0) gayab. y = 0 ho to pehla hissa gayab. Ek formula, dono case.</li>
+              <li>Cost J = saare examples ke L ka average. Ye katori jaisa hota hai → gradient descent safe.</li>
+            </ul></div>
+            <p>Gradient descent ka update formula dikhne mein <strong>bilkul linear regression jaisa</strong> hi lagta hai — bas ab f ke andar sigmoid hai.</p>            <h4>Cost = losses ka average</h4>
+            <p>Teen emails pe mini calculation dekho:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Email</th><th>Asli y</th><th>Model f</th><th>Loss</th></tr>
+              <tr><td>A</td><td>1</td><td>0.80</td><td>−log(0.80) = 0.22</td></tr>
+              <tr><td>B</td><td>0</td><td>0.80</td><td>−log(0.20) = 1.61</td></tr>
+              <tr><td>C</td><td>1</td><td>0.60</td><td>−log(0.60) = 0.51</td></tr>
+              <tr><td colspan="3"><b>Cost J</b></td><td>(0.22 + 1.61 + 0.51) ÷ 3 = <b>0.78</b></td></tr>
+            </table></div>
+            <p>Email B ne zyada cost badhaya, kyunki model ne not-spam email ko 80% spam bola. Confident galti ka bill bada.</p>
+
+            <h4>Squared error se intuition compare</h4>
+            <p>Beginner doubt genuine hai: “galti to galti hai, square kyu nahi?” Classification mein hume probability ki quality chahiye.</p>
+            <div class="compare-grid">
+              <div><b>Squared error</b>Number prediction ke liye mast. Par sigmoid ke saath training surface messy ho sakti hai.</div>
+              <div><b>Log loss</b>Sahi class ko low probability dene pe heavy penalty. Classification ke confidence ko better train karta hai.</div>
+            </div>
+            <p>Isliye logistic regression mein log loss standard hai. Tumhe formula ratna nahi; bas behaviour yaad: confident galti = mehenga bill.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Log loss poochta hai — “sahi answer ko tumne kitna chance diya tha?” Kam diya to zyada loss.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>log simple bhasha mein kya hai?</summary><p>Tumhe bas iski shape pata honi chahiye: log(1) = 0 (koi saza nahi), aur number jitna 0 ke kareeb jaata hai, −log utna bada hota jaata hai. Isi se “confident galti = badi saza” wala behaviour aata hai.</p></details>
+            <details class="qa"><summary>Ye formula ratna padega?</summary><p>Nahi. Meaning yaad rakho. Code mein library ka ek naam likhna hota hai (jaise BinaryCrossentropy).</p></details>
+            <details class="qa"><summary>“Cross-entropy” aur “log loss” alag hain?</summary><p>Nahi, haan/na wale problems ke liye binary cross-entropy aur log loss same cheez ke do naam hain.</p></details>
+            <details class="qa"><summary>Loss itna bada kyu ho sakta hai?</summary><p>Kyuki agar sahi answer ko model almost 0 chance de, to −log almost infinity ki taraf bhaagta hai. Isliye code mein probabilities ko kabhi-kabhi chhote safe range mein clip karte hain.</p></details>            <details class="qa"><summary>Accuracy achhi ho to log loss dekhna zaroori hai?</summary><p>Haan. Do models dono 90% accurate ho sakte hain, par ek galat answers pe 0.51 confidence rakhta hai aur doosra 0.999. Log loss doosre ko zyada punish karega — confidence quality dikhti hai.</p></details>            <details class="qa"><summary>Log loss zero kab hota hai?</summary><p>Sirf tab jab model har example pe sahi class ko 100% chance de. Real data mein noise hota hai, isliye exact zero expect mat karo. Cost ka trend neeche aa raha hai ya nahi, woh zyada useful signal hai.</p></details>

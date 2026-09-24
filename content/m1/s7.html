@@ -1,0 +1,47 @@
+
+            <div class="chat">
+              <p class="msg me">Features to data mein jo diye hain wahi use karne padenge na?</p>
+              <p class="msg dost">Zaroori nahi. Tum apni samajh se <strong>naye features</strong> bana sakte ho — isko feature engineering kehte hain. Example: plot ki lambai aur chaudai di hai. Tum jaante ho ki price asal mein <em>area</em> pe depend karta hai. To naya feature banao: area = lambai × chaudai. Model ka kaam aasan ho gaya.</p>
+              <p class="msg me">Aur agar dots seedhi line mein na hon, curve mein hon?</p>
+              <p class="msg dost">Tab bhi yahi trick! x ke saath x², x³ ya √x bhi feature bana ke daal do. Ab model curve fit kar sakta hai. Isko <strong>polynomial regression</strong> kehte hain.</p>
+              <p class="msg me">To model ko thoda “extra hint” de rahe hain?</p>
+              <p class="msg dost">Haan. Feature engineering wahi hai — domain knowledge se model ke kaan mein sahi hint bolna.</p>
+            </div>
+            <figure class="figure">
+              <svg viewBox="0 0 400 200" role="img" aria-label="Curve wala data: seedhi line miss karti hai, curve fit hota hai">
+                <line x1="30" y1="185" x2="390" y2="185" stroke="#b8c2d3"/><line x1="30" y1="10" x2="30" y2="185" stroke="#b8c2d3"/>
+                <line x1="40" y1="150" x2="380" y2="40" stroke="#c2410c" stroke-width="2" stroke-dasharray="6 4"/>
+                <path d="M40,175 C110,70 220,45 380,35" fill="none" stroke="#3567e8" stroke-width="3"/>
+                <g fill="#7b93e0"><circle cx="55" cy="160" r="5"/><circle cx="90" cy="115" r="5"/><circle cx="130" cy="85" r="5"/><circle cx="180" cy="66" r="5"/><circle cx="240" cy="52" r="5"/><circle cx="300" cy="44" r="5"/><circle cx="360" cy="38" r="5"/></g>
+              </svg>
+              <div class="cap">Laal dashed = seedhi line (theek se fit nahi). Neela = x aur √x features wala curve (achha fit).</div>
+            </figure>
+            <div class="formula"><code>f(x) = w₁·x + w₂·x² + w₃·x³ + b</code><ul><li>Pehle feature x tha. Ab x², x³ bhi naye “features” hain. Weights waise hi seekhe jaate hain.</li></ul></div>            <h4>Worked example: area feature</h4>
+            <p>Plot ki lambai 20 aur chaudai 30 hai. Agar sirf lambai/chaudai doge to model ko area ka relation khud mushkil se samajhna padega. Tum direct area de do.</p>
+            <div class="visual-flow"><span>Length 20</span><b>×</b><span>Width 30</span><b>→</b><span class="flow-highlight">Area = 600</span><b>→</b><span>Price clue</span></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Feature</th><th>Value</th><th>Simple model</th></tr>
+              <tr><td>Area</td><td>20 × 30 = <b>600</b></td><td>0.05 × 600 + 5 = <b>35 lakh</b></td></tr>
+            </table></div>
+            <h4>Worked example: polynomial feature</h4>
+            <p>Model: <strong>f(x) = 3x + 2x² + 1</strong>. Ye still “linear regression” hai, kyunki weights 3 aur 2 simply features se multiply ho rahe hain.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>x</th><th>x²</th><th>Prediction</th></tr>
+              <tr><td>2</td><td>4</td><td>3×2 + 2×4 + 1 = <b>15</b></td></tr>
+              <tr><td>4</td><td>16</td><td>3×4 + 2×16 + 1 = <b>45</b></td></tr>
+            </table></div>
+
+            <h4>Yahan scaling bahut zaroori ho jaati hai</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>x</th><th>x²</th><th>x³</th></tr>
+              <tr><td>10</td><td>100</td><td>1,000</td></tr>
+              <tr><td>1,000</td><td>10,00,000</td><td>1,00,00,00,000</td></tr>
+            </table></div>
+            <p>Dekha kitna bada gap? x³ itna bada ho gaya ki baaki features ki awaaz dab sakti hai. Isliye polynomial features ke saath scaling pakka karna.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Feature engineering ka matlab random columns banana nahi hai. Har naya feature ke peeche ek reason hona chahiye — ya domain sense, ya graph mein dikhta pattern. Warna model ko extra noise milti hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Achhe features = aadhi jeet. Aur x², √x jaise features se seedha model bhi curve bana leta hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>x² daala, phir bhi isko “linear” regression kyu bolte hain?</summary><p>“Linear” ka matlab hai <strong>weights ke hisaab se linear</strong> — har w bas ek number se multiply ho ke jud raha hai. Feature khud x² ho ya √x, koi farak nahi.</p></details>
+            <details class="qa"><summary>Kaunse naye features banayein, kaise pata?</summary><p>Do cheezein: problem ki samajh (area price ke liye matter karta hai) aur experiment. Module 2 mein validation data se alag options compare karna seekhoge.</p></details>
+            <details class="qa"><summary>x¹⁰ tak daal dein to perfect fit milega?</summary><p>Training dots pe shayad haan, par curve har dot ko chhoone ke chakkar mein pagal jaisa hil jayega aur naye data pe bekaar hoga. Ye overfitting hai — topic 11.</p></details>            <details class="qa"><summary>Feature engineering model se zyada important ho sakti hai?</summary><p>Haan, kaafi baar. Galat clues ke saath fancy model bhi confuse hota hai. Sahi clue, jaise area, simple model ko bhi strong bana sakta hai.</p></details>
+            <details class="qa"><summary>√x kab use karte hain?</summary><p>Jab growth shuru mein fast aur baad mein slow dikhe. Jaise plot size badhne se price badhta hai, par har extra sq ft ka benefit thoda kam ho sakta hai. Graph dekh ke try karo, validation pe compare karo.</p></details>            <details class="qa"><summary>Feature banaane ke baad scaling pehle ya baad mein?</summary><p>Pehle raw data se naye features banao (jaise area = length×width), phir final feature table ko scale karo. Polynomial/area features ke baad ranges aur bhi alag ho jaati hain, isliye scaling aur important ho jaati hai.</p></details>

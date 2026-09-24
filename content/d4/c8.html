@@ -1,0 +1,100 @@
+            <div class="chat">
+              <p class="msg me">Server pe model chal gaya, par phone pe lag kar raha hai. Ab?</p>
+              <p class="msg dost">Yahi real duniya hai dost. Har user ke paas fancy GPU nahi hota. Mobile model ko kam memory, kam battery, kam latency mein chalna padta hai.</p>
+              <p class="msg me">To accuracy sacrifice?</p>
+              <p class="msg dost">Thoda trade-off hota hai, par smart architecture se bahut compute bach sakta hai. MobileNet ka main jugaad hai: normal convolution ko do saste steps mein tod do.</p>
+              <p class="msg me">Depthwise aur pointwise?</p>
+              <p class="msg dost">Haan. Pehle har channel pe alag spatial filter, phir 1×1 se channels mix. Kaam kaafi same feel, bill bahut kam.</p>
+            </div>
+
+            <h4>Kam compute ki zaroorat kyu?</h4>
+            <p>Phone camera app, AR filter, document scanner, offline face unlock — in sab mein model ko turant jawab dena hota hai. Cloud pe image bhejna slow, mehenga, kabhi privacy issue bhi. Isliye CNN ko lightweight banana padta hai.</p>
+            <div class="compare-grid">
+              <div><b>Latency</b>User button dabaye aur result aane mein kitna time.</div>
+              <div><b>Battery</b>Har multiply-add energy leta hai. Heavy model phone garam kar sakta hai.</div>
+              <div><b>Memory</b>Weights aur activations RAM mein fit hone chahiye.</div>
+            </div>
+
+            <h4>Normal convolution ka cost</h4>
+            <p>Example lo: input feature map 80×80×24, output channels 48, filter 3×3, stride 1 same padding. Normal conv mein har output channel har input channel ke 3×3 patch ko dekhta hai.</p>
+            <div class="formula"><code>Cost_normal = H × W × n_C_in × f × f × n_C_out</code><ul>
+              <li><b>H, W</b> = output height/width</li>
+              <li><b>n_C_in</b> = input channels</li>
+              <li><b>f</b> = filter size</li>
+              <li><b>n_C_out</b> = filters/output channels</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Normal conv</th><th>Calculation</th><th>Multiplications</th></tr>
+              <tr><td>80×80×24 → 80×80×48</td><td>80×80×24×3×3×48</td><td class="bad">66,355,200 ≈ 6.64 crore</td></tr>
+            </table></div>
+
+            <h4>Depthwise + pointwise: do saste steps</h4>
+            <p>MobileNet v1 normal conv ko split karta hai:</p>
+            <ul>
+              <li><b>Depthwise conv:</b> har input channel par apna 3×3 filter. Channels mix nahi hote.</li>
+              <li><b>Pointwise conv:</b> 1×1 filters se channels mix karke desired output channels banao.</li>
+            </ul>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Step</th><th>Calculation</th><th>Multiplications</th></tr>
+              <tr><td>Depthwise</td><td>80×80×24×3×3</td><td>1,382,400</td></tr>
+              <tr><td>Pointwise 1×1</td><td>80×80×24×48</td><td>7,372,800</td></tr>
+              <tr><td>Total</td><td>1,382,400 + 7,372,800</td><td class="good">8,755,200 ≈ 0.88 crore</td></tr>
+            </table></div>
+            <p>Normal conv ke 6.64 crore ke saamne 0.88 crore. Ratio ≈ 0.132, yaani lagbhag <strong>7.6x less computation</strong>. Phone khush, battery khush, user khush.</p>
+
+            <figure class="figure">
+              <svg viewBox="0 0 430 210" role="img" aria-label="Depthwise separable convolution do steps mein hota hai">
+                <rect x="35" y="72" width="75" height="60" fill="#edf3ff" stroke="#3567e8"/>
+                <text x="72" y="154" font-size="11" text-anchor="middle" fill="#4b5871">Input channels</text>
+                <rect x="155" y="45" width="80" height="35" rx="8" fill="#e9f7f3" stroke="#159477"/>
+                <text x="195" y="67" font-size="11" text-anchor="middle" fill="#159477">Depthwise 3×3</text>
+                <rect x="155" y="110" width="80" height="35" rx="8" fill="#f2edff" stroke="#7653d6"/>
+                <text x="195" y="132" font-size="11" text-anchor="middle" fill="#7653d6">Pointwise 1×1</text>
+                <rect x="300" y="72" width="85" height="60" fill="#fff3ec" stroke="#e0703a"/>
+                <text x="342" y="154" font-size="11" text-anchor="middle" fill="#4b5871">Output channels</text>
+                <path d="M110,102 L150,62" stroke="#8a96aa"/>
+                <path d="M235,62 L300,102" stroke="#8a96aa"/>
+                <path d="M110,102 L150,128" stroke="#8a96aa"/>
+                <path d="M235,128 L300,102" stroke="#8a96aa"/>
+              </svg>
+              <div class="cap">Depthwise spatial pattern pakadta hai; pointwise channels ko mix karta hai.</div>
+            </figure>
+
+            <h4>MobileNet v1</h4>
+            <p>MobileNet v1 depthwise separable convolutions ko backbone bana deta hai. Normal conv ki jagah repeated depthwise + pointwise blocks. Do knobs bhi popular hain:</p>
+            <ul>
+              <li><b>Width multiplier:</b> channels kam/zyada karo. 1.0 full, 0.5 half-ish.</li>
+              <li><b>Resolution multiplier:</b> input image resolution kam/zyada karo.</li>
+            </ul>
+            <pre class="code"># MobileNet-v1 style block
+x = DepthwiseConv2D(3, padding="same", activation="relu")(x)
+x = Conv2D(48, 1, activation="relu")(x)  <span class="cm"># pointwise channel mix</span></pre>
+
+            <h4>MobileNet v2: expansion, residual, bottleneck</h4>
+            <p>MobileNet v2 ne block ko aur refined banaya. Pehle 1×1 se channels expand karo, beech mein depthwise conv, phir 1×1 se channels compress karo. Agar input-output shape same ho, residual shortcut add ho sakta hai.</p>
+            <div class="visual-flow"><span>Input</span><b>→</b><span>1×1 expand</span><b>→</b><span class="flow-highlight">Depthwise 3×3</span><b>→</b><span>1×1 project</span><b>↻</b><span>Residual</span></div>
+            <p>“Bottleneck” ka matlab yahan block ka output narrow ho sakta hai. V2 ka ek important idea linear bottleneck bhi hai: final projection ke baad ReLU nahi lagate, taaki compressed information zyada na kat jaaye.</p>
+
+            <h4>EfficientNet: resolution, depth, width ko saath scale</h4>
+            <p>Aksar log model bada karne ke liye random choice karte hain: image resolution badha do, layers badha do, ya channels badha do. EfficientNet ka idea: teeno ko balanced tarike se scale karo.</p>
+            <div class="formula"><code>Better scaling = resolution ↑, depth ↑, width ↑  (saath-saath, fixed ratio se)</code><ul>
+              <li><b>Resolution</b> = input image bigger, detail zyada</li>
+              <li><b>Depth</b> = layers/blocks zyada</li>
+              <li><b>Width</b> = channels zyada</li>
+            </ul></div>
+            <p>Jaise gym mein sirf biceps nahi, legs aur core bhi train karna. Sirf ek dimension badhaya to imbalance aa sakta hai.</p>
+
+            <div class="mistake"><b>Dhyan rakhna:</b> “Less compute” ka matlab hamesha “same accuracy” nahi. Lightweight models trade-off karte hain; target device aur acceptable accuracy dono saath socho.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> MobileNet normal conv ko depthwise spatial step + pointwise channel mix mein todkar compute bachata hai; EfficientNet model ko balanced tarike se scale karta hai.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Depthwise conv channels mix nahi karta, to kya information incomplete rahegi?</summary><p>Isliye pointwise 1×1 step aata hai. Pehle har channel ka spatial pattern, phir channels ka mix.</p></details>
+            <details class="qa"><summary>MobileNet sirf phones ke liye hai?</summary><p>Main motivation mobile/edge devices tha, par lightweight backbone server pe bhi useful ho sakta hai jab speed important ho.</p></details>
+            <details class="qa"><summary>EfficientNet mein compound scaling manually karna padega?</summary><p>Usually pretrained EfficientNet variants ready milte hain. Concept samajhna useful hai: bigger model ko balanced tarike se grow karo.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>40×40×20 input, normal 3×3 conv with 36 output channels. Cost?</summary><p>40×40×20×3×3×36 = 10,368,000 multiplications. <b>~1.04 crore</b>.</p></details>
+              <details class="qa"><summary>Same setting ka depthwise + pointwise cost?</summary><p>Depthwise: 40×40×20×9 = 288,000. Pointwise: 40×40×20×36 = 1,152,000. Total = <b>1,440,000</b>.</p></details>
+              <details class="qa"><summary>MobileNet v2 block mein shortcut kab add kar sakte hain?</summary><p>Jab input aur output shape same ho (same height, width, channels), tab residual add possible hai.</p></details>
+            </div>

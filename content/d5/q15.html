@@ -1,0 +1,87 @@
+            <div class="chat">
+              <p class="msg me">Single self-attention samajh aa gaya. Par “multi-head” kya extra karta hai?</p>
+              <p class="msg dost">Ek hi dost se advice loge to ek angle milega. Teen dost: ek grammar dekhega, ek meaning, ek long-distance relation. Multi-head attention bhi kai alag sawaal ek saath poochta hai.</p>
+              <p class="msg me">Aur full Transformer block mein aur kya hota hai?</p>
+              <p class="msg dost">Attention ke baad feed-forward, residual, layer norm, decoder masking, output softmax — thoda kitchen set hai. Aaram se assemble karte hain.</p>
+            </div>
+
+            <h4>Multi-head: kai alag “sawaal” ek saath</h4>
+            <p>Single attention head ek type ka relation pakad sakta hai. Multi-head mein Q, K, V ko multiple learned projections se chhote spaces mein bhejte hain. Har head attention karta hai. Phir head outputs concatenate hote hain aur W<sup>O</sup> se mix hote hain.</p>
+            <div class="formula"><code>headᵢ = Attention(QWᵢ<sup>Q</sup>, KWᵢ<sup>K</sup>, VWᵢ<sup>V</sup>)
+MultiHead = Concat(head₁, head₂, ..., headₕ) W<sup>O</sup></code><ul>
+              <li><b>h</b> = number of heads</li>
+              <li><b>Wᵢ</b> = har head ki apni learned projection</li>
+              <li><b>W<sup>O</sup></b> = heads ko final vector mein mix karta hai</li>
+            </ul></div>
+            <h4>Encoder block: attention, feed-forward, repeat N baar</h4>
+            <p>Transformer encoder block ka basic pattern: multi-head self-attention, phir position-wise feed-forward network. Dono ke around <strong>Add &amp; Norm</strong> hota hai: residual connection plus layer normalization.</p>
+            <div class="visual-flow"><span>Input embeddings</span><b>→</b><span class="flow-highlight">Multi-head self-attention</span><b>→</b><span>Add &amp; Norm</span><b>→</b><span>Feed-forward</span><b>→</b><span>Add &amp; Norm</span></div>
+            <p><b>Residual</b> ka matlab: layer output ke saath original input add karo. Jaise “agar new layer confused ho, purani info ka raasta khula rahe.” <b>Layer norm</b> activations ko stable scale pe rakhta hai. Ye training ko calm banata hai.</p>
+            <div class="formula"><code>z = LayerNorm(x + Sublayer(x))</code><ul>
+              <li><b>x</b> = sublayer ka input</li>
+              <li><b>Sublayer</b> = attention ya feed-forward</li>
+              <li><b>LayerNorm</b> = vector ke features ko normalize karna</li>
+            </ul></div>
+            <p>Ye block N baar stack hota hai. Lower layers local patterns pakad sakti hain; upper layers abstract meaning.</p>
+
+            <h4>Decoder: future mat dekhna</h4>
+            <p>Decoder training mein target sentence available hota hai, par model ko future word jhaankne nahi dena. Agar “I am eating” predict karte waqt model already “eating” dekh le, exam mein answer sheet khol di. Isliye <strong>masked self-attention</strong> use hota hai: position t sirf past aur current positions dekhe.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Predicting position</th><th>Allowed to attend</th><th>Blocked</th></tr>
+              <tr><td>1</td><td>1</td><td>2, 3, 4</td></tr>
+              <tr><td>2</td><td>1, 2</td><td>3, 4</td></tr>
+              <tr><td>3</td><td>1, 2, 3</td><td>4</td></tr>
+            </table></div>
+            <p>Decoder mein second attention bhi hota hai: encoder-decoder attention. Yahan <b>Q decoder se</b> aata hai, aur <b>K, V encoder output se</b>. Matlab decoder poochta hai, “mere next word ke liye source sentence ka kaunsa part useful hai?”</p>
+
+            <h4>Positional encoding: order ka address</h4>
+            <p>Self-attention set jaisa hai; agar position info na do to “dog bites man” aur “man bites dog” ka order blur ho sakta hai. Transformer embeddings mein positional encoding add karta hai. Classic version sine/cosine waves use karta hai, different frequencies ke saath.</p>
+            <div class="formula"><code>PE(pos, 2i) = sin(pos / 10000<sup>2i/d</sup>)
+PE(pos, 2i+1) = cos(pos / 10000<sup>2i/d</sup>)</code><ul>
+              <li><b>pos</b> = token position</li>
+              <li><b>i</b> = dimension pair index</li>
+              <li><b>d</b> = model dimension</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Example</th><th>Value</th></tr>
+              <tr><td>pos = 2, i = 0: sin(2)</td><td>0.909</td></tr>
+              <tr><td>pos = 2, i = 0: cos(2)</td><td>−0.416</td></tr>
+              <tr><td>pos = 2, i = 1, d = 4: sin(2 / 100)</td><td>0.020</td></tr>
+            </table></div>
+            <p>Different frequencies se model nearby aur far positions dono ke patterns learn kar sakta hai. Aaj kal learned positional embeddings bhi popular hain, par reason same: order ka signal do.</p>
+
+            <h4>Linear + softmax output</h4>
+            <p>Decoder ka final vector vocabulary ke size ke logits mein map hota hai. Agar vocabulary 50,000 words ki hai, linear layer 50,000 scores degi. Softmax in scores ko probabilities banata hai. Training mein cross-entropy next correct token ko reward/punish karta hai.</p>
+            <pre class="code"># decoder hidden: [batch, d_model]
+logits = hidden @ W_vocab + b_vocab   <span class="cm"># [batch, vocab_size]</span>
+probs = softmax(logits)               <span class="cm"># next-token probabilities</span>
+loss = cross_entropy(probs, target)   <span class="cm"># teacher forcing ke saath</span></pre>
+
+            <h4>Training mein masking do jagah</h4>
+            <ul>
+              <li><b>Padding mask:</b> Batch mein sentences same length banane ke liye pad tokens add hote hain. Attention ko pad pe focus nahi karna chahiye.</li>
+              <li><b>Look-ahead mask:</b> Decoder future target tokens ko nahi dekh sakta.</li>
+            </ul>
+            <div class="mistake"><b>Dhyan rakhna:</b> Mask sign galat hua to model ya to future dekh lega, ya useful tokens block kar dega. Training loss suspiciously low ya output bilkul bakwaas — dono mask bug ke symptoms ho sakte hain.</div>
+
+            <h4>BERT, GPT kahan fit hote hain?</h4>
+            <p><strong>BERT</strong> mostly encoder-only Transformer family ka example hai. Woh bidirectional context se text understanding tasks mein strong raha: classification, question answering, embeddings. <strong>GPT</strong> decoder-only family ka example hai. Masked self-attention ke saath next token predict karta hai, isliye generation mein natural fit.</p>
+            <div class="compare-grid">
+              <div><b>BERT-style</b>Encoder stack. Poora input context dekh ke representation banata hai.</div>
+              <div><b>GPT-style</b>Decoder stack. Past tokens dekh ke next token generate karta hai.</div>
+            </div>
+
+            <div class="lesson-callout"><b>Specialization ka wrap-up, dost:</b> Tumne linear models se start kiya, neural nets, CNNs, RNNs, embeddings, attention, aur ab Transformers tak aaye. Big picture ye hai: data ko useful representation mein badlo, loss se feedback lo, aur architecture ko problem ke shape ke hisaab se choose karo. Hype badalta rahega, par ye thinking tumhare saath rahegi.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Transformer block attention se relations pakadta hai, feed-forward se features polish karta hai, residual/norm se training stable rakhta hai, aur masks se cheating rokta hai.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Multi-head mein heads truly different cheezein seekhte hain?</summary><p>Often haan, par manually assign nahi karte. Training decide karti hai. Kuch heads syntax, kuch position, kuch long-distance relation pakad sakte hain; kuch redundant bhi ho sakte hain.</p></details>
+            <details class="qa"><summary>Encoder-decoder Transformer kab use hota hai?</summary><p>Translation, summarization, speech-to-text jaise tasks jahan input sequence aur output sequence dono alag roles mein hote hain. Encoder source padhta hai, decoder target generate karta hai.</p></details>
+            <details class="qa"><summary>Layer norm aur batch norm same hain?</summary><p>Nahi. Layer norm ek example ke feature vector ke andar normalize karta hai, sequence models mein convenient hai. Batch norm batch statistics pe depend karta hai.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>4 heads hain, har head output dimension 8 hai. Concat dimension kya hoga?</summary><p>4 × 8 = <b>32</b>. Phir W<sup>O</sup> is 32-d vector ko desired model dimension mein project karega.</p></details>
+              <details class="qa"><summary>Decoder position 5 ko training mein kaunse positions dekhne chahiye?</summary><p>Positions 1, 2, 3, 4, 5 allowed. Future 6, 7, ... blocked. Ye <b>look-ahead mask</b> karta hai.</p></details>
+              <details class="qa"><summary>BERT aur GPT ka simplest difference?</summary><p>BERT-style encoder input ko samajhne ke liye poora context dekhta hai. GPT-style decoder past context se next token generate karta hai. Bas dost — ab tum sequence models ki poori kahani ka map dekh chuke ho.</p></details>
+            </div>

@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Inputs normalize karna: Training ko gol katori do. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Inputs normalize karna (DL · 2) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-improving-networks.html">DL · 2: Improving Deep Neural Networks</a> › Topic 5 / 15</nav>
+        <p class="eyebrow">DL · 2 · TOPIC 05 · OPTIMIZATION SETUP</p>
+        <h1>Inputs normalize karna</h1>
+        <p>Training ko gol katori do</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 2 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="i1" href="dl-train-dev-test-bias-variance.html"><span>01</span>Train/dev/test aur bias-variance</a>
+            <a data-topic-link="i2" href="dl-l2-regularization.html"><span>02</span>L2 regularization</a>
+            <a data-topic-link="i3" href="dl-dropout.html"><span>03</span>Dropout</a>
+            <a data-topic-link="i4" href="dl-augmentation-early-stopping.html"><span>04</span>Data augmentation aur early stopping</a>
+            <a data-topic-link="i5" class="current" aria-current="page" href="dl-normalizing-inputs.html"><span>05</span>Inputs normalize karna</a>
+            <a data-topic-link="i6" href="dl-vanishing-exploding-init.html"><span>06</span>Vanishing/exploding gradients aur weight initialization</a>
+            <a data-topic-link="i7" href="dl-gradient-checking.html"><span>07</span>Gradient checking</a>
+            <a data-topic-link="i8" href="dl-mini-batch.html"><span>08</span>Mini-batch gradient descent</a>
+            <a data-topic-link="i9" href="dl-exponentially-weighted-averages.html"><span>09</span>Exponentially weighted averages</a>
+            <a data-topic-link="i10" href="dl-momentum-rmsprop-adam.html"><span>10</span>Momentum, RMSprop aur Adam</a>
+            <a data-topic-link="i11" href="dl-learning-rate-decay-local-optima.html"><span>11</span>Learning rate decay aur local optima ka sach</a>
+            <a data-topic-link="i12" href="dl-hyperparameter-tuning.html"><span>12</span>Hyperparameter tuning ka tareeka</a>
+            <a data-topic-link="i13" href="dl-batch-normalization.html"><span>13</span>Batch normalization</a>
+            <a data-topic-link="i14" href="dl-softmax-regression.html"><span>14</span>Softmax regression</a>
+            <a data-topic-link="i15" href="dl-frameworks-tensorflow.html"><span>15</span>Deep learning frameworks aur TensorFlow</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="i1,i2,i3,i4,i5,i6,i7,i8,i9,i10,i11,i12,i13,i14,i15"><span>DL · 2 progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Ek chhota sa preprocessing step jo training ko kai guna tez kar sakta hai.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z5" href="maths-average-probability.html"><small>Maths</small>Average, phailaav aur probability</a></div></div>
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Mean ghataao, variance se divide karo</li><li>Test data pe bhi training wala μ aur σ²</li><li>Lambi katori vs gol katori — gradient descent pe asar</li><li>Kab zaroori hai, kab farak kam</li></ul></details>
+        <article class="lesson-card single" id="i5">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Gradient descent slow chal raha hai. Learning rate badhaun?</p>
+              <p class="msg dost">Pehle features ki units dekho. Agar ek feature rupees mein 1,00,000 tak hai aur doosra rating 1 se 5, to cost ki katori lambi-sankri ban sakti hai.</p>
+              <p class="msg me">Katori ka shape training speed ko kaise affect karta hai?</p>
+              <p class="msg dost">Gol katori mein seedha neeche jaoge. Lambi katori mein ping-pong karoge. Input normalization katori ko zyada gol banata hai.</p>
+            </div>
+            <h4>Mean ghataao, variance se scale karo</h4>
+            <p>Normalization ka common recipe: training data ka mean μ nikalo, har value se μ subtract karo, phir standard deviation σ se divide karo. σ variance ka square root hota hai. Result: feature ka center 0 ke paas, spread 1 ke paas.</p>
+            <div class="formula"><code>x_norm = (x − μ) / σ
+σ = √(variance)</code><ul>
+              <li><b>μ</b> = training feature ka average</li>
+              <li><b>variance</b> = values average se kitni phaili hain</li>
+              <li><b>σ</b> = standard deviation, same unit mein spread</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Training values</th><th>Mean μ</th><th>Variance</th><th>σ</th></tr>
+              <tr><td>40, 50, 60, 70, 80</td><td>60</td><td>200</td><td>√200 ≈ 14.14</td></tr>
+              <tr><td>x = 80</td><td colspan="3">(80 − 60) ÷ 14.14 ≈ <b>1.41</b></td></tr>
+            </table></div>
+            <pre class="code">mu = X_train.mean(axis=0, keepdims=True)
+sigma = X_train.std(axis=0, keepdims=True)
+
+X_train_norm = (X_train - mu) / sigma  <span class="cm"># train se μ, σ seekho</span>
+X_test_norm = (X_test - mu) / sigma    <span class="cm"># test pe wahi μ, σ use karo</span></pre>
+            <h4>Test data pe training wala μ aur σ²</h4>
+            <p>Ye point chhota lagta hai, par bugs ka king hai. Dev/test data ka apna mean nikaal ke normalize kar diya to tum future information use kar rahe ho. Real life mein naye user ke data ka distribution pehle se nahi pata. Isliye train se μ aur σ store karo, wahi dev/test/inference pe lagao.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Train aur test ko alag-alag normalize karna exam ke answer key jhaankne jaisa ho sakta hai. Scaling parameters sirf training set se fit karo.</div>
+            <h4>Lambi katori vs gol katori</h4>
+            <p>Suppose ek feature 0 se 1 hai, doosra 0 se 10,000. Cost surface ek lambi valley banata hai. Gradient descent ek side se doosri side zig-zag karta rahega. Normalize karne se features comparable scale pe aa jaate hain, valley zyada gol hoti hai, aur larger learning rate safely use kar sakte ho.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 430 210" role="img" aria-label="Unnormalized cost lambi katori aur normalized cost gol katori">
+                <ellipse cx="115" cy="105" rx="75" ry="25" fill="none" stroke="#c2410c" stroke-width="3"/>
+                <ellipse cx="115" cy="105" rx="45" ry="14" fill="none" stroke="#e0703a" stroke-width="2"/>
+                <polyline points="55,88 170,123 65,98 160,114" fill="none" stroke="#c2410c" stroke-dasharray="4 3"/>
+                <circle cx="295" cy="105" r="62" fill="none" stroke="#159477" stroke-width="3"/>
+                <circle cx="295" cy="105" r="32" fill="none" stroke="#159477" stroke-width="2"/>
+                <polyline points="250,65 270,85 285,98 295,105" fill="none" stroke="#159477" stroke-dasharray="4 3"/>
+                <g font-size="11" text-anchor="middle">
+                  <text x="115" y="180" fill="#c2410c">without normalization: zig-zag</text>
+                  <text x="295" y="180" fill="#159477">with normalization: seedha</text>
+                </g>
+              </svg>
+              <div class="cap">Shape better ho to optimizer ko route dhoondhne mein kam nautanki hoti hai.</div>
+            </figure>
+            <h4>Worked mini example: do features</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Feature</th><th>Raw range</th><th>After normalize</th><th>Optimizer feel</th></tr>
+              <tr><td>Income</td><td>20,000–2,00,000</td><td>roughly −2 to +2</td><td class="good">Manageable</td></tr>
+              <tr><td>Rating</td><td>1–5</td><td>roughly −2 to +2</td><td class="good">Same scale</td></tr>
+            </table></div>
+            <div class="lesson-callout"><b>Image note:</b> Images mein pixel 0–255 ko 0–1 pe divide karna bhi normalization ka simple form hai. Kabhi per-channel mean/std bhi use karte hain.</div>
+            <h4>Kab zaroori, kab farak kam?</h4>
+            <div class="compare-grid">
+              <div><b>Zaroori jaisa</b>Features ki scales bahut different, gradient descent slow, tabular data, custom network from scratch.</div>
+              <div><b>Farak kam</b>Features already same scale, batch norm layers strong, ya tree models. Phir bhi neural nets mein normalize karna safe default hai.</div>
+            </div>
+            <p>Normalization accuracy ka magic button nahi. Ye optimization ko easy banata hai. Matlab same model kam epochs mein achha point tak pahunch sakta hai.</p>
+            <div class="formula"><code>If X has shape (m, n):
+μ has shape (1, n)
+σ has shape (1, n)</code><ul>
+              <li><b>m</b> = examples</li>
+              <li><b>n</b> = features</li>
+              <li><b>keepdims</b> se broadcasting clean rehti hai</li>
+            </ul></div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Normalize inputs = optimizer ko seedhi road dena. Model wahi hai, bas safar smooth ho gaya.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Mean 0 aur variance 1 exactly hona zaroori?</summary><p>Nahi, exact nahi. Bas features comparable scale pe aa jaayein. Floating point aur batches ki wajah se slight difference normal hai.</p></details>
+            <details class="qa"><summary>σ zero ho to?</summary><p>Feature constant hai, information nahi de raha. Usko drop karo ya denominator mein chhota ε add karo to avoid divide-by-zero.</p></details>
+            <details class="qa"><summary>Labels y normalize karne hote hain?</summary><p>Classification mein usually nahi. Regression mein kabhi-kabhi y scale karna useful hota hai, par prediction ko wapas original unit mein convert karna padega.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>μ = 50, σ = 10, x = 80. Normalized value?</summary><p>(80 − 50) ÷ 10 = 3. <b>final answer: 3</b>.</p></details>
+              <details class="qa"><summary>Dev set normalize karte waqt μ aur σ kahan se loge?</summary><p><b>Training set</b> se. Dev/test ka apna mean/std fit nahi karna.</p></details>
+              <details class="qa"><summary>Normalization se model ki capacity badhti hai?</summary><p>Nahi. Ye mainly optimization ko fast/stable banata hai, jaise road smooth karna.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="i5"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-augmentation-early-stopping.html"><small>← Pichhla</small>Data augmentation aur early stopping</a>
+          <a class="pager-next" href="dl-vanishing-exploding-init.html"><small>Agla →</small>Vanishing/exploding gradients aur weight initialization</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

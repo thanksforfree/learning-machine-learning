@@ -1,0 +1,46 @@
+            <div class="chat">
+              <p class="msg me">PCA kya hai? Naam hi darawna hai — Principal Component Analysis.</p>
+              <p class="msg dost">Haan, naam full professor mode mein hai. Simple kahani: tumhe ek teapot ki <strong>ek hi photo</strong> leke dost ko dikhani hai. Upar se photo lo — bas gol dikhega. Side se lo — handle, tonti, shape sab dikhega. Tumne woh <strong>angle</strong> chuna jahan se sabse zyada information dikhe.</p>
+              <p class="msg dost">PCA yahi karta hai data ke saath: 50 features ko 2–3 “naye features” mein samet deta hai, aise angle se jahan data <strong>sabse zyada phaila</strong> (spread) dikhe. Phir tum usko graph pe dekh sakte ho.</p>
+            </div>
+            <h4>Simple example: 2 features → 1</h4>
+            <p>Gaadiyon ka data: x₁ = lambai, x₂ = chaudai. Dono saath-saath badhte hain (lambi gaadi aam taur pe chaudi bhi). Dots ek tirchhi line ke aas-paas hain.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 400 210" role="img" aria-label="Tirchhe phaile dots aur un par ek naya axis jo sabse zyada spread pakadta hai">
+                <line x1="30" y1="190" x2="390" y2="190" stroke="#b8c2d3"/><line x1="30" y1="10" x2="30" y2="190" stroke="#b8c2d3"/>
+                <line x1="50" y1="175" x2="370" y2="30" stroke="#159477" stroke-width="3"/>
+                <g fill="#8a96aa"><circle cx="80" cy="150" r="5"/><circle cx="110" cy="148" r="5"/><circle cx="140" cy="120" r="5"/><circle cx="170" cy="118" r="5"/><circle cx="200" cy="95" r="5"/><circle cx="235" cy="92" r="5"/><circle cx="265" cy="70" r="5"/><circle cx="300" cy="66" r="5"/><circle cx="330" cy="45" r="5"/></g>
+                <g stroke="#e0703a" stroke-dasharray="3 3"><line x1="110" y1="148" x2="118" y2="146"/><line x1="170" y1="118" x2="172" y2="120"/><line x1="235" y1="92" x2="238" y2="92"/><line x1="300" y1="66" x2="302" y2="67"/></g>
+                <text x="372" y="25" font-size="11" text-anchor="end" fill="#159477">naya axis “z” (gaadi ka size)</text>
+                <text x="385" y="205" font-size="11" text-anchor="end" fill="#7a879b">lambai →</text><text x="36" y="22" font-size="11" fill="#7a879b">chaudai</text>
+              </svg>
+              <div class="cap">Hari line = pehla principal component. Har dot ko is line pe “projection” karo — ek number z. 2 numbers ki jagah 1, aur zyada information nahi khoi.</div>
+            </figure>
+            <div class="visual-flow"><span>1. Features ko scale + average 0 karo</span><b>→</b><span>2. Woh direction dhundho jahan spread sabse zyada</span><b>→</b><span class="flow-highlight">3. Har point ko us line pe project karo</span></div>
+            <p><strong>Project karna</strong> = har dot se line pe seedha (90°) shadow girana. Shadow ki jagah = naya number z. Jaise dopahar mein dhoop padti hai aur cheez ki shadow zameen pe aati hai. Doosra component pehle ke 90° pe hota hai, teesra dono ke 90° pe… jitne chahiye utne.</p>
+            <h4>Code mein</h4>
+<pre class="code">from sklearn.decomposition import PCA
+pca = PCA(n_components=2)
+Z = pca.fit_transform(X)                 <span class="cm"># 50 features → 2</span>
+print(pca.explained_variance_ratio_)     <span class="cm"># jaise [0.72, 0.18] → 90% spread bacha</span>
+X_approx = pca.inverse_transform(Z)      <span class="cm"># wapas original ka andaaza</span></pre>
+            <h4>PCA kab use karein?</h4>
+            <div class="compare-grid">
+              <div><b>Aaj kal mostly: visualization</b>50 features wale data ko 2D graph mein dekhna — groups/patterns aankh se samajhne ke liye.</div>
+              <div><b>Pehle zyada use hota tha</b>Data compress karna, ya training fast karne ke liye features kam karna. Aaj ke fast computers aur deep learning mein ye kam zaroori.</div>
+            </div>
+            <div class="mistake"><b>PCA linear regression nahi hai:</b> Linear regression ek target y predict karta hai (vertical galti). PCA ka koi y nahi — woh sabhi features ko barabar treat karke unka structure dhundhta hai (line pe seedhi 90° doori). Dono mein line dikhti hai, par kaam alag hai.</div>
+
+            <h4>Projection ka numeric feel</h4>
+            <div class="chat"><p class="msg me">Shadow wali baat achhi hai, par z number nikalta kaise hai?</p><p class="msg dost">Agar direction unit vector ho, to z = point · direction. Dot product hi shadow ki length deta hai.</p></div>
+            <p>Direction maan lo u = [0.71, 0.71] — roughly 45° line. Points ko is line pe project karte hain.</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Point x</th><th>z = x·u</th><th>Meaning</th></tr><tr><td>[2, 2]</td><td>2×0.71 + 2×0.71 = <b>2.84</b></td><td>Line pe aage</td></tr><tr><td>[3, 1]</td><td>3×0.71 + 1×0.71 = <b>2.84</b></td><td>Same shadow length</td></tr><tr><td>[1, 0]</td><td>1×0.71 + 0 = <b>0.71</b></td><td>Chhota projection</td></tr></table></div>
+            <p>Notice [2,2] aur [3,1] ka z same aaya. PCA compression mein kuch detail lost hoti hai — dono original points alag the, par 1D shadow same. Trade-off yahi hai: kam dimensions, thodi information loss.</p>
+            <div class="lesson-callout"><b>Scale pe dhyan:</b> PCA se pehle features scale karo. Height centimeters aur income rupees mein ho to income spread dominate karega, aur “best angle” biased ho jaayega.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> PCA = data ki best “photo angle” dhundh ke bahut features ko kam naye features mein samet-na.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Naye features (z₁, z₂) ka matlab kya hai?</summary><p>Aksar mix hota hai (jaise z₁ ≈ “gaadi ka overall size”). Kabhi naam de pate ho, kabhi nahi.</p></details>
+            <details class="qa"><summary>Kitne components rakhun?</summary><p>Visualization ke liye 2 ya 3, kyunki screen bhi 2D/3D hi dikhati hai. Doosre kaam ke liye itne ki explained variance ka total ~90–95% ho jaye.</p></details>
+
+            <details class="qa"><summary>PCA se model accuracy badhegi?</summary><p>Guarantee nahi. Aajkal PCA mostly visualization ke liye use hota hai. Accuracy ke liye CV set pe compare karo — with PCA vs without PCA.</p></details>
+            <details class="qa"><summary>PCA supervised hai kya?</summary><p>Nahi. PCA y labels nahi dekhta. Bas X features ka spread dekhta hai aur best directions choose karta hai.</p></details>

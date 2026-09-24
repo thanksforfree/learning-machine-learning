@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Transfer learning aur multi-task learning: Ek kaam ki seekh doosre mein. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Transfer learning aur multi-task learning (DL · 3) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-structuring-projects.html">DL · 3: Structuring Machine Learning Projects</a> › Topic 8 / 9</nav>
+        <p class="eyebrow">DL · 3 · TOPIC 08 · SEEKH KO AAGE BADHANA</p>
+        <h1>Transfer learning aur multi-task learning</h1>
+        <p>Ek kaam ki seekh doosre mein</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 3 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="p1" href="dl-ml-strategy-orthogonalization.html"><span>01</span>ML strategy aur orthogonalization</a>
+            <a data-topic-link="p2" href="dl-single-number-metric.html"><span>02</span>Ek number wala metric, satisficing aur optimizing</a>
+            <a data-topic-link="p3" href="dl-dev-test-setup.html"><span>03</span>Dev/test set lagana, aur kab badalna</a>
+            <a data-topic-link="p4" href="dl-human-level-performance.html"><span>04</span>Human-level performance aur avoidable bias</a>
+            <a data-topic-link="p5" href="dl-error-analysis.html"><span>05</span>Error analysis aur galat labels</a>
+            <a data-topic-link="p6" href="dl-mismatched-distributions.html"><span>06</span>Training aur testing alag distributions pe</a>
+            <a data-topic-link="p7" href="dl-fix-data-mismatch.html"><span>07</span>Data mismatch kaise theek karein</a>
+            <a data-topic-link="p8" class="current" aria-current="page" href="dl-transfer-multitask.html"><span>08</span>Transfer learning aur multi-task learning</a>
+            <a data-topic-link="p9" href="dl-end-to-end.html"><span>09</span>End-to-end deep learning</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="p1,p2,p3,p4,p5,p6,p7,p8,p9"><span>DL · 3 progress</span><strong data-progress-label>0 / 9 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Chhote data wale projects ke liye transfer learning sabse bada shortcut hai.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Pre-training aur fine-tuning</li><li>Sirf aakhri layer vs saari layers</li><li>Kab samajhdaari hai: same input, A mein bahut data, B mein kam</li><li>Multi-task: ek input se kai labels ek saath (apna example)</li><li>Loss: har label ka logistic loss jodo, missing labels chhod do</li><li>Multi-task kab kaam karta hai, aur ye transfer se kam common kyu</li></ul></details>
+        <article class="lesson-card single" id="p8">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Mere paas sirf 1,500 fabric defect photos hain. Deep learning possible hai?</p>
+              <p class="msg dost">Scratch se giant model train karna mushkil. Par kisi aur model ki seekh borrow kar sakte ho.</p>
+              <p class="msg me">Borrow matlab copy?</p>
+              <p class="msg dost">Weights borrow, problem apni. Jaise tumne scooter chalana seekha ho, to bike seekhna zero se nahi hota.</p>
+              <p class="msg me">Aur multi-task learning?</p>
+              <p class="msg dost">Woh ek model ko ek saath kai related kaam sikhana. Clothing photo mein collar, print, sleeve type, stain sab detect karna.</p>
+            </div>
+
+            <h4>Pre-training aur fine-tuning</h4>
+            <p><strong>Pre-training</strong> mein model ek bade general dataset pe seekhta hai. Image model edges, textures, shapes pakadna seekh sakta hai. Speech model basic sounds. Text model language patterns.</p>
+            <p><strong>Fine-tuning</strong> mein tum us model ko apne smaller task pe adapt karte ho: crop disease, fabric defect, product-photo tagging, Hindi support-ticket intent.</p>
+            <div class="visual-flow">
+              <span>Bada source task<br><small>bahut data</small></span><b>→</b>
+              <span>Pre-trained model</span><b>→</b>
+              <span class="flow-highlight">Apna task<br><small>fine-tune</small></span>
+            </div>
+            <p>Ye shortcut tab powerful hai jab source aur target ka input type similar ho. Photo se photo, audio se audio, text se text.</p>
+
+            <h4>Sirf aakhri layer vs saari layers</h4>
+            <p>Data kam ho to pre-trained network ki early layers freeze kar do. Sirf nayi output layer train karo. Data thoda zyada ho to saari layers fine-tune kar sakte ho, par small learning rate ke saath.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Apne task ka data</th><th>Strategy</th><th>Kyu</th></tr>
+              <tr><td>500 images</td><td>Freeze backbone, train last layer</td><td class="good">Overfit kam</td></tr>
+              <tr><td>10,000 images</td><td>Last few layers fine-tune</td><td>Task-specific patterns seekho</td></tr>
+              <tr><td>5 lakh images</td><td>All layers fine-tune, maybe scratch compare</td><td class="good">Enough data</td></tr>
+            </table></div>
+            <p>Backbone matlab model ka bada feature-extractor part. Last layer tumhare classes ke hisaab se replace hoti hai: “healthy”, “rust”, “mildew” etc.</p>
+
+            <h4>Kab transfer learning samajhdaari hai?</h4>
+            <p>Teen conditions dekho:</p>
+            <ul>
+              <li>Input type same ho: dono images, dono audio, dono text.</li>
+              <li>Source task A mein bahut data ho.</li>
+              <li>Target task B mein data kam ho, aur low-level patterns share hote hon.</li>
+            </ul>
+            <div class="compare-grid">
+              <div><b>Good transfer</b>General product-photo model → handloom defect detection. Edges, texture, cloth weave useful.</div>
+              <div><b>Weak transfer</b>English text model → loom vibration signal. Input nature hi alag, features share nahi.</div>
+            </div>
+            <div class="formula"><code>A has lots of data, B has little data, input(A) ≈ input(B) ⇒ transfer try karo</code><ul>
+              <li><b>A</b> = source task jahan model pehle seekha</li>
+              <li><b>B</b> = tumhara target task</li>
+              <li><b>≈</b> = exact same nahi, par representation useful ho sakti hai</li>
+            </ul></div>
+
+            <h4>Multi-task learning: ek photo, kai labels</h4>
+            <p>Fashion catalogue photo mein collar bhi ho sakta hai, long sleeve bhi, printed pattern bhi, stain defect bhi. Separate four models bana sakte ho. Ya ek model bana sakte ho jo four outputs de.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Image</th><th>Collar</th><th>Long sleeve</th><th>Print</th><th>Stain</th></tr>
+              <tr><td>#1</td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
+              <tr><td>#2</td><td>0</td><td>1</td><td>1</td><td>?</td></tr>
+              <tr><td>#3</td><td>1</td><td>0</td><td>1</td><td>1</td></tr>
+            </table></div>
+            <p>Question mark ka matlab label missing hai. Maybe annotator ne stain mark hi nahi kiya. Loss calculate karte waqt us label ko ignore kar sakte ho; baaki labels se learning hoti rahe.</p>
+
+            <h4>Loss: logistic losses jodo, missing chhod do</h4>
+            <p>Multi-task mein har output ek independent yes/no question ho sakta hai. Isliye har label ka logistic loss nikalo, available labels ka sum/average lo.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Task</th><th>Label</th><th>Loss</th><th>Use?</th></tr>
+              <tr><td>Collar</td><td>1</td><td>0.12</td><td class="good">Use</td></tr>
+              <tr><td>Long sleeve</td><td>0</td><td>0.18</td><td class="good">Use</td></tr>
+              <tr><td>Print</td><td>?</td><td>—</td><td>Ignore</td></tr>
+              <tr><td>Stain</td><td>1</td><td>0.45</td><td class="good">Use</td></tr>
+              <tr><td><b>Total used loss</b></td><td></td><td><b>0.12 + 0.18 + 0.45 = 0.75</b></td><td></td></tr>
+            </table></div>
+            <p>Is setup mein missing labels poison nahi. Bas code ko pata hona chahiye ki question mark pe loss nahi jodna.</p>
+
+            <h4>Multi-task kab kaam karta hai?</h4>
+            <p>Jab tasks related hon aur shared features useful hon. Road image mein edges, lanes, vehicles, lights — sab tasks ko help kar sakte hain. Agar tasks unrelated hain, ek model confuse ya compromise kar sakta hai.</p>
+            <div class="compare-grid">
+              <div><b>Good multi-task</b>Fashion photo: collar, sleeve, print, stain. Same visual world.</div>
+              <div><b>Bad idea</b>Same model se banana ripeness aur bank fraud predict karna. Shared representation weak.</div>
+            </div>
+
+            <h4>Transfer zyada common kyu?</h4>
+            <p>Multi-task ko har example ke liye multiple labels chahiye, aur tasks ka balanced importance chahiye. Industry mein often tumhare paas ek specific target hota hai aur pre-trained model ready milta hai. Isliye transfer learning daily shortcut ban jaata hai; multi-task powerful hai, par setup heavy.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Pre-trained model ko blind trust mat karo. Agar source data tumhare users se bahut alag hai, bias aur mismatch aa sakta hai. Dev set pe sach check karo.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Transfer learning mein pehle kisi aur ka homework use karte ho, phir apne exam ke hisaab se fine-tune. Multi-task mein ek student ko related subjects saath padhate ho.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Fine-tuning mein learning rate chhota kyu?</summary><p>Pre-trained weights already useful hain. Bahut bada learning rate unhe tod sakta hai. Chhota learning rate se model dheere apne task ke hisaab se adjust hota hai.</p></details>
+            <details class="qa"><summary>Last layer train karne ke baad all layers fine-tune kar sakte hain?</summary><p>Haan, common workflow hai. Pehle last layer stabilize karo, phir kuch layers unfreeze karke small learning rate se train karo.</p></details>
+            <details class="qa"><summary>Multi-label aur multiclass same hain?</summary><p>Nahi. Multiclass mein ek option choose hota hai, jaise digit 0–9. Multi-label mein ek shirt printed bhi ho sakti hai aur long-sleeve bhi.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Source: 12 lakh product photos. Target: 900 handloom defect photos. Strategy?</summary><p>Same input type, source data large, target small. Freeze backbone, train new last layer; maybe later small fine-tune. <b>Final answer: transfer learning</b>.</p></details>
+              <details class="qa"><summary>Multi-task losses available: 0.3, missing, 0.2, 0.4. Total used loss?</summary><p>Missing label ignore. Total = 0.3 + 0.2 + 0.4 = 0.9. <b>Final answer: 0.9</b>.</p></details>
+              <details class="qa"><summary>One clothing image can be printed, long-sleeve, and stained together. Softmax ya independent sigmoids?</summary><p>Multiple labels ek saath true ho sakte hain, isliye independent sigmoid outputs. <b>Final answer: sigmoids</b>.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="p8"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-fix-data-mismatch.html"><small>← Pichhla</small>Data mismatch kaise theek karein</a>
+          <a class="pager-next" href="dl-end-to-end.html"><small>Agla →</small>End-to-end deep learning</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

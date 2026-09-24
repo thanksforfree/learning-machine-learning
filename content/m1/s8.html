@@ -1,0 +1,51 @@
+
+            <div class="chat">
+              <p class="msg me">Ab tumor khatarnak hai ya nahi, ye batana hai. Answer 0 (nahi) ya 1 (haan). Linear regression hi use kar lein?</p>
+              <p class="msg dost">Try karke dekhte hain. Tumor size vs 0/1 pe line fit karo, aur bolo “line 0.5 se upar to khatarnak”. Shuru mein chal bhi jayega.</p>
+              <p class="msg dost">Ab data mein ek <em>bahut bada</em> tumor add karo (clearly khatarnak). Line uski taraf jhuk jaati hai, 0.5 wala point khisak jaata hai, aur beech wale kuch khatarnak tumors ab “safe” dikhne lagte hain! Ek bilkul sahi example ne sab bigaad diya. Upar se line 1.7 ya −0.3 jaisa output deti hai — chance kabhi 170% hota hai kya?</p>
+              <p class="msg me">To kya karein?</p>
+              <p class="msg dost">Line ka output ek <strong>S-shape machine</strong> mein daalo jo kisi bhi number ko 0 aur 1 ke beech daba deti hai. Isko <strong>sigmoid</strong> kehte hain. Line + sigmoid = <strong>logistic regression</strong>.</p>
+              <p class="msg me">0 aur 1 ke beech matlab probability jaisa?</p>
+              <p class="msg dost">Exactly. Doctor bhi “chance zyada/kam” type baat karta hai; sigmoid model ko wahi bhasha de deta hai.</p>
+            </div>
+            <figure class="figure">
+              <svg viewBox="0 0 400 210" role="img" aria-label="Sigmoid curve: bade negative z pe 0, z=0 pe 0.5, bade positive z pe 1">
+                <line x1="20" y1="190" x2="385" y2="190" stroke="#b8c2d3"/><line x1="200" y1="10" x2="200" y2="195" stroke="#dde3ec"/>
+                <line x1="20" y1="105" x2="385" y2="105" stroke="#dde3ec" stroke-dasharray="4 4"/><line x1="20" y1="20" x2="385" y2="20" stroke="#dde3ec" stroke-dasharray="4 4"/>
+                <polyline points="20,190 80,187 110,182 140,170 170,144 200,105 230,66 260,40 290,28 320,23 380,20" fill="none" stroke="#3567e8" stroke-width="3"/>
+                <text x="8" y="194" font-size="11" fill="#7a879b">0</text><text x="4" y="109" font-size="11" fill="#7a879b">.5</text><text x="8" y="24" font-size="11" fill="#7a879b">1</text>
+                <text x="200" y="206" font-size="11" text-anchor="middle" fill="#7a879b">z = 0</text><text x="380" y="206" font-size="11" text-anchor="end" fill="#7a879b">z →</text>
+              </svg>
+              <div class="cap">Sigmoid: z kitna bhi bada/chhota ho, output hamesha 0 aur 1 ke beech.</div>
+            </figure>
+            <div class="formula"><code>z = w · x + b          (wahi purani line)
+f = g(z) = 1 / (1 + e⁻ᶻ)   (sigmoid)</code><ul><li>f = “y = 1 hone ka chance”. f = 0.73 matlab model ke hisaab se 73% chance khatarnak.</li></ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>z</th><th>−4</th><th>−2</th><th>0</th><th>2</th><th>4</th></tr>
+              <tr><td>g(z)</td><td>0.02</td><td>0.12</td><td>0.50</td><td>0.88</td><td>0.98</td></tr>
+            </table></div>
+            <h4>Ek solved example</h4>
+            <p>Model ne seekha w = 0.5, b = −3. Ab alag tumors:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Tumor size</th><th>z = 0.5 × size − 3</th><th>Chance (sigmoid)</th><th>Faisla (≥ 0.5?)</th></tr>
+              <tr><td>2 cm</td><td>−2</td><td>12%</td><td>Safe (0)</td></tr>
+              <tr><td>6 cm</td><td>0</td><td>50%</td><td>Border pe</td></tr>
+              <tr><td>8 cm</td><td>1</td><td>73%</td><td>Khatarnak (1)</td></tr>
+              <tr><td>12 cm</td><td>3</td><td>95%</td><td>Khatarnak (1)</td></tr>
+            </table></div>
+            <p>Notice karo: z = 0 pe chance exactly 50%. Isi wajah se z = 0 wali jagah decision boundary ban jaati hai — next topic mein iski picture dekhenge.</p>            <h4>Threshold ka business decision</h4>
+            <p>Sigmoid chance deta hai; final haan/na tum threshold se banate ho. Threshold context pe depend karta hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Case</th><th>Model chance f</th><th>Threshold</th><th>Faisla</th></tr>
+              <tr><td>Normal spam filter</td><td>0.42</td><td>0.5</td><td>Not spam</td></tr>
+              <tr><td>Cancer screening</td><td>0.42</td><td>0.3</td><td class="bad">Extra test karao</td></tr>
+            </table></div>
+            <p>Same probability, alag decision. Kyunki spam mein false alarm irritating hai; health mein missed case mehenga pad sakta hai.</p>
+
+            <div class="lesson-callout"><b>Chhota check-in:</b> Logistic regression ka “linear” hissa abhi bhi z = w·x + b hai. Sigmoid sirf us score ko chance wali language mein translate karta hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Logistic regression = pehle line wala score, phir sigmoid se usko 0–1 ka chance banao, phir threshold se haan/na.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Ye “e” kya hai?</summary><p>Ek fixed number ≈ 2.718, bilkul π ≈ 3.14 jaisa. Calculation NumPy (np.exp) kar deta hai. Tumhe bas S-shape yaad rakhni hai.</p></details>
+            <details class="qa"><summary>Naam “regression” hai par kaam classification — confusing nahi?</summary><p>Haan, naam confusing hai. Andar se ye ek number (chance) predict karta hai, isliye regression bola gaya. Phir threshold se category banti hai.</p></details>
+            <details class="qa"><summary>Threshold hamesha 0.5 hi rakhna hai?</summary><p>Nahi, woh default hai. Cancer screening mein 0.3 rakh sakte ho — koi asli case miss na ho, chahe kuch healthy logon ka extra test ho jaye. Spam filter mein 0.8 — koi zaroori email galti se spam mein na chala jaye.</p></details>
+            <details class="qa"><summary>73% matlab model 73% pakka hai?</summary><p>Ye model ka andaaza hai, guarantee nahi. Model achhe data pe achhe se train hua ho tabhi ye number bharosemand hota hai.</p></details>            <details class="qa"><summary>Sigmoid output 0.99 ho to kya class pakki hai?</summary><p>Nahi. Bas model bahut confident hai. Agar training data biased, noisy, ya naye data se alag hai, to 0.99 bhi galat ho sakta hai. Confidence aur correctness alag cheezein hain.</p></details>

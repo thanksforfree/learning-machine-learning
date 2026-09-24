@@ -1,0 +1,80 @@
+            <div class="chat">
+              <p class="msg me">Mere model mein knobs hi knobs hain: learning rate, layers, units, β, batch size. Main grid bana ke sab try kar dun?</p>
+              <p class="msg dost">Agar tum chai bana rahe ho, chini 1, 2, 3 chamach aur adrak 1, 2, 3 tukde ka grid chalega. Par deep learning mein knobs ki ginti zyada aur cost mehengi.</p>
+              <p class="msg me">To kaise choose karun?</p>
+              <p class="msg dost">Random search. Par “random” matlab andha nahi. Sahi scale pe random.</p>
+              <p class="msg me">Scale?</p>
+              <p class="msg dost">Learning rate ko 0.0001 se 1 tak equally mat chuno. Log scale pe chuno, warna important chhote values miss ho jaayenge.</p>
+            </div>
+            <h4>Kaunsa hyperparameter kitna important?</h4>
+            <p>Har project alag, par practical priority kuch aisi hoti hai:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Priority</th><th>Hyperparameter</th><th>Kyu</th></tr>
+              <tr><td>Sabse upar</td><td>α learning rate</td><td class="bad">Galat hua to training fail ya snail speed</td></tr>
+              <tr><td>High</td><td>Momentum β, mini-batch size, hidden units</td><td>Speed aur capacity pe strong asar</td></tr>
+              <tr><td>Medium</td><td>Layers, decay, regularization λ</td><td>Problem aur data size pe depend</td></tr>
+              <tr><td>Usually default</td><td>Adam β₁, β₂, ε</td><td>Defaults aksar kaafi achhe</td></tr>
+            </table></div>
+            <h4>Grid search ki jagah random search kyu</h4>
+            <p>Grid mein tum har knob ko fixed lines pe try karte ho. Problem: agar asli important knob α hai, aur doosra knob utna matter nahi karta, to grid bahut attempts waste karega. Random search har trial mein α ki nayi value deta hai.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 420 220" role="img" aria-label="Grid search points aur random search points comparison">
+                <rect x="35" y="35" width="150" height="150" fill="#edf3ff" stroke="#b8c2d3"/>
+                <rect x="235" y="35" width="150" height="150" fill="#e9f7f3" stroke="#b8c2d3"/>
+                <g fill="#3567e8"><circle cx="65" cy="65" r="4"/><circle cx="110" cy="65" r="4"/><circle cx="155" cy="65" r="4"/><circle cx="65" cy="110" r="4"/><circle cx="110" cy="110" r="4"/><circle cx="155" cy="110" r="4"/><circle cx="65" cy="155" r="4"/><circle cx="110" cy="155" r="4"/><circle cx="155" cy="155" r="4"/></g>
+                <g fill="#159477"><circle cx="260" cy="72" r="4"/><circle cx="305" cy="55" r="4"/><circle cx="360" cy="90" r="4"/><circle cx="278" cy="130" r="4"/><circle cx="330" cy="122" r="4"/><circle cx="372" cy="160" r="4"/><circle cx="250" cy="170" r="4"/><circle cx="315" cy="177" r="4"/><circle cx="352" cy="45" r="4"/></g>
+                <text x="78" y="205" font-size="11" fill="#3567e8">grid</text><text x="285" y="205" font-size="11" fill="#159477">random</text>
+              </svg>
+              <div class="cap">Grid neat dikhta hai, random zyada area explore karta hai. Neat hona goal nahi; achha model goal hai.</div>
+            </figure>
+            <h4>Coarse to fine: pehle shehar, phir gali</h4>
+            <p>Pehle wide range mein random points try karo. Jahan achhe results mile, us region ke aas-paas zoom in karo. Jaise flat dhundhte waqt pehle area choose, phir society, phir floor.</p>
+            <div class="visual-flow"><span>Wide random<br><small>0.0001 se 1</small></span><b>→</b><span class="flow-highlight">Achha zone mila</span><b>→</b><span>Fine random<br><small>0.003 se 0.03</small></span></div>
+            <h4>Learning rate ke liye log scale</h4>
+            <p>α = 0.0001, 0.001, 0.01, 0.1, 1 — inke beech ka farak multiplication mein hai. Isliye r ko random chuno, phir α = 10ʳ.</p>
+            <div class="formula"><code>r ~ uniform(a, b)
+α = 10ʳ</code><ul>
+              <li><b>a, b</b> exponent range, jaise −4 se −1</li>
+              <li><b>uniform</b> matlab r range mein randomly</li>
+              <li><b>α</b> log scale pe spread hota hai</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>r</th><th>α = 10ʳ</th><th>Feel</th></tr>
+              <tr><td>−4.0</td><td>0.00010</td><td>bahut chhota</td></tr>
+              <tr><td>−3.2</td><td>0.00063</td><td>chhota</td></tr>
+              <tr><td>−2.4</td><td>0.00398</td><td class="good">common useful zone</td></tr>
+              <tr><td>−1.6</td><td>0.02512</td><td>bada</td></tr>
+              <tr><td>−0.8</td><td>0.15849</td><td>kaafi aggressive</td></tr>
+            </table></div>
+            <pre class="code">r = np.random.uniform(-4, -1)
+alpha = 10 ** r  <span class="cm"># 0.0001 se 0.1 tak log scale</span>
+
+s = 10 ** np.random.uniform(-3, -1)
+beta = 1 - s    <span class="cm"># beta ko 0.9, 0.99, 0.999 zone mein sample karo</span></pre>
+            <h4>β ke liye 1 − β sample karo</h4>
+            <p>β = 0.9 aur 0.99 mein bada practical farak hai: average 10 readings vs 100 readings. Agar β ko 0.9 se 0.999 tak normal random chuna, to useful near-1 zones properly cover nahi honge. Isliye s = 1 − β ko log scale pe sample karo.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>s = 1 − β</th><th>β</th><th>Rough memory</th></tr>
+              <tr><td>0.1</td><td>0.9</td><td>10 steps</td></tr>
+              <tr><td>0.01</td><td>0.99</td><td>100 steps</td></tr>
+              <tr><td>0.001</td><td>0.999</td><td>1000 steps</td></tr>
+            </table></div>
+            <h4>Tutor mode vs tournament mode</h4>
+            <div class="compare-grid">
+              <div><b>Tutor mode</b>Ek student ko personal coaching. Ek model train dekho, α adjust karo, architecture tweak karo. Limited compute ho to useful.</div>
+              <div><b>Tournament mode</b>Poore batch ko mock test. Bahut saare models parallel chalao, best score wale ko shortlist karo. Compute zyada ho to fast discovery.</div>
+            </div>
+            <p>Dono valid hain. Laptop pe ho to tutor mode. Cloud budget hai to tournament mode. Bas har experiment ka config aur dev score likhte rehna, warna kal khud ko yaad nahi rahega ki kaunsi chai mein kitni chini thi.</p>
+            <div class="lesson-callout"><b>Dobara check:</b> Data badla, architecture badla, ya kuch mahine nikal gaye — hyperparameters dobara tune karo. Purana best hamesha naya best nahi hota.</div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Linear random sampling se α ke bade values over-represent ho jaate hain. 0.0001 se 1 tak uniform sample kiya to 0.1 se 1 ke beech hi bahut points girenge, jabki useful zone 0.001 ke aas-paas ho sakta hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Random search karo, log scale pe karo, pehle wide jao phir zoom in. Sabse pehle α ko serious lo.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Random search mein kitne trials?</summary><p>Budget pe depend. 10 trials bhi grid se better signal de sakte hain. Serious project mein dozens ya hundreds. Har trial ka result save karo.</p></details>
+            <details class="qa"><summary>Batch size bhi log scale pe?</summary><p>Aksar powers of 2 try karte hain: 32, 64, 128, 256, 512. Memory limit bhi decide karti hai.</p></details>
+            <details class="qa"><summary>Dev set pe baar-baar tune karne se overfit?</summary><p>Haan, possible. Isi liye final test set ko end tak lock rakho. Dev tuning ke baad test pe sirf final honest number.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>r = −3 ho to α = 10ʳ kitna?</summary><p>10⁻³ = <b>0.001</b>.</p></details>
+              <details class="qa"><summary>β = 0.99 roughly kitne steps ka average?</summary><p>1/(1 − 0.99) = 1/0.01 = <b>100 steps</b>.</p></details>
+              <details class="qa"><summary>Compute kam hai. Tutor mode ya tournament mode?</summary><p><b>Tutor mode</b>: ek model ko dhyaan se monitor aur tune karo.</p></details>
+            </div>

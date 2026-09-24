@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Average, phailaav aur probability: μ, σ aur chance. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Average, phailaav aur probability (Maths) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a class="active" href="../maths.html">Maths</a><a href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../maths.html">Maths: Maths — zero se deep learning tak</a> › Topic 5 / 16</nav>
+        <p class="eyebrow">MATHS · TOPIC 05 · LEVEL 2 · DATA AUR BADLAAV</p>
+        <h1>Average, phailaav aur probability</h1>
+        <p>μ, σ aur chance</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>Maths ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="z1" href="maths-symbols.html"><span>01</span>Symbols aur formula padhna</a>
+            <a data-topic-link="z2" href="maths-graphs.html"><span>02</span>Graph, line aur slope</a>
+            <a data-topic-link="z3" href="maths-functions.html"><span>03</span>Function = input-output machine</a>
+            <a data-topic-link="z4" href="maths-powers-e-log.html"><span>04</span>Power, e aur log</a>
+            <a data-topic-link="z5" class="current" aria-current="page" href="maths-average-probability.html"><span>05</span>Average, phailaav aur probability</a>
+            <a data-topic-link="z6" href="maths-vectors-matrices.html"><span>06</span>Vectors, matrices aur dot product</a>
+            <a data-topic-link="z7" href="maths-slope-derivative.html"><span>07</span>Slope, derivative aur chain rule</a>
+            <a data-topic-link="z8" href="maths-python-numpy.html"><span>08</span>Python aur NumPy crash course</a>
+            <a data-topic-link="z9" href="maths-broadcasting-shapes.html"><span>09</span>Broadcasting, shapes aur reshape</a>
+            <a data-topic-link="z10" href="maths-computation-graph.html"><span>10</span>Computation graph aur activation ke derivatives</a>
+            <a data-topic-link="z11" href="maths-matrix-gradients.html"><span>11</span>Matrix gradients aur dimensions ka hisaab</a>
+            <a data-topic-link="z12" href="maths-norms-similarity.html"><span>12</span>Norms, distance aur cosine similarity</a>
+            <a data-topic-link="z13" href="maths-moving-average.html"><span>13</span>Exponentially weighted (moving) average</a>
+            <a data-topic-link="z14" href="maths-probability-2.html"><span>14</span>Probability level 2: conditional, likelihood, cross-entropy</a>
+            <a data-topic-link="z15" href="maths-randomness-scale.html"><span>15</span>Randomness, variance aur scale</a>
+            <a data-topic-link="z16" href="maths-convolution.html"><span>16</span>Convolution: sliding dot product</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="z1,z2,z3,z4,z5,z6,z7,z8,z9,z10,z11,z12,z13,z14,z15,z16"><span>Maths progress</span><strong data-progress-label>0 / 16 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Feature scaling μ aur σ use karta hai, anomaly detection bell curve use karta hai, aur har classifier probability deta hai.</div>
+        
+        
+        <article class="lesson-card single" id="z5">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Average to pata hai. Par ye variance, standard deviation, probability — ye kya hai?</p>
+              <p class="msg dost">Teen dost ki kahani sunao. Class ke do groups ne test diya. Dono ka average 50 marks. Kya dono same hain?</p>
+              <p class="msg me">Average same hai to same hi honge?</p>
+              <p class="msg dost">Nahi! Group A: 48, 50, 52 — sab average ke paas. Group B: 10, 50, 90 — bahut phaile hue. Average sirf “beech” batata hai. <strong>Kitna phaila hai</strong> — woh variance aur standard deviation batate hain.</p>
+              <p class="msg me">To average kabhi-kabhi aadhi kahani batata hai?</p>
+              <p class="msg dost">Exactly. Average news headline hai; variance andar ki report. Dono dekho, tab picture clear hoti hai.</p>
+            </div>
+            <h4>Mean (average) = μ</h4>
+            <div class="formula"><code>μ = (sab numbers ka total) ÷ (kitne numbers)</code><ul><li>[48, 50, 52] → 150 ÷ 3 = 50</li><li>[10, 50, 90] → 150 ÷ 3 = 50</li></ul></div>
+            <h4>Variance aur standard deviation (σ) — step by step</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Step</th><th>Group A: 48, 50, 52</th><th>Group B: 10, 50, 90</th></tr>
+              <tr><td>1. Har number − average</td><td>−2, 0, 2</td><td>−40, 0, 40</td></tr>
+              <tr><td>2. Square karo</td><td>4, 0, 4</td><td>1600, 0, 1600</td></tr>
+              <tr><td>3. Average = <b>variance (σ²)</b></td><td>8 ÷ 3 ≈ 2.7</td><td>3200 ÷ 3 ≈ 1067</td></tr>
+              <tr><td>4. Root = <b>std deviation (σ)</b></td><td class="good">≈ 1.6</td><td class="bad">≈ 32.7</td></tr>
+            </table></div>
+            <p><strong>σ ka matlab:</strong> “aam taur pe ek number average se kitna door hota hai”. Group A mein ~1.6 marks, Group B mein ~33 marks. Square isliye kiya taaki −40 aur +40 cancel na hon — Module 1 ke cost function jaisa hi trick!</p>
+            <h4>Bell curve (normal / Gaussian distribution)</h4>
+            <p>Bahut saari cheezein — logon ki height, machine ka temperature — ek <strong>ghante (bell) jaisi</strong> shape banati hain: zyadatar values average ke paas, door wali kam.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 400 190" role="img" aria-label="Bell curve: beech mein average, dono taraf 1 sigma aur 2 sigma">
+                <line x1="20" y1="165" x2="380" y2="165" stroke="#b8c2d3"/>
+                <path d="M20,164 C110,164 140,20 200,20 C260,20 290,164 380,164" fill="#edf3ff" stroke="#3567e8" stroke-width="3"/>
+                <line x1="200" y1="20" x2="200" y2="165" stroke="#3567e8" stroke-dasharray="4 3"/>
+                <line x1="155" y1="70" x2="155" y2="165" stroke="#8a96aa" stroke-dasharray="3 3"/><line x1="245" y1="70" x2="245" y2="165" stroke="#8a96aa" stroke-dasharray="3 3"/>
+                <line x1="110" y1="140" x2="110" y2="165" stroke="#c2410c" stroke-dasharray="3 3"/><line x1="290" y1="140" x2="290" y2="165" stroke="#c2410c" stroke-dasharray="3 3"/>
+                <g font-size="11" text-anchor="middle"><text x="200" y="180" fill="#3567e8">μ (average)</text><text x="155" y="180" fill="#7a879b">−1σ</text><text x="245" y="180" fill="#7a879b">+1σ</text><text x="110" y="180" fill="#c2410c">−2σ</text><text x="290" y="180" fill="#c2410c">+2σ</text></g>
+              </svg>
+              <div class="cap">Lagbhag 68% values ±1σ ke andar, ~95% values ±2σ ke andar. Isse bahut bahar = “ajeeb” (anomaly).</div>
+            </figure>
+            <h4>Probability = chance, 0 se 1 ke beech</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Probability</th><th>Matlab</th><th>Example</th></tr>
+              <tr><td>0</td><td>Kabhi nahi</td><td>Normal dice pe 7 aana</td></tr>
+              <tr><td>0.5</td><td>50-50</td><td>Sikka uchhalne pe heads</td></tr>
+              <tr><td>1/6 ≈ 0.17</td><td>6 mein 1</td><td>Dice pe 4</td></tr>
+              <tr><td>1</td><td>Pakka</td><td>Dice pe 1 se 6 ke beech kuch</td></tr>
+            </table></div>
+            <p><strong>Do independent cheezein ek saath:</strong> chances multiply karo. Do sikke dono heads: 0.5 × 0.5 = 0.25. (Anomaly detection mein har feature ka chance aise hi multiply hota hai.)</p>
+            <p>“Independent” ka matlab: ek ka result doosre ko influence nahi kar raha. Jaise do alag coins. Par India match jeeta aur WhatsApp pe memes badhe — woh independent nahi 😄.</p>
+            <p><strong>Ek hi cheez ke saare options ka total = 1.</strong> Dice ke 6 options × 1/6 = 1. (Softmax yahi guarantee karta hai.)</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> μ = beech kahan, σ = kitna phaila, probability = kitna chance (0 se 1).</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Variance aur σ dono kyu? Ek kaafi nahi?</summary><p>Variance ki unit square ho jaati hai (marks²), jo ajeeb hai. σ = root(variance) wapas original unit (marks) mein aata hai — samajhna aasan. Kaam dono ka same: phailaav naapna.</p></details>
+            <details class="qa"><summary>Model 0.8 probability bole to kya 10 mein 8 baar sahi?</summary><p>Achhe se calibrated model ho to haan, aise 10 cases mein lagbhag 8 sach mein positive hone chahiye. Par har model calibrated nahi hota — isliye check karna padta hai.</p></details>
+            <details class="qa"><summary>ML mein ye kahan aayega?</summary><p>Feature scaling (μ, σ), anomaly detection (bell curve), logistic regression (probability), softmax (total = 1), reinforcement learning (random outcomes ka average).</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>[2, 4, 6] ka mean aur variance?</summary><p>Mean = 4. Doori −2, 0, 2 → square 4, 0, 4 → variance = 8/3 ≈ <b>2.67</b>, σ ≈ 1.63.</p></details>
+              <details class="qa"><summary>Do dice dono pe 6 aane ka chance?</summary><p>1/6 × 1/6 = <b>1/36 ≈ 0.028</b>.</p></details>
+            </div>
+            <div class="used-box"><h4>Ye maths aage kahan kaam aayegi</h4><div class="chips"><a class="chip" data-topic-link="s6" href="feature-scaling.html"><small>ML · 1</small>Feature scaling aur training check</a><a class="chip" data-topic-link="a5" href="softmax-multiclass.html"><small>ML · 2</small>Multiclass aur softmax</a><a class="chip" data-topic-link="a10" href="precision-recall.html"><small>ML · 2</small>Precision, recall aur F1</a><a class="chip" data-topic-link="a11" href="decision-trees.html"><small>ML · 2</small>Decision tree, entropy aur information gain</a><a class="chip" data-topic-link="u4" href="anomaly-gaussian.html"><small>ML · 3</small>Anomaly detection aur Gaussian</a><a class="chip" data-topic-link="u5" href="anomaly-algorithm.html"><small>ML · 3</small>Anomaly detection algorithm aur evaluation</a><a class="chip" data-topic-link="u8" href="mean-normalization.html"><small>ML · 3</small>Mean normalization, TensorFlow aur related items</a><a class="chip" data-topic-link="u12" href="q-function-bellman.html"><small>ML · 3</small>Q-function aur Bellman equation</a><a class="chip" data-topic-link="i5" href="dl-normalizing-inputs.html"><small>DL · 2</small>Inputs normalize karna</a><a class="chip" data-topic-link="i13" href="dl-batch-normalization.html"><small>DL · 2</small>Batch normalization</a><a class="chip" data-topic-link="p2" href="dl-single-number-metric.html"><small>DL · 3</small>Ek number wala metric, satisficing aur optimizing</a></div></div>
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="z5"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="maths-powers-e-log.html"><small>← Pichhla</small>Power, e aur log</a>
+          <a class="pager-next" href="maths-vectors-matrices.html"><small>Agla →</small>Vectors, matrices aur dot product</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

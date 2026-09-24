@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CNN practical advice: Open source, transfer learning, augmentation. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>CNN practical advice (DL · 4) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-convolutional-networks.html">DL · 4: Convolutional Neural Networks</a> › Topic 9 / 15</nav>
+        <p class="eyebrow">DL · 4 · TOPIC 09 · FAMOUS ARCHITECTURES</p>
+        <h1>CNN practical advice</h1>
+        <p>Open source, transfer learning, augmentation</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 4 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="c1" href="dl-cv-edge-detection.html"><span>01</span>Computer vision aur edge detection</a>
+            <a data-topic-link="c2" href="dl-padding-stride.html"><span>02</span>Padding aur strided convolution</a>
+            <a data-topic-link="c3" href="dl-conv-volumes-layer.html"><span>03</span>Volumes pe convolution aur ek conv layer</a>
+            <a data-topic-link="c4" href="dl-pooling-cnn-example.html"><span>04</span>Pooling, poora CNN example aur convolution kyu</a>
+            <a data-topic-link="c5" href="dl-classic-networks.html"><span>05</span>Classic networks: LeNet-5, AlexNet, VGG-16</a>
+            <a data-topic-link="c6" href="dl-resnets.html"><span>06</span>ResNets</a>
+            <a data-topic-link="c7" href="dl-inception.html"><span>07</span>1×1 convolution aur Inception network</a>
+            <a data-topic-link="c8" href="dl-mobilenet-efficientnet.html"><span>08</span>MobileNet aur EfficientNet</a>
+            <a data-topic-link="c9" class="current" aria-current="page" href="dl-cnn-practical-advice.html"><span>09</span>CNN practical advice</a>
+            <a data-topic-link="c10" href="dl-localization-landmarks.html"><span>10</span>Object localization aur landmark detection</a>
+            <a data-topic-link="c11" href="dl-sliding-windows.html"><span>11</span>Sliding windows aur uska convolutional version</a>
+            <a data-topic-link="c12" href="dl-yolo.html"><span>12</span>YOLO: IoU, non-max suppression, anchor boxes</a>
+            <a data-topic-link="c13" href="dl-region-proposals-unet.html"><span>13</span>Region proposals aur semantic segmentation (U-Net)</a>
+            <a data-topic-link="c14" href="dl-face-recognition.html"><span>14</span>Face recognition: one-shot, Siamese, triplet loss</a>
+            <a data-topic-link="c15" href="dl-neural-style-transfer.html"><span>15</span>Neural style transfer aur ConvNet andar kya seekhta hai</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15"><span>DL · 4 progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Asli project mein zero se network kam hi banate hain. Ye page batata hai ki pro log kaise shuru karte hain.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>GitHub pe open-source implementation se shuru</li><li>Transfer learning: freeze karna, activations pehle nikaal ke rakhna, data zyada to zyada layers train</li><li>Augmentation: mirror, random crop, rotation, shearing, color shift</li><li>Augmentation training ke saath parallel</li><li>Computer vision ki haalat: kam data = zyada hand-engineering</li><li>Benchmark tricks: ensembling, test pe multi-crop</li></ul></details>
+        <article class="lesson-card single" id="c9">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Dost, CNN banana hai. Kya main blank file se shuru karun?</p>
+              <p class="msg dost">Blank file se sirf chai girti hai aur time bhi. Real project mein pehla move hota hai: kisi trusted open-source implementation ko dekho, phir apne data ke hisaab se adjust karo.</p>
+              <p class="msg me">Matlab copy-paste?</p>
+              <p class="msg dost">Nahi. Recipe dekh ke apni sabzi banana. Architecture, preprocessing, input size, normalization, training loop — ye sab details ready milti hain. Par data, labels aur final decision tumhara.</p>
+              <p class="msg me">Aur agar mere paas sirf 800 images hain?</p>
+              <p class="msg dost">Tab hero entry hoti hai <strong>transfer learning</strong> ki. Kisi bade dataset pe trained model lo, uski aankhon ko reuse karo, bas apna final classifier sikhao.</p>
+            </div>
+
+            <h4>Open-source se shuru karna cheating nahi, smart kaam hai</h4>
+            <p>Computer vision mein chhoti details bahut kaat-ti hain: image ko 224×224 karna hai ya 299×299, RGB order kya hai, normalization ka mean-std kya hai, learning rate kitna hai. GitHub pe achhi implementation se tumhe ye “plumbing” mil jaati hai.</p>
+            <div class="visual-flow"><span>Known architecture</span><b>→</b><span>Working code</span><b>→</b><span class="flow-highlight">Apna dataset</span><b>→</b><span>Fine-tune</span></div>
+            <p>Bas teen cheezein check karo: code actively maintained hai ya nahi, license project ke kaam ke liye theek hai ya nahi, aur reported accuracy reproduce ho rahi hai ya nahi. “Mere laptop pe chal gaya” ko science mat samjho.</p>
+
+            <h4>Transfer learning: pehle se trained aankhen udhaar lo</h4>
+            <p>Socho ek intern ko office gate pe visitor ID check karni hai. Usko pehle se face, shirt, bag, text jaise visual clues samajh aate hain. Ab tum bas sikha rahe ho: “hamare office ka blue badge allowed hai.” CNN bhi aise hi reuse hota hai.</p>
+            <div class="compare-grid">
+              <div><b>Kam data</b>Base CNN freeze karo. Sirf last dense/softmax layer train karo. Overfitting kam hota hai.</div>
+              <div><b>Medium data</b>Last ke kuch convolution blocks unfreeze karo. Model thoda apni problem ke texture seekhega.</div>
+              <div><b>Bahut data</b>Zyada layers train kar sakte ho. Kabhi-kabhi poora network fine-tune bhi hota hai, chhote learning rate ke saath.</div>
+            </div>
+            <p><strong>Freeze</strong> ka matlab: layer ke weights training mein change nahi honge. Woh feature extractor ki tarah kaam karegi. Agar base model ka output 6×6×640 hai aur tum 7 classes classify kar rahe ho, final dense layer ke parameters:</p>
+            <div class="formula"><code>6 × 6 × 640 × 7 + 7 = 161287</code><ul>
+              <li><b>6×6×640</b> = ek image se nikla feature vector, flatten karne ke baad 23040 numbers</li>
+              <li><b>7</b> = tumhari classes, jaise helmet, no-helmet, car, bike, bus, truck, auto</li>
+              <li><b>+7</b> = har class ka bias</li>
+            </ul></div>
+            <p>Poore CNN ke crore parameters train karne ke bajay lagbhag 1.61 lakh trainable parameters — small dataset ke liye yahi practical hai.</p>
+
+            <h4>Activations pehle nikaal ke rakhna</h4>
+            <p>Agar frozen base bilkul change nahi ho raha, to har epoch usse same features nikalenge. Phir baar-baar CNN chalane ki kya zaroorat? Ek baar sab images ke activations save karo, phir chhote classifier ko un saved features pe train karo.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Setup</th><th>Har epoch mein base CNN?</th><th>Kab useful</th></tr>
+              <tr><td>On-the-fly</td><td class="bad">Haan, slow</td><td>Jab augmentation live ho rahi ho</td></tr>
+              <tr><td>Precomputed activations</td><td class="good">Nahi, fast</td><td>Jab images fixed hain aur base frozen hai</td></tr>
+            </table></div>
+
+            <h4>Augmentation: data ko thoda hila do, label wahi rakho</h4>
+            <p>Traffic camera mein bike kabhi left se aayegi, kabhi thoda tilt, kabhi dhoop tez. Agar training photos bahut seedhi-saadhi hain, model exam mein panic karega. <strong>Data augmentation</strong> usko practice karata hai.</p>
+            <div class="visual-flow"><span>original photo</span><b>→</b><span>mirror / crop</span><b>→</b><span>rotate / shear</span><b>→</b><span class="flow-highlight">color shift</span></div>
+            <p>Color shift bhi kaam ka hai: thoda brightness, contrast, saturation badalna. Aadmi same hai, bas shaam ki light alag hai. Lekin limit rakho — agar “6” ko rotate karke “9” bana diya, label kharab ho gaya.</p>
+
+            <h4>Augmentation training ke parallel chalti hai</h4>
+            <p>Practical pipeline mein CPU image ko random crop/flip/color shift karta rehta hai, aur GPU model train karta rehta hai. Dono ka kaam line mein lagao, warna GPU chai break pe chala jaata hai.</p>
+            <pre class="code"># TensorFlow style idea
+augment = tf.keras.Sequential([
+    tf.keras.layers.RandomFlip("horizontal"),
+    tf.keras.layers.RandomRotation(0.05),
+    tf.keras.layers.RandomContrast(0.15),
+])
+base.trainable = False          <span class="cm"># pehle feature extractor freeze</span>
+x = augment(inputs)             <span class="cm"># har batch mein naya version</span>
+features = base(x, training=False)
+outputs = head(features)</pre>
+
+            <h4>Kam data ho to human design zyada kaam aata hai</h4>
+            <p>Computer vision ki haalat thodi ajeeb hai: data kam ho to architecture tricks, pretrained weights, augmentation, hand-tuned preprocessing sab important ho jaate hain. Data bahut zyada ho to model khud bahut kuch seekh leta hai. Isliye 500 photos wale project aur 5 crore photos wale project ka style same nahi hota.</p>
+
+            <h4>Benchmark tricks: leaderboard ka game alag hota hai</h4>
+            <p>Competition mein log accuracy ka last 0.5% nikalne ke liye extra tricks lagate hain. <strong>Ensembling</strong>: 5 models train karo, predictions average. <strong>Multi-crop testing</strong>: test image ke center, corners, flipped version pe prediction lo, phir average.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Production app mein in tricks ka cost bhi hota hai. 5 models ka ensemble matlab roughly 5× inference time. Leaderboard ki mithai roz ke tiffin mein nahi chalti.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> CNN project mein pehle reliable code + pretrained model lo, phir data ke size ke hisaab se freeze, fine-tune aur augmentation choose karo.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Pretrained model doosre dataset pe trained hai. Mere traffic camera pe kaise chalega?</summary><p>Early layers edges, corners, textures jaise common clues pakadti hain. Ye har photo mein kaam aate hain. Last layers ko tumhare labels ke hisaab se train karna padta hai.</p></details>
+            <details class="qa"><summary>Augmentation kitni strong rakhu?</summary><p>Itni ki real world jaisa variation aaye. Helmet detection mein small rotation ok; par upside-down image shayad real camera mein nahi aayegi, to usse model confuse ho sakta hai.</p></details>
+            <details class="qa"><summary>Fine-tuning mein learning rate chhota kyu?</summary><p>Pretrained weights already useful hain. Bada learning rate unhe tod sakta hai. Chhota learning rate bolta hai: “bas thoda adjust karo, purana gyaan mat bhoolo.”</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Frozen base ka output 4×4×512 hai. 6 classes ke dense head mein kitne parameters?</summary><p>Flatten size = 4 × 4 × 512 = 8192. Weights = 8192 × 6 = 49152, bias = 6. Total <b>49158</b>.</p></details>
+              <details class="qa"><summary>500 images hain. Tum pehle poora CNN train karoge ya pretrained base freeze?</summary><p>Pretrained base freeze karke head train karna better start hai. Data kam hai, poora CNN train karne se overfitting ka chance high.</p></details>
+              <details class="qa"><summary>Number plate OCR mein horizontal flip augmentation safe hai?</summary><p>Aksar nahi. Flip se letters ulte ho jaate hain; label ka meaning badal sakta hai. Crop/brightness zyada safe choices hain.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="c9"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-mobilenet-efficientnet.html"><small>← Pichhla</small>MobileNet aur EfficientNet</a>
+          <a class="pager-next" href="dl-localization-landmarks.html"><small>Agla →</small>Object localization aur landmark detection</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

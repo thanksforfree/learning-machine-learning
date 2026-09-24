@@ -1,0 +1,68 @@
+            <div class="chat">
+              <p class="msg me">Dost, NumPy mein shape error aata hai to lagta hai computer mujhse lad raha hai.</p>
+              <p class="msg dost">Haan, Level 3 ka pehla boss yahi hai: <strong>shape</strong>. Deep learning mein numbers se zyada tables ki size matter karti hai.</p>
+              <p class="msg me">Par (3,), (3,1), (1,3) — teeno mein 3 numbers hi hain na?</p>
+              <p class="msg dost">Numbers same, par table ka posture alag. Ek loose list, ek seedha column, ek leti hui row. NumPy inke saath alag behave karta hai.</p>
+            </div>
+            <h4>(m,), (m,1), (1,m) — chhota farak, bada bug</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Shape</th><th>Dikhta kaise</th><th>Beginner translation</th></tr>
+              <tr><td><code>(3,)</code></td><td><code>[10, 20, 30]</code></td><td>Rank-1 array: na row, na column. Thoda “latka hua”.</td></tr>
+              <tr><td><code>(3, 1)</code></td><td><code>[[10], [20], [30]]</code></td><td>3 rows, 1 column. Proper column vector.</td></tr>
+              <tr><td><code>(1, 3)</code></td><td><code>[[10, 20, 30]]</code></td><td>1 row, 3 columns. Proper row vector.</td></tr>
+            </table></div>
+            <p>Deep learning code mein rank-1 array <code>(m,)</code> se bachna achha hota hai. Ye kabhi row jaisa, kabhi column jaisa act karta hai. Isliye labels ko aksar <code>Y.shape = (1, m)</code> aur biases ko <code>(n, 1)</code> rakhte hain.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> <code>a.T</code> rank-1 array pe kuch nahi badalta. <code>np.array([1,2,3]).T</code> ki shape phir bhi <code>(3,)</code> rahegi. Pehle <code>reshape(3,1)</code> karo.</div>
+            <h4>Broadcasting — NumPy ka “copy mat banao, samajh lo” trick</h4>
+            <p>Broadcasting ka matlab: chhoti cheez ko mentally repeat karke badi table se operation karna. Jaise class ke har student ko same notice milna.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Operation</th><th>Example</th><th>Result</th></tr>
+              <tr><td>Matrix + row</td><td><code>[[1,2,3],[10,20,30]] + [100,200,300]</code></td><td><code>[[101,202,303],[110,220,330]]</code></td></tr>
+              <tr><td>Matrix + column</td><td><code>[[1,2,3],[10,20,30]] + [[5],[50]]</code></td><td><code>[[6,7,8],[60,70,80]]</code></td></tr>
+              <tr><td>Matrix + number</td><td><code>[[1,2],[3,4]] + 10</code></td><td><code>[[11,12],[13,14]]</code></td></tr>
+            </table></div>
+            <div class="formula"><code>Broadcasting simple rule: dimensions right side se compare karo.
+Same number chalega, ya ek dimension 1 ho to repeat ho sakta hai.</code><ul>
+              <li><code>(2,3) + (1,3)</code> chalega: row 2 baar repeat hogi.</li>
+              <li><code>(2,3) + (2,1)</code> chalega: column 3 baar repeat hoga.</li>
+              <li><code>(2,3) + (2,2)</code> error: 3 aur 2 match nahi, aur koi 1 bhi nahi.</li>
+            </ul></div>
+            <h4>axis=0 / axis=1 — kis direction mein jodna?</h4>
+            <p>Axis ko lift/elevator ki tarah socho. <code>axis=0</code> rows ke through neeche jaata hai, isliye har column ka total. <code>axis=1</code> columns ke through side mein jaata hai, isliye har row ka total.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th><code>A = [[1,2,3],[10,20,30]]</code></th><th>Shape</th><th>Output</th></tr>
+              <tr><td><code>A.sum(axis=0)</code></td><td><code>(3,)</code></td><td><code>[11, 22, 33]</code></td></tr>
+              <tr><td><code>A.sum(axis=1)</code></td><td><code>(2,)</code></td><td><code>[6, 60]</code></td></tr>
+              <tr><td><code>A.sum(axis=1, keepdims=True)</code></td><td><code>(2,1)</code></td><td><code>[[6],[60]]</code></td></tr>
+            </table></div>
+            <p><code>keepdims=True</code> shape ko proper 2D rakhta hai. Backprop mein ye chhota option bahut shape bugs bachata hai.</p>
+            <h4>Image ko vector banana</h4>
+            <p>Computer photo ko pixels ki dabbi samajhta hai. 32 × 32 photo, 3 colour channels (R,G,B): total numbers = 32 × 32 × 3 = <strong>3072</strong>.</p>
+            <div class="visual-flow"><span>Image<br><small>(32,32,3)</small></span><b>→</b><span>Flatten</span><b>→</b><span class="flow-highlight">Vector<br><small>(3072,1)</small></span></div>
+<pre class="code">import numpy as np
+
+img = np.zeros((32, 32, 3))
+x = img.reshape(32 * 32 * 3, 1)  <span class="cm"># (3072, 1)</span>
+assert x.shape == (3072, 1)</pre>
+            <h4>Transpose aur assert — shape police</h4>
+            <p>Transpose table ko palat deta hai: <code>(2,3)</code> se <code>(3,2)</code>. Matrix multiply mein yahi kaam aata hai: <code>X @ W</code> tabhi chalega jab beech ke dimensions match karein.</p>
+<pre class="code">X = np.array([[1, 2, 3],
+              [4, 5, 6]])        <span class="cm"># shape (2, 3)</span>
+print(X.T.shape)                 <span class="cm"># (3, 2)</span>
+
+w = np.array([[0.1], [0.2], [0.3]])
+z = X @ w                        <span class="cm"># (2, 3) @ (3, 1) = (2, 1)</span>
+assert z.shape == (2, 1)</pre>
+            <h4>Deep learning mein ye kahan milega?</h4>
+            <p>DL Course 1 ke vectorization aur logistic regression labs mein, Course 1 ke photo flattening wale pages mein, aur har backprop formula mein. Bias <code>b</code> ko columns mein broadcast karna roz ka kaam hai.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Shape pehle dekho, formula baad mein. Rank-1 <code>(m,)</code> se bachna, <code>keepdims=True</code> aur <code>assert</code> tumhare dost hain.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Broadcasting actual copy banata hai kya?</summary><p>Nahi, NumPy usually memory mein copy nahi banata. Woh bas operation karte waqt chhoti cheez ko repeat jaisa treat karta hai. Isi liye fast bhi hota hai.</p></details>
+            <details class="qa"><summary>axis yaad kaise rakhu?</summary><p><code>axis=0</code> ko “rows hatao” samjho: answer mein rows wali dimension gayi. <code>(2,3)</code> se <code>(3,)</code>. <code>axis=1</code> mein columns wali dimension gayi: <code>(2,)</code>.</p></details>
+            <details class="qa"><summary>Har jagah 2D array hi use karun?</summary><p>Deep learning ke beginner code mein haan, mostly safer. Proper row/column shape likhne se formulas aur asserts dono clear rehte hain.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary><code>(4,1) + (1,3)</code> ka result shape?</summary><p>Column 3 baar repeat, row 4 baar repeat. Result shape <b>(4,3)</b>.</p></details>
+              <details class="qa"><summary><code>A</code> shape <code>(5,10)</code>. <code>A.sum(axis=0, keepdims=True)</code> ka shape?</summary><p>Rows collapse hui, par keepdims ne row dimension rakhi. Shape <b>(1,10)</b>.</p></details>
+              <details class="qa"><summary>28 × 28 grayscale image ko column vector banao. Length?</summary><p>Grayscale mein 1 channel hota hai. 28 × 28 × 1 = 784. Shape <b>(784,1)</b>.</p></details>
+            </div>

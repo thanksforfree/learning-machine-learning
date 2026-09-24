@@ -1,0 +1,76 @@
+            <div class="chat">
+              <p class="msg me">Dataset 50 lakh examples ka hai. Har gradient step se pehle sab data dekhna padega?</p>
+              <p class="msg dost">Agar har chai sip se pehle poori ketli naapoge, chai thandi ho jayegi. Mini-batch ka idea: thoda data dekho, ek useful step lo.</p>
+              <p class="msg me">To gradient exact nahi hoga?</p>
+              <p class="msg dost">Exact nahi, par kaafi useful. Thoda shor hoga, par speed bahut badhegi.</p>
+            </div>
+            <h4>Batch vs mini-batch notation</h4>
+            <p>Batch gradient descent har step mein saare m examples use karta hai. Mini-batch gradient descent data ko chhote packets mein todta hai: X{1}, Y{1}; X{2}, Y{2}; ... Har packet pe forward/backward/update hota hai.</p>
+            <div class="formula"><code>X{t} = t-th mini-batch of X
+Y{t} = matching labels
+mini-batch size = examples per packet</code><ul>
+              <li><b>t</b> = mini-batch number</li>
+              <li><b>X{t}</b> ka shape often (nₓ, mini_batch_size)</li>
+              <li><b>Last batch</b> chhota ho sakta hai</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>m</th><th>Batch size</th><th>Full mini-batches</th><th>Last batch</th></tr>
+              <tr><td>1000</td><td>128</td><td>7 batches = 896 examples</td><td>104 examples</td></tr>
+              <tr><td colspan="4">Total batches = 8, kyunki 1000 = 7×128 + 104</td></tr>
+            </table></div>
+            <h4>Epoch ka matlab</h4>
+            <p>Ek epoch = model ne training set ke har example ko roughly ek baar dekh liya. Agar 1000 examples aur batch size 128, to ek epoch mein 8 updates honge. 10 epochs ka matlab same dataset ke 10 chakkar, har chakkar shuffle ke baad nayi grouping ho sakti hai.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 430 180" role="img" aria-label="Dataset shuffle ke baad mini-batches mein partition hota hai aur ek epoch complete hota hai">
+                <rect x="30" y="35" width="360" height="35" rx="8" fill="#edf3ff" stroke="#3567e8"/>
+                <g stroke="#3567e8"><line x1="82" y1="35" x2="82" y2="70"/><line x1="134" y1="35" x2="134" y2="70"/><line x1="186" y1="35" x2="186" y2="70"/><line x1="238" y1="35" x2="238" y2="70"/><line x1="290" y1="35" x2="290" y2="70"/><line x1="342" y1="35" x2="342" y2="70"/></g>
+                <text x="210" y="58" font-size="11" text-anchor="middle" fill="#24324a">shuffled training data</text>
+                <path d="M210,78 L210,112" stroke="#8a96aa" stroke-width="2"/>
+                <rect x="55" y="118" width="70" height="32" rx="7" fill="#e9f7f3" stroke="#159477"/>
+                <rect x="145" y="118" width="70" height="32" rx="7" fill="#e9f7f3" stroke="#159477"/>
+                <rect x="235" y="118" width="70" height="32" rx="7" fill="#e9f7f3" stroke="#159477"/>
+                <rect x="325" y="118" width="45" height="32" rx="7" fill="#fff3ec" stroke="#e0703a"/>
+                <g font-size="11" text-anchor="middle" fill="#24324a"><text x="90" y="138">X{1}</text><text x="180" y="138">X{2}</text><text x="270" y="138">X{3}</text><text x="347" y="138">last</text></g>
+              </svg>
+              <div class="cap">Shuffle karo, packets banao, packets pe updates lo — ye ek epoch.</div>
+            </figure>
+            <h4>Cost graph shor wala kyu hota hai</h4>
+            <p>Batch gradient descent mein har point full dataset cost pe based hota hai, graph smooth lag sakta hai. Mini-batch mein ek batch easy ho sakta hai, next batch tough. Isliye cost kabhi down, kabhi thoda up. Trend downward hona chahiye, har mini-step perfect nahi.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Mini-batch</th><th>Cost</th><th>Interpretation</th></tr>
+              <tr><td>1</td><td>0.92</td><td>Start</td></tr>
+              <tr><td>2</td><td>0.88</td><td>Down</td></tr>
+              <tr><td>3</td><td>0.91</td><td>Shor, panic nahi</td></tr>
+              <tr><td>4</td><td>0.80</td><td class="good">Trend down</td></tr>
+            </table></div>
+            <h4>Batch size choices</h4>
+            <div class="compare-grid">
+              <div><b>Batch size = m</b>Pure batch. Gradient stable, par huge data pe slow per update.</div>
+              <div><b>Batch size = 1</b>Stochastic. Fast updates, bahut noisy, vectorization ka fayda kam.</div>
+              <div><b>Beech wala</b>64, 128, 256, 512 jaise sizes. Speed aur noise ka practical balance.</div>
+            </div>
+            <p>Mini-batch size ko powers of 2 rakhna common hai, kyunki hardware/memory pe friendly hota hai. Par rule stone pe likha nahi. Sabse bada sawaal: GPU/CPU memory mein fit ho raha? Training stable hai?</p>
+            <h4>Size kaise chunein: 64 se 512</h4>
+            <p>Small datasets mein full batch bhi okay. Large datasets mein 64, 128, 256, 512 se start karo. Agar batch memory mein fit nahi, size ghatao. Agar GPU underused hai aur memory bach rahi, size badha ke throughput improve ho sakta hai.</p>
+            <pre class="code">def random_mini_batches(X, Y, size=128):
+    m = X.shape[1]
+    perm = np.random.permutation(m)       <span class="cm"># pehle shuffle</span>
+    Xs, Ys = X[:, perm], Y[:, perm]
+    batches = []
+    for k in range(0, m, size):
+        batches.append((Xs[:, k:k+size], Ys[:, k:k+size]))
+    return batches                         <span class="cm"># last batch chhota ho sakta</span></pre>
+            <h4>Shuffle + partition</h4>
+            <p>Shuffle zaroori hai. Agar data sorted hai — pehle 500 cricket photos, phir 500 football photos — aur tum batches bina shuffle banate ho, first batches sirf cricket dikhayenge. Gradients biased ho jayenge. Shuffle se har mini-batch dataset ka chhota mixed sample banne ki koshish karta hai.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> X aur Y ko same permutation se shuffle karo. X alag shuffle, Y alag shuffle hua to labels galat examples se chipak jayenge. Ye silent disaster hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Mini-batch training poore data ka intezaar nahi karti; chhote samples se noisy par useful kadam leti hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Mini-batch gradient descent hamesha full batch se better?</summary><p>Large data pe usually practical better. Chhote data pe full batch simple aur stable ho sakta hai. Hardware aur dataset size decide karte hain.</p></details>
+            <details class="qa"><summary>Cost mini-batch pe plot karun ya epoch average?</summary><p>Dono useful. Mini-batch plot noisy signal deta hai; epoch average cleaner trend dikhata hai.</p></details>
+            <details class="qa"><summary>Last mini-batch chhota ho to drop karna hai?</summary><p>Usually use kar sakte ho. Batch norm jaisi cases mein very tiny last batch issue de sakta hai, tab drop_last option useful ho sakta hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>m = 5000, mini-batch size = 1000. Ek epoch mein kitne updates?</summary><p>5000 ÷ 1000 = 5. <b>final answer: 5 updates</b>.</p></details>
+              <details class="qa"><summary>m = 1050, batch size = 128. Last batch size?</summary><p>128×8 = 1024, bache 26. <b>final answer: 26</b>.</p></details>
+              <details class="qa"><summary>Cost ek mini-batch pe thoda badh gaya. Kya training fail?</summary><p>Zaroori nahi. Mini-batch cost noisy hoti hai. Overall trend aur dev performance dekho.</p></details>
+            </div>

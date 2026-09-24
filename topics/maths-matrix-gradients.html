@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Matrix gradients aur dimensions ka hisaab: Shape dekh ke formula khud nikaal lo. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Matrix gradients aur dimensions ka hisaab (Maths) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a class="active" href="../maths.html">Maths</a><a href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../maths.html">Maths: Maths — zero se deep learning tak</a> › Topic 11 / 16</nav>
+        <p class="eyebrow">MATHS · TOPIC 11 · LEVEL 3 · DEEP LEARNING KI MATHS</p>
+        <h1>Matrix gradients aur dimensions ka hisaab</h1>
+        <p>Shape dekh ke formula khud nikaal lo</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>Maths ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="z1" href="maths-symbols.html"><span>01</span>Symbols aur formula padhna</a>
+            <a data-topic-link="z2" href="maths-graphs.html"><span>02</span>Graph, line aur slope</a>
+            <a data-topic-link="z3" href="maths-functions.html"><span>03</span>Function = input-output machine</a>
+            <a data-topic-link="z4" href="maths-powers-e-log.html"><span>04</span>Power, e aur log</a>
+            <a data-topic-link="z5" href="maths-average-probability.html"><span>05</span>Average, phailaav aur probability</a>
+            <a data-topic-link="z6" href="maths-vectors-matrices.html"><span>06</span>Vectors, matrices aur dot product</a>
+            <a data-topic-link="z7" href="maths-slope-derivative.html"><span>07</span>Slope, derivative aur chain rule</a>
+            <a data-topic-link="z8" href="maths-python-numpy.html"><span>08</span>Python aur NumPy crash course</a>
+            <a data-topic-link="z9" href="maths-broadcasting-shapes.html"><span>09</span>Broadcasting, shapes aur reshape</a>
+            <a data-topic-link="z10" href="maths-computation-graph.html"><span>10</span>Computation graph aur activation ke derivatives</a>
+            <a data-topic-link="z11" class="current" aria-current="page" href="maths-matrix-gradients.html"><span>11</span>Matrix gradients aur dimensions ka hisaab</a>
+            <a data-topic-link="z12" href="maths-norms-similarity.html"><span>12</span>Norms, distance aur cosine similarity</a>
+            <a data-topic-link="z13" href="maths-moving-average.html"><span>13</span>Exponentially weighted (moving) average</a>
+            <a data-topic-link="z14" href="maths-probability-2.html"><span>14</span>Probability level 2: conditional, likelihood, cross-entropy</a>
+            <a data-topic-link="z15" href="maths-randomness-scale.html"><span>15</span>Randomness, variance aur scale</a>
+            <a data-topic-link="z16" href="maths-convolution.html"><span>16</span>Convolution: sliding dot product</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="z1,z2,z3,z4,z5,z6,z7,z8,z9,z10,z11,z12,z13,z14,z15,z16"><span>Maths progress</span><strong data-progress-label>0 / 16 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Vectorized backprop ke formulas (dW = dZ·Xᵀ/m jaise) yaad karne ki zaroorat nahi — shapes se khud ban jaate hain. Ye skill deep networks ko debug karne mein bahut kaam aati hai.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Element-wise multiply (*) vs matrix multiply (@)</li><li>Kisi cheez ka gradient hamesha usi cheez ke shape ka hota hai</li><li>dZ = A − Y ka seedha matlab</li><li>Shapes jod ke dW = (1/m)·dZ·Xᵀ nikaalna</li><li>db = examples pe average (sum axis=1, keepdims)</li><li>Backward jaate waqt transpose kyu aata hai</li></ul></details>
+        <article class="lesson-card single" id="z11">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Matrix gradients dekh ke lagta hai formula yaad karne padenge.</p>
+              <p class="msg dost">Formula ratna mat. Shape dekho. Gradient hamesha us cheez ke shape ka hota hai jiske liye gradient nikal rahe ho.</p>
+              <p class="msg me">Matlab dW ka shape W jaisa?</p>
+              <p class="msg dost">Exactly. Agar W ka shape (1,2) hai to dW bhi (1,2). Ye ek rule tumhe aadhe formulas khud nikaalne dega.</p>
+            </div>
+            <h4><code>*</code> vs <code>@</code> — dono multiply nahi hote</h4>
+            <div class="compare-grid">
+              <div><b>Element-wise <code>*</code></b>Same shape ke boxes pair-by-pair multiply. <code>[2,3] * [10,20] = [20,60]</code>.</div>
+              <div><b>Matrix multiply <code>@</code></b>Rows aur columns ka dot product. Shapes ka rule: <code>(a,b) @ (b,c) = (a,c)</code>.</div>
+            </div>
+            <p>Backprop mein dono aate hain. ReLU/tanh derivative ke saath <code>*</code>. Weight gradient ke liye mostly <code>@</code>.</p>
+            <h4>Gradient ka shape rule</h4>
+            <div class="formula"><code>gradient of X has same shape as X</code><ul>
+              <li><code>W</code> shape <code>(1,2)</code> hai to <code>dW</code> shape <code>(1,2)</code>.</li>
+              <li><code>b</code> shape <code>(1,1)</code> hai to <code>db</code> shape <code>(1,1)</code>.</li>
+              <li><code>Z</code> shape <code>(1,m)</code> hai to <code>dZ</code> shape <code>(1,m)</code>.</li>
+            </ul></div>
+            <h4><code>dZ = A − Y</code> ka seedha matlab</h4>
+            <p>Binary classifier mein final sigmoid + log loss ke baad ek beautiful shortcut aata hai: <code>dZ = A − Y</code>. Prediction minus actual. Agar model 0.8 bolta hai aur answer 1 hai, dZ = −0.2. Matlab z badhana chahiye. Agar model 0.3 bolta hai aur answer 0 hai, dZ = +0.3. Matlab z ghatana chahiye.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Example</th><th>A (prediction)</th><th>Y (actual)</th><th>dZ = A − Y</th></tr>
+              <tr><td>1</td><td>0.8</td><td>1</td><td>−0.2</td></tr>
+              <tr><td>2</td><td>0.3</td><td>0</td><td>0.3</td></tr>
+              <tr><td>3</td><td>0.6</td><td>1</td><td>−0.4</td></tr>
+            </table></div>
+            <h4>Shapes jod ke dW nikaalo</h4>
+            <p>Chhota setup: 2 features, 3 examples. Is convention mein examples columns mein hain.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Cheez</th><th>Shape</th><th>Value</th></tr>
+              <tr><td><code>X</code></td><td><code>(2,3)</code></td><td><code>[[1,2,3],[4,0,1]]</code></td></tr>
+              <tr><td><code>W</code></td><td><code>(1,2)</code></td><td>2 weights</td></tr>
+              <tr><td><code>Z, A, Y, dZ</code></td><td><code>(1,3)</code></td><td>har example ka ek output</td></tr>
+              <tr><td><code>dW</code></td><td><code>(1,2)</code></td><td>W jaisa hona hi hai</td></tr>
+            </table></div>
+            <p>Ab dW ke liye dZ <code>(1,3)</code> aur X ka koi version chahiye jisse answer <code>(1,2)</code> aaye. <code>dZ @ X.T</code> gives <code>(1,3) @ (3,2) = (1,2)</code>. Bas formula mil gaya.</p>
+            <div class="formula"><code>dW = (1/m) × dZ @ Xᵀ
+db = (1/m) × sum(dZ, axis=1, keepdims=True)</code><ul>
+              <li><b>m</b> = examples ki count, yahan 3.</li>
+              <li><b>Xᵀ</b> isliye, kyunki hume examples wali dimension 3 ko match karna hai.</li>
+              <li><b>db</b> mein har example ki bias wali galti average hoti hai.</li>
+            </ul></div>
+            <h4>Worked numbers</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Quantity</th><th>Hisaab</th><th>Result</th></tr>
+              <tr><td><code>dZ</code></td><td><code>[[-0.2, 0.3, -0.4]]</code></td><td>shape (1,3)</td></tr>
+              <tr><td><code>dW₁</code></td><td>(−0.2×1 + 0.3×2 − 0.4×3) ÷ 3</td><td>−0.267</td></tr>
+              <tr><td><code>dW₂</code></td><td>(−0.2×4 + 0.3×0 − 0.4×1) ÷ 3</td><td>−0.400</td></tr>
+              <tr><td><code>db</code></td><td>(−0.2 + 0.3 − 0.4) ÷ 3</td><td>−0.100</td></tr>
+            </table></div>
+<pre class="code">import numpy as np
+
+X  = np.array([[1, 2, 3],
+               [4, 0, 1]])       <span class="cm"># (2, 3)</span>
+dZ = np.array([[-0.2, 0.3, -0.4]]) <span class="cm"># (1, 3)</span>
+m = X.shape[1]
+dW = dZ @ X.T / m
+db = np.sum(dZ, axis=1, keepdims=True) / m
+print(np.round(dW, 3))            <span class="cm"># [[-0.267 -0.4  ]]</span>
+print(np.round(db, 3))            <span class="cm"># [[-0.1]]</span></pre>
+            <h4>Backward mein transpose baar-baar kyu?</h4>
+            <p>Forward mein agar <code>Z = W @ X + b</code>, to W ne X ko output side bheja. Backward mein gradient ko wapas input side bhejna hai, isliye <code>W.T</code> aata hai. Direction palat gayi, table bhi palat gayi.</p>
+            <div class="visual-flow"><span>Forward<br><small>W @ X</small></span><b>→</b><span>Z</span><b>↻</b><span class="flow-highlight">Backward<br><small>Wᵀ @ dZ</small></span></div>
+            <h4>Deep learning mein ye kahan milega?</h4>
+            <p>DL Course 1 ke logistic gradients, vectorized backprop, shallow network, aur L-layer dimensions pages mein. Course 2 ke gradient checking mein bhi dW/db shapes verify karne padte hain.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Agar <code>dW</code> ka shape W jaisa nahi aa raha, formula galat hai ya transpose missing hai. Pehle shape print karo, values baad mein dekho.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Gradient same shape ka hota hai. Matrix formula confuse kare to sirf shapes multiply karke dekho; transpose wahi lagao jahan beech dimension match ho.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>dZ = A − Y hamesha hota hai?</summary><p>Nahi. Ye special combo hai: sigmoid output + binary cross-entropy, ya softmax + cross-entropy mein similar <code>dZ = Ŷ − Y</code>. Har activation/loss ke liye same nahi.</p></details>
+            <details class="qa"><summary>db mein axis=1 kyu?</summary><p><code>dZ</code> shape <code>(neurons, examples)</code>. Bias har neuron ka ek number hai, to examples ke across average chahiye. Examples axis 1 par hain.</p></details>
+            <details class="qa"><summary>Formula yaad na rahe to?</summary><p>W ka shape likho. dZ ka shape likho. X ya Xᵀ mein se jo dW jaisa answer de, woh choose karo. Ye trick surprisingly reliable hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary><code>W</code> shape <code>(4,5)</code>. <code>dW</code> ka shape?</summary><p>Gradient same shape ka. <b>(4,5)</b>.</p></details>
+              <details class="qa"><summary><code>dZ</code> shape <code>(4,10)</code>, <code>A_prev</code> shape <code>(5,10)</code>. <code>dW</code> ke liye kya multiply karoge?</summary><p><code>dZ @ A_prev.T</code>: <code>(4,10) @ (10,5) = <b>(4,5)</b></code>.</p></details>
+              <details class="qa"><summary>A = 0.15, Y = 1. dZ?</summary><p><code>A − Y = 0.15 − 1 = <b>−0.85</b></code>.</p></details>
+            </div>
+            
+            <div class="used-box"><h4>Ye maths aage kahan kaam aayegi</h4><div class="chips"><a class="chip" data-topic-link="n5" href="dl-logistic-gradients.html"><small>DL · 1</small>Logistic regression ke gradients</a><a class="chip" data-topic-link="n9" href="dl-shallow-backprop.html"><small>DL · 1</small>Shallow network ka backprop aur random initialization</a><a class="chip" data-topic-link="n10" href="dl-deep-network.html"><small>DL · 1</small>Deep L-layer network aur dimensions</a></div></div>
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="z11"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="maths-computation-graph.html"><small>← Pichhla</small>Computation graph aur activation ke derivatives</a>
+          <a class="pager-next" href="maths-norms-similarity.html"><small>Agla →</small>Norms, distance aur cosine similarity</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

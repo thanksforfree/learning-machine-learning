@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sequence models kyu, aur notation: Jab order matter karta hai. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Sequence models kyu, aur notation (DL · 5) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-sequence-models.html">DL · 5: Sequence Models</a> › Topic 1 / 15</nav>
+        <p class="eyebrow">DL · 5 · TOPIC 01 · RNN</p>
+        <h1>Sequence models kyu, aur notation</h1>
+        <p>Jab order matter karta hai</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 5 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="q1" class="current" aria-current="page" href="dl-why-sequence-models.html"><span>01</span>Sequence models kyu, aur notation</a>
+            <a data-topic-link="q2" href="dl-rnn-model.html"><span>02</span>Recurrent Neural Network (RNN)</a>
+            <a data-topic-link="q3" href="dl-bptt-rnn-types.html"><span>03</span>Backprop through time aur RNN ke types</a>
+            <a data-topic-link="q4" href="dl-language-model-sampling.html"><span>04</span>Language model aur naye sentences banana</a>
+            <a data-topic-link="q5" href="dl-vanishing-gradients-gru.html"><span>05</span>Vanishing gradients aur GRU</a>
+            <a data-topic-link="q6" href="dl-lstm-brnn-deep-rnn.html"><span>06</span>LSTM, bidirectional RNN aur deep RNN</a>
+            <a data-topic-link="q7" href="dl-word-embeddings.html"><span>07</span>Word embeddings: shabdon ko matlab wale numbers</a>
+            <a data-topic-link="q8" href="dl-word2vec-negative-sampling.html"><span>08</span>Embedding matrix, Word2Vec aur negative sampling</a>
+            <a data-topic-link="q9" href="dl-glove-sentiment-debiasing.html"><span>09</span>GloVe, sentiment classification aur bias hatana</a>
+            <a data-topic-link="q10" href="dl-seq2seq-beam-search.html"><span>10</span>Sequence-to-sequence aur beam search</a>
+            <a data-topic-link="q11" href="dl-beam-refinements-bleu.html"><span>11</span>Beam search refinements, error analysis aur BLEU</a>
+            <a data-topic-link="q12" href="dl-attention-model.html"><span>12</span>Attention model</a>
+            <a data-topic-link="q13" href="dl-speech-trigger-word.html"><span>13</span>Speech recognition aur trigger word detection</a>
+            <a data-topic-link="q14" href="dl-transformer-self-attention.html"><span>14</span>Transformer intuition aur self-attention</a>
+            <a data-topic-link="q15" href="dl-multihead-transformer.html"><span>15</span>Multi-head attention aur Transformer network</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="q1,q2,q3,q4,q5,q6,q7,q8,q9,q10,q11,q12,q13,q14,q15"><span>DL · 5 progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Pehle ye samajhna ki sequence wale data mein kya alag hai, aur shabdon ko computer ko kaise dikhayein.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Examples: speech, music, sentiment, DNA, translation, video, naam pehchanna (NER)</li><li>Notation: x⟨t⟩, T_x, T_y, x⁽ⁱ⁾⟨t⟩</li><li>Vocabulary (jaise 10,000 shabd)</li><li>One-hot vector</li><li>⟨UNK⟩ token</li></ul></details>
+        <article class="lesson-card single" id="q1">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Dost, sentence, audio, DNA… in sab mein neural network ko alag kya problem aati hai?</p>
+              <p class="msg dost">Simple si baat: yahan <strong>order</strong> hero hai. “Maine chai pi” aur “chai ne mujhe pi” mein same words hain, par meaning full comedy ban gaya.</p>
+              <p class="msg me">Toh rows-columns wali fixed table kaam nahi karegi?</p>
+              <p class="msg dost">Kabhi karegi, par awkward. Sequence data ka length badalta rehta hai, aur har position ka role context se badalta hai. Isliye pehle notation set karte hain, warna aage sab dhundla lagega.</p>
+            </div>
+            <h4>Sequence examples — jahan pehle-aaya/baad-mein-aaya matter karta hai</h4>
+            <p>Socho tum WhatsApp voice note sun rahe ho. “Kal aa raha hoon” mein <em>kal</em> pehle aaya, phir action. Agar audio ke chhote-chhote frames ulat do, awaaz robot nahi, blender jaisi lagegi. Sequence model isi order ko respect karta hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Data</th><th>Sequence item kya hai?</th><th>Model kya seekhega?</th></tr>
+              <tr><td>Speech</td><td>Audio frames</td><td>Kaun sa word bola gaya</td></tr>
+              <tr><td>Music</td><td>Notes / beats</td><td>Agla sur natural lage</td></tr>
+              <tr><td>Sentiment</td><td>Words</td><td>Review khush hai ya gussa</td></tr>
+              <tr><td>DNA</td><td>A, C, G, T letters</td><td>Pattern, gene region, mutation signal</td></tr>
+              <tr><td>Translation</td><td>Source words</td><td>Dusri language ke words</td></tr>
+              <tr><td>Video</td><td>Frames</td><td>Action ka flow: shot, run, dance</td></tr>
+              <tr><td>Naam pehchanna (NER)</td><td>Sentence ke words</td><td>“Virat” person hai, “Delhi” place hai</td></tr>
+            </table></div>
+            <figure class="figure">
+              <svg viewBox="0 0 520 170" role="img" aria-label="Sentence ke words time steps mein dikhaye gaye hain">
+                <rect x="28" y="45" width="70" height="46" rx="10" fill="#edf3ff" stroke="#3567e8"/><text x="45" y="73" font-size="11">Aaj</text>
+                <rect x="123" y="45" width="70" height="46" rx="10" fill="#edf3ff" stroke="#3567e8"/><text x="140" y="73" font-size="11">baarish</text>
+                <rect x="218" y="45" width="70" height="46" rx="10" fill="#edf3ff" stroke="#3567e8"/><text x="238" y="73" font-size="11">hogi</text>
+                <rect x="313" y="45" width="70" height="46" rx="10" fill="#fff3ec" stroke="#e0703a"/><text x="334" y="73" font-size="11">&lt;EOS&gt;</text>
+                <path d="M98 68 H123 M193 68 H218 M288 68 H313" stroke="#8a96aa" stroke-width="2"/>
+                <text x="45" y="122" font-size="11" fill="#7a879b">x⟨1⟩</text><text x="141" y="122" font-size="11" fill="#7a879b">x⟨2⟩</text><text x="239" y="122" font-size="11" fill="#7a879b">x⟨3⟩</text><text x="332" y="122" font-size="11" fill="#7a879b">x⟨4⟩</text>
+                <text x="410" y="70" font-size="11" fill="#159477">Tₓ = 4</text>
+              </svg>
+              <div class="cap">Har word ek time step hai. Sentence khatam batane ke liye &lt;EOS&gt; lag sakta hai.</div>
+            </figure>
+            <h4>Notation: pehle symbols se dosti</h4>
+            <p>Sequence pages mein baar-baar ye likha milega: <strong>x⟨t⟩</strong>. Iska matlab hai input ka t-th time step. Speech mein t-th audio frame, sentence mein t-th word.</p>
+            <div class="formula"><code>x⟨t⟩ = input at time step t
+Tₓ = input sequence ki length
+Tᵧ = output sequence ki length
+x⁽ⁱ⁾⟨t⟩ = i-th training example ka t-th item</code><ul>
+              <li><b>t</b> = position, jaise 1st word, 2nd word.</li>
+              <li><b>i</b> = dataset mein kaunsa example. Example 7 ka 3rd word: x⁽⁷⁾⟨3⟩.</li>
+              <li><b>Tₓ aur Tᵧ</b> alag ho sakte hain. Hindi sentence 5 words ka, English translation 7 words ki ho sakti hai.</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Sentence</th><th>Tₓ</th><th>x⟨1⟩</th><th>x⟨2⟩</th><th>x⟨3⟩</th></tr>
+              <tr><td>“Mummy chai lao”</td><td>3</td><td>Mummy</td><td>chai</td><td>lao</td></tr>
+              <tr><td>“Aaj match jeet gaye”</td><td>4</td><td>Aaj</td><td>match</td><td>jeet</td></tr>
+            </table></div>
+            <h4>Vocabulary: model ka dictionary shelf</h4>
+            <p>Computer raw word ko samajhta nahi. Hum pehle ek fixed <strong>vocabulary</strong> banate hain: maan lo 10,000 common words. Har word ko ek index milta hai, bilkul library shelf number jaisa.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Index</th><th>Token</th><th>One-hot vector ka idea</th></tr>
+              <tr><td>1</td><td>aaj</td><td>[1, 0, 0, 0, 0, …]</td></tr>
+              <tr><td>2</td><td>chai</td><td>[0, 1, 0, 0, 0, …]</td></tr>
+              <tr><td>3</td><td>match</td><td>[0, 0, 1, 0, 0, …]</td></tr>
+              <tr><td>10,000</td><td>&lt;UNK&gt;</td><td>[0, 0, 0, 0, …, 1]</td></tr>
+            </table></div>
+            <p><strong>One-hot vector</strong> mein length vocabulary jitni hoti hai. Sirf apne word wale index pe 1, baaki sab 0. Agar vocabulary 10,000 hai, toh “chai” ka vector 10,000 numbers ka hoga; bas ek jagah 1.</p>
+            <div class="lesson-callout"><b>&lt;UNK&gt; ka kaam:</b> Unknown word ke liye safety net. Agar model ne “jhakkas-est” kabhi nahi dekha, toh crash karne ke bajay usko &lt;UNK&gt; token de do.</div>
+            <h4>Tokenization ka tiny code</h4>
+            <pre class="code">vocab = {"aaj": 1, "chai": 2, "match": 3, "&lt;UNK&gt;": 10000}
+sentence = "aaj samosa chai"
+ids = [vocab.get(w, vocab["&lt;UNK&gt;"]) for w in sentence.split()]
+print(ids)  <span class="cm"># [1, 10000, 2] — samosa vocab mein nahi tha</span></pre>
+            <div class="mistake"><b>Dhyan rakhna:</b> One-hot vector word ka meaning nahi batata. “chai” aur “coffee” vectors utne hi alag dikhte hain jitne “chai” aur “rocket”. Meaning wali representation embeddings mein aayegi.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Sequence = ordered items. x⟨t⟩ time step hai, Tₓ length hai, vocabulary shelf hai, one-hot shelf number ka signal hai.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Har sentence ko same length banana zaroori hai?</summary><p>Training batch ke andar padding lag sakti hai, par conceptually sequence ki asli length Tₓ alag-alag ho sakti hai.</p></details>
+            <details class="qa"><summary>&lt;EOS&gt; aur &lt;UNK&gt; dono token hain?</summary><p>Haan. &lt;EOS&gt; bolta hai “sentence khatam”. &lt;UNK&gt; bolta hai “ye word vocabulary mein nahi mila”.</p></details>
+            <details class="qa"><summary>Vocabulary 10,000 hi kyu?</summary><p>Ye fixed rule nahi. Chhote app ke liye 5,000, bade corpus ke liye 50,000 bhi ho sakta hai. Trade-off: zyada words = kam unknown, par model bada.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>Sentence “kal train late thi” mein Tₓ kitna hai?</summary><p>4 words hain, isliye <b>Tₓ = 4</b>.</p></details>
+              <details class="qa"><summary>Vocabulary size 8,000 hai. One-hot vector mein kitne 1 honge?</summary><p>Har word ke vector mein sirf ek active shelf hota hai. Isliye <b>1</b> value 1 hogi, baaki 7,999 zeros.</p></details>
+              <details class="qa"><summary>Agar “vada-pav” vocab mein nahi hai to kaunsa token use karoge?</summary><p>Usko <b>&lt;UNK&gt;</b> se replace karenge, taaki model safely process kar sake.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="q1"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-neural-style-transfer.html"><small>← Pichhla · DL · 4</small>Neural style transfer aur ConvNet andar kya seekhta hai</a>
+          <a class="pager-next" href="dl-rnn-model.html"><small>Agla →</small>Recurrent Neural Network (RNN)</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

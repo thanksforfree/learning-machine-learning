@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Randomness, variance aur scale: Weights random kyu, aur kitne bade. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Randomness, variance aur scale (Maths) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a class="active" href="../maths.html">Maths</a><a href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../maths.html">Maths: Maths — zero se deep learning tak</a> › Topic 15 / 16</nav>
+        <p class="eyebrow">MATHS · TOPIC 15 · LEVEL 3 · DEEP LEARNING KI MATHS</p>
+        <h1>Randomness, variance aur scale</h1>
+        <p>Weights random kyu, aur kitne bade</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>Maths ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="z1" href="maths-symbols.html"><span>01</span>Symbols aur formula padhna</a>
+            <a data-topic-link="z2" href="maths-graphs.html"><span>02</span>Graph, line aur slope</a>
+            <a data-topic-link="z3" href="maths-functions.html"><span>03</span>Function = input-output machine</a>
+            <a data-topic-link="z4" href="maths-powers-e-log.html"><span>04</span>Power, e aur log</a>
+            <a data-topic-link="z5" href="maths-average-probability.html"><span>05</span>Average, phailaav aur probability</a>
+            <a data-topic-link="z6" href="maths-vectors-matrices.html"><span>06</span>Vectors, matrices aur dot product</a>
+            <a data-topic-link="z7" href="maths-slope-derivative.html"><span>07</span>Slope, derivative aur chain rule</a>
+            <a data-topic-link="z8" href="maths-python-numpy.html"><span>08</span>Python aur NumPy crash course</a>
+            <a data-topic-link="z9" href="maths-broadcasting-shapes.html"><span>09</span>Broadcasting, shapes aur reshape</a>
+            <a data-topic-link="z10" href="maths-computation-graph.html"><span>10</span>Computation graph aur activation ke derivatives</a>
+            <a data-topic-link="z11" href="maths-matrix-gradients.html"><span>11</span>Matrix gradients aur dimensions ka hisaab</a>
+            <a data-topic-link="z12" href="maths-norms-similarity.html"><span>12</span>Norms, distance aur cosine similarity</a>
+            <a data-topic-link="z13" href="maths-moving-average.html"><span>13</span>Exponentially weighted (moving) average</a>
+            <a data-topic-link="z14" href="maths-probability-2.html"><span>14</span>Probability level 2: conditional, likelihood, cross-entropy</a>
+            <a data-topic-link="z15" class="current" aria-current="page" href="maths-randomness-scale.html"><span>15</span>Randomness, variance aur scale</a>
+            <a data-topic-link="z16" href="maths-convolution.html"><span>16</span>Convolution: sliding dot product</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="z1,z2,z3,z4,z5,z6,z7,z8,z9,z10,z11,z12,z13,z14,z15,z16"><span>Maths progress</span><strong data-progress-label>0 / 16 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Weight initialization, vanishing/exploding gradients aur hyperparameter search — teeno ka secret variance aur scale mein hai.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>np.random.randn: mean 0, variance 1</li><li>Random number ko c se multiply karo to variance c² guna</li><li>n random cheezon ka sum — variance n guna badhta hai, isliye 1/n se scale</li><li>Baar baar multiply: 1.1⁵⁰ vs 0.9⁵⁰ (explode vs vanish)</li><li>Log scale pe random sampling: α = 10ʳ</li><li>Random seed — result dobara same lana</li></ul></details>
+        <article class="lesson-card single" id="z15">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Weights random kyu shuru karte hain? Zero se start simple nahi?</p>
+              <p class="msg dost">Zero se saare neurons same sochenge — jaise group project mein sab ek hi answer copy kar rahe hon. Randomness symmetry todti hai.</p>
+              <p class="msg me">Par random kitna bada? Kuch bhi daal dein?</p>
+              <p class="msg dost">Yahin scale ka game hai. Bahut bada to activations/gradients explode; bahut chhota to vanish.</p>
+            </div>
+            <h4><code>np.random.randn</code>: mean 0, variance 1</h4>
+            <p><code>randn</code> normal bell curve se random numbers deta hai: average 0 ke aas-paas, variance 1 ke aas-paas. Matlab typical number −2 se 2 ke beech hoga, kabhi-kabhi bahar bhi.</p>
+<pre class="code">import numpy as np
+
+np.random.seed(7)                 <span class="cm"># same random numbers dobara</span>
+W = np.random.randn(3, 2)         <span class="cm"># mean 0, variance ~1 source</span>
+print(W.shape)                    <span class="cm"># (3, 2)</span></pre>
+            <div class="mistake"><b>Dhyan rakhna:</b> Random ka matlab uncontrolled nahi. Experiments compare karne ke liye seed set karo, warna har run thoda alag result dega.</div>
+            <h4>Scale karo to variance c² guna hoti hai</h4>
+            <p>Agar random number <code>x</code> ki variance 1 hai, aur tum <code>y = c x</code> banate ho, to variance <code>c²</code> ho jaati hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Multiplier c</th><th>Variance multiplier</th><th>Meaning</th></tr>
+              <tr><td>0.2</td><td>0.2² = <b>0.04</b></td><td>Numbers chhote, spread kam</td></tr>
+              <tr><td>2</td><td>2² = <b>4</b></td><td>Numbers bade, spread 4 guna</td></tr>
+            </table></div>
+            <h4>n random cheezon ka sum — variance badh jaati hai</h4>
+            <p>Neuron dot product mein kai terms jodta hai: <code>w₁x₁ + w₂x₂ + ...</code>. Agar 100 independent terms hain aur har term ki variance 0.01 hai, sum ki variance ≈ 100 × 0.01 = <strong>1</strong>. Isi idea se weights ki variance ko input count ke hisaab se chhota rakhte hain.</p>
+            <div class="formula"><code>n terms ka sum variance ≈ n × term_variance
+Stable rakhne ke liye weight variance ≈ 1/n
+ReLU ke liye common: Var(W) ≈ 2/n</code><ul>
+              <li><b>Xavier</b> (tanh ke liye): standard deviation ≈ √(1/n).</li>
+              <li><b>He init</b> (ReLU ke liye): standard deviation ≈ √(2/n).</li>
+              <li>Code: <code>np.random.randn(...) * np.sqrt(2 / n_prev)</code>.</li>
+            </ul></div>
+<pre class="code">n_prev = 100
+W_relu = np.random.randn(50, n_prev) * np.sqrt(2 / n_prev)
+W_tanh = np.random.randn(50, n_prev) * np.sqrt(1 / n_prev)</pre>
+            <h4>Baar-baar multiply: explode vs vanish</h4>
+            <p>Deep network mein signal layer se layer multiply hota rehta hai. Thoda sa 1 se bada number bhi 50 layers mein monster ban sakta hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Repeated factor</th><th>50 baar multiply</th><th>Feel</th></tr>
+              <tr><td>1.1⁵⁰</td><td><b>117.39</b></td><td>Explode: signal bahut bada</td></tr>
+              <tr><td>0.9⁵⁰</td><td><b>0.00515</b></td><td>Vanish: signal almost gayab</td></tr>
+            </table></div>
+            <figure class="figure">
+              <svg viewBox="0 0 420 180" role="img" aria-label="Repeated multiplication causing exploding and vanishing values">
+                <line x1="40" y1="145" x2="390" y2="145" stroke="#b8c2d3"/>
+                <polyline points="50,135 120,125 190,105 260,70 330,25" fill="none" stroke="#c2410c" stroke-width="4"/>
+                <polyline points="50,55 120,78 190,101 260,124 330,140" fill="none" stroke="#3567e8" stroke-width="4"/>
+                <g font-size="11"><text x="335" y="25" fill="#c2410c">1.1⁵⁰ explode</text><text x="335" y="142" fill="#3567e8">0.9⁵⁰ vanish</text></g>
+              </svg>
+              <div class="cap">Initialization ka goal: signal ko na rocket banana, na hawa.</div>
+            </figure>
+            <h4>Log scale pe random sampling</h4>
+            <p>Learning rate jaise hyperparameters 0.0001 se 1 tak ho sakte hain. Linear random pick karoge to bade numbers zyada milenge. Log scale pe pick karo:</p>
+            <div class="formula"><code>r uniformly choose karo [−4, 0] se
+α = 10ʳ</code><ul>
+              <li>r = −4 → α = 0.0001</li>
+              <li>r = −2 → α = 0.01</li>
+              <li>r = 0 → α = 1</li>
+            </ul></div>
+<pre class="code">r = np.random.uniform(-4, 0)
+alpha = 10 ** r                 <span class="cm"># log scale learning rate</span>
+
+seed = 42
+np.random.seed(seed)            <span class="cm"># result reproducible</span></pre>
+            <h4>Deep learning mein ye kahan milega?</h4>
+            <p>DL Course 1 ke random initialization page mein, Course 2 ke vanishing/exploding gradients, He/Xavier initialization, hyperparameter tuning, aur dropout randomness mein.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Randomness symmetry todti hai; scale training ko stable rakhta hai. Variance ka hisaab galat hua to deep network ya explode karega ya vanish.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Zero bias rakh sakte hain?</summary><p>Haan, biases ko zero se start karna common hai. Problem zero weights se hoti hai, kyunki neurons same gradients paate hain.</p></details>
+            <details class="qa"><summary>Seed set karna production mein zaroori?</summary><p>Debugging aur experiments compare karne mein zaroori. Final training mein bhi reproducibility ke liye useful, par GPU operations kabhi-kabhi phir bhi tiny difference de sakte hain.</p></details>
+            <details class="qa"><summary>He init sirf ReLU ke liye?</summary><p>Mainly ReLU-family ke liye. tanh/sigmoid ke liye Xavier type scale zyada natural hota hai, kyunki activation behavior alag hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>x ki variance 1 hai. y = 0.5x. y ki variance?</summary><p>Variance multiplier 0.5² = 0.25. Final variance <b>0.25</b>.</p></details>
+              <details class="qa"><summary>n = 400 inputs. Xavier std roughly?</summary><p>√(1/400) = 1/20 = <b>0.05</b>.</p></details>
+              <details class="qa"><summary>r = −3 ho to α = 10ʳ kitna?</summary><p><code>10⁻³ = <b>0.001</b></code>.</p></details>
+            </div>
+            
+            <div class="used-box"><h4>Ye maths aage kahan kaam aayegi</h4><div class="chips"><a class="chip" data-topic-link="n9" href="dl-shallow-backprop.html"><small>DL · 1</small>Shallow network ka backprop aur random initialization</a><a class="chip" data-topic-link="i6" href="dl-vanishing-exploding-init.html"><small>DL · 2</small>Vanishing/exploding gradients aur weight initialization</a><a class="chip" data-topic-link="i12" href="dl-hyperparameter-tuning.html"><small>DL · 2</small>Hyperparameter tuning ka tareeka</a></div></div>
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="z15"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="maths-probability-2.html"><small>← Pichhla</small>Probability level 2: conditional, likelihood, cross-entropy</a>
+          <a class="pager-next" href="maths-convolution.html"><small>Agla →</small>Convolution: sliding dot product</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

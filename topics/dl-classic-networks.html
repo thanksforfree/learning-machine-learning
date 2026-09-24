@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Classic networks: LeNet-5, AlexNet, VGG-16: Doosron ke design padhna seekho. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Classic networks: LeNet-5, AlexNet, VGG-16 (DL · 4) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-purple">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-convolutional-networks.html">DL · 4: Convolutional Neural Networks</a> › Topic 5 / 15</nav>
+        <p class="eyebrow">DL · 4 · TOPIC 05 · FAMOUS ARCHITECTURES</p>
+        <h1>Classic networks: LeNet-5, AlexNet, VGG-16</h1>
+        <p>Doosron ke design padhna seekho</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 4 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="c1" href="dl-cv-edge-detection.html"><span>01</span>Computer vision aur edge detection</a>
+            <a data-topic-link="c2" href="dl-padding-stride.html"><span>02</span>Padding aur strided convolution</a>
+            <a data-topic-link="c3" href="dl-conv-volumes-layer.html"><span>03</span>Volumes pe convolution aur ek conv layer</a>
+            <a data-topic-link="c4" href="dl-pooling-cnn-example.html"><span>04</span>Pooling, poora CNN example aur convolution kyu</a>
+            <a data-topic-link="c5" class="current" aria-current="page" href="dl-classic-networks.html"><span>05</span>Classic networks: LeNet-5, AlexNet, VGG-16</a>
+            <a data-topic-link="c6" href="dl-resnets.html"><span>06</span>ResNets</a>
+            <a data-topic-link="c7" href="dl-inception.html"><span>07</span>1×1 convolution aur Inception network</a>
+            <a data-topic-link="c8" href="dl-mobilenet-efficientnet.html"><span>08</span>MobileNet aur EfficientNet</a>
+            <a data-topic-link="c9" href="dl-cnn-practical-advice.html"><span>09</span>CNN practical advice</a>
+            <a data-topic-link="c10" href="dl-localization-landmarks.html"><span>10</span>Object localization aur landmark detection</a>
+            <a data-topic-link="c11" href="dl-sliding-windows.html"><span>11</span>Sliding windows aur uska convolutional version</a>
+            <a data-topic-link="c12" href="dl-yolo.html"><span>12</span>YOLO: IoU, non-max suppression, anchor boxes</a>
+            <a data-topic-link="c13" href="dl-region-proposals-unet.html"><span>13</span>Region proposals aur semantic segmentation (U-Net)</a>
+            <a data-topic-link="c14" href="dl-face-recognition.html"><span>14</span>Face recognition: one-shot, Siamese, triplet loss</a>
+            <a data-topic-link="c15" href="dl-neural-style-transfer.html"><span>15</span>Neural style transfer aur ConvNet andar kya seekhta hai</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15"><span>DL · 4 progress</span><strong data-progress-label>0 / 15 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Achhe architectures padhna coding seekhne jaisa hai — doosron ka code padh ke hi achha code likhna aata hai.</div>
+        
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Case studies kyu padhein</li><li>LeNet-5: ~60 hazaar parameters, sizes ghat-te channels badhte</li><li>AlexNet: ~6 crore parameters, ReLU, bada</li><li>VGG-16: ~13.8 crore, har jagah 3×3 same conv + 2×2 pool, channels double</li></ul></details>
+        <article class="lesson-card single" id="c5">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Architectures padhne se kya fayda? Main to TensorFlow mein model bana ke train karunga.</p>
+              <p class="msg dost">Bilkul banaoge. Par doosron ke good designs padhna cooking videos dekhne jaisa hai. Recipe copy nahi, sense develop hota hai.</p>
+              <p class="msg me">Sense matlab?</p>
+              <p class="msg dost">Kab size ghatana, channels badhana, chhote filters repeat karna, dense layers kitni mehengi padti hain — ye sab famous networks se feel aata hai.</p>
+              <p class="msg me">To ye history lesson nahi hai?</p>
+              <p class="msg dost">Nahi dost, ye design-reading practice hai. LeNet, AlexNet, VGG — teen alag zamane ke “code reviews”.</p>
+            </div>
+
+            <h4>Case studies kyu padhein?</h4>
+            <p>Har architecture ek engineering choice ka bundle hota hai. Kisi ne small images ke liye halka network banaya, kisi ne GPUs ka use karke bada network train kiya, kisi ne simple rule ko extreme tak push kiya.</p>
+            <div class="compare-grid">
+              <div><b>Pattern spotting</b>Conv ke baad pool, spatial size neeche, channels upar — ye rhythm baar-baar dikhega.</div>
+              <div><b>Parameter sense</b>Kaunsi layer heavy hai? Dense layer memory kha rahi hai ya conv?</div>
+              <div><b>Transfer learning</b>Pretrained model use karte waqt naam aur blocks samajh aate hain.</div>
+            </div>
+
+            <h4>LeNet-5: chhota par smart</h4>
+            <p>LeNet handwritten digits jaise chhote grayscale images ke liye famous hua. Roughly 60 hazaar parameters. Pattern yaad rakho: image size ghat-ta hai, channels badhte hain.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Stage</th><th>Shape idea</th><th>Feeling</th></tr>
+              <tr><td>Input</td><td>32×32×1</td><td>chhoti grayscale image</td></tr>
+              <tr><td>Conv + pool</td><td>28×28×6 → 14×14×6</td><td>basic edges/features</td></tr>
+              <tr><td>Conv + pool</td><td>10×10×16 → 5×5×16</td><td>parts thode complex</td></tr>
+              <tr><td>FC layers</td><td>120 → 84 → 10</td><td>digit class decide</td></tr>
+              <tr><td>Total</td><td colspan="2"><b>~60k parameters</b> — aaj ke standards se halka</td></tr>
+            </table></div>
+            <p>LeNet se lesson: CNN fully connected network se bahut kam parameters mein image ka local structure use kar sakta hai.</p>
+
+            <h4>AlexNet: bada jump, ReLU, aur GPU wala zamana</h4>
+            <p>AlexNet ne large color image classification mein CNNs ko spotlight mein la diya. Ismein roughly 6 crore parameters the. ReLU activation ne training fast banayi, aur GPUs ne itna bada model practical banaya.</p>
+            <p>First conv layer ka number feel karo:</p>
+            <div class="formula"><code>AlexNet conv1 params = 11 × 11 × 3 × 96 + 96 = 34,944</code><ul>
+              <li><b>11×11</b> = bada receptive field, early layer</li>
+              <li><b>3</b> = RGB input channels</li>
+              <li><b>96</b> = filters</li>
+              <li><b>+96</b> = har filter ka bias</li>
+            </ul></div>
+            <p>AlexNet se lesson: data aur compute mile to larger networks surprisingly strong ho sakte hain. Lekin parameters badhne se overfitting aur memory ka bill bhi badhta hai.</p>
+
+            <figure class="figure">
+              <svg viewBox="0 0 430 190" role="img" aria-label="LeNet, AlexNet aur VGG parameter scale comparison">
+                <rect x="45" y="120" width="55" height="18" fill="#159477"/><text x="72" y="154" font-size="11" text-anchor="middle" fill="#4b5871">LeNet</text><text x="72" y="112" font-size="11" text-anchor="middle" fill="#159477">60k</text>
+                <rect x="175" y="75" width="55" height="63" fill="#3567e8"/><text x="202" y="154" font-size="11" text-anchor="middle" fill="#4b5871">AlexNet</text><text x="202" y="67" font-size="11" text-anchor="middle" fill="#3567e8">60M</text>
+                <rect x="305" y="28" width="55" height="110" fill="#7653d6"/><text x="332" y="154" font-size="11" text-anchor="middle" fill="#4b5871">VGG-16</text><text x="332" y="20" font-size="11" text-anchor="middle" fill="#7653d6">138M</text>
+                <line x1="30" y1="138" x2="390" y2="138" stroke="#b8c2d3"/>
+              </svg>
+              <div class="cap">Scale ka jump dekho: thousands se millions, phir hundred-million club.</div>
+            </figure>
+
+            <h4>VGG-16: simple rule, bahut depth</h4>
+            <p>VGG ka charm ye hai ki design almost boring hai — aur wahi beauty hai. Har jagah 3×3 same convolution, beech-beech mein 2×2 max pooling. Spatial size half hota jaata hai, channels double hote jaate hain: 64, 128, 256, 512...</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>VGG idea</th><th>Example</th></tr>
+              <tr><td>Small filters repeat</td><td>3×3 conv, same padding</td></tr>
+              <tr><td>Pooling</td><td>2×2, stride 2; height/width half</td></tr>
+              <tr><td>Channels</td><td>64 → 128 → 256 → 512</td></tr>
+              <tr><td>Total params</td><td>~13.8 crore, FP32 memory ≈ 526 MB just for weights</td></tr>
+            </table></div>
+            <p>Ek VGG-style conv ka parameter count:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Layer</th><th>Calculation</th><th>Params</th></tr>
+              <tr><td>3×3, 64 input channels, 128 filters</td><td>3×3×64×128 + 128</td><td>73,856</td></tr>
+            </table></div>
+            <p>VGG se lesson: chhote 3×3 filters stack karke large receptive field mil sakta hai, aur har layer ke beech ReLU non-linearity bhi milti hai.</p>
+
+            <h4>Teen networks ka quick comparison</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Network</th><th>Approx params</th><th>Signature idea</th><th>Beginner takeaway</th></tr>
+              <tr><td>LeNet-5</td><td>~60k</td><td>conv-pool blocks</td><td>Small images ke liye CNN ka basic grammar</td></tr>
+              <tr><td>AlexNet</td><td>~60M</td><td>ReLU + big model + GPU</td><td>Scale matters, compute matters</td></tr>
+              <tr><td>VGG-16</td><td>~138M</td><td>3×3 same conv repeated</td><td>Simple repeated blocks powerful ho sakte hain</td></tr>
+            </table></div>
+            <pre class="code"># VGG-style mini block
+model.add(Conv2D(64, 3, padding="same", activation="relu"))
+model.add(Conv2D(64, 3, padding="same", activation="relu"))
+model.add(MaxPool2D(2))  <span class="cm"># height/width half</span></pre>
+
+            <div class="mistake"><b>Dhyan rakhna:</b> Famous architecture ka naam dekh ke blindly use mat karo. Dataset size, device memory, latency, aur task ka type check karo. VGG strong hai, par heavy bhi hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> LeNet ne grammar dikhayi, AlexNet ne scale dikhaya, VGG ne simple repeated 3×3 blocks ki power dikhayi.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>VGG mein 5×5 ki jagah do 3×3 kyu?</summary><p>Do 3×3 layers ka receptive field 5×5 jaisa ho sakta hai, par beech mein extra ReLU milta hai. Often parameters bhi manageable rehte hain.</p></details>
+            <details class="qa"><summary>AlexNet ke 6 crore parameters mein sab conv layers se aate hain?</summary><p>Nahi. AlexNet/VGG jaise old designs mein fully connected layers bhi bahut parameters leti thi. Modern networks FC ko kam karte hain.</p></details>
+            <details class="qa"><summary>Case study yaad karni hai?</summary><p>Exact layer-by-layer ratna zaroori nahi. Pattern yaad rakho: sizes, channels, filters, aur design reason.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>3×3 conv, 32 input channels, 64 filters, bias ke saath params?</summary><p>3×3×32×64 + 64 = 18,432 + 64 = <b>18,496</b>.</p></details>
+              <details class="qa"><summary>VGG-style max pool 2×2 s=2 ke baad 224×224 feature map ka size?</summary><p>Height aur width half: <b>112×112</b>. Channels same rehte hain.</p></details>
+              <details class="qa"><summary>LeNet se sabse bada design lesson kya?</summary><p>Images ke local structure ka use karo: conv filters share karo, pool se size ghatao, end mein class decide karo.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="c5"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-pooling-cnn-example.html"><small>← Pichhla</small>Pooling, poora CNN example aur convolution kyu</a>
+          <a class="pager-next" href="dl-resnets.html"><small>Agla →</small>ResNets</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

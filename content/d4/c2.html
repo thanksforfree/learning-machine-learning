@@ -1,0 +1,95 @@
+            <div class="chat">
+              <p class="msg me">Pichhle page mein convolution karte hi 7×7 photo 5×5 ho gayi. Ye to har layer mein photo ko sukha dega?</p>
+              <p class="msg dost">Bilkul. Agar har baar bina soche filter ghuma diya, to photo chhoti hoti jaayegi aur corner pixels ko kam chance milega.</p>
+              <p class="msg me">Corner pixels ko kam chance matlab?</p>
+              <p class="msg dost">Beech wala pixel kai 3×3 patches mein aata hai. Corner wala sirf ek-do patches mein. Jaise group project mein corner wala dost meeting mein bulaaya hi nahi gaya.</p>
+              <p class="msg me">To solution?</p>
+              <p class="msg dost">Photo ke aas-paas zero ka border laga do. Isko <strong>padding</strong> kehte hain. Aur jab fast chhota output chahiye, khidki ko ek-ek nahi, do-do kadam chalao — isko <strong>stride</strong> kehte hain.</p>
+            </div>
+
+            <h4>Do problems: shrinking aur corner unfairness</h4>
+            <p>Valid convolution matlab filter sirf asli photo ke andar rahe. 7×7 input pe 3×3 filter lagao, stride 1, padding 0:</p>
+            <div class="formula"><code>output = ⌊(n + 2p − f) / s⌋ + 1</code><ul>
+              <li><b>n</b> = input height/width (square example mein)</li>
+              <li><b>f</b> = filter size</li>
+              <li><b>p</b> = padding, photo ke charo taraf kitne zero layers</li>
+              <li><b>s</b> = stride, filter kitne pixel ka kadam leta hai</li>
+              <li><b>⌊ ⌋</b> = floor, decimal aaye to neeche wala integer</li>
+            </ul></div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Setting</th><th>Calculation</th><th>Output</th></tr>
+              <tr><td>valid: n=7, f=3, p=0, s=1</td><td>⌊(7 + 0 − 3)/1⌋ + 1</td><td>5×5</td></tr>
+              <tr><td>same: n=7, f=3, p=1, s=1</td><td>⌊(7 + 2 − 3)/1⌋ + 1</td><td>7×7</td></tr>
+              <tr><td>stride 2: n=10, f=3, p=1, s=2</td><td>⌊(10 + 2 − 3)/2⌋ + 1 = ⌊4.5⌋ + 1</td><td>5×5</td></tr>
+            </table></div>
+
+            <h4>Padding p: photo ke aas-paas safe border</h4>
+            <p>Padding mein hum input ke border ke bahar zero values add karte hain. Filter jab corner pe aata hai, to uska kuch hissa zero border pe hota hai. Isse two fayde:</p>
+            <ul>
+              <li>Output jaldi shrink nahi hota.</li>
+              <li>Corner pixels bhi zyada patches mein participate karte hain.</li>
+            </ul>
+            <div class="compare-grid">
+              <div><b>Valid convolution</b>p = 0. Filter sirf asli photo ke andar. Output chhota hota hai.</div>
+              <div><b>Same convolution</b>p aisa choose karo ki stride 1 pe output size input jaisa rahe.</div>
+            </div>
+
+            <figure class="figure">
+              <svg viewBox="0 0 420 175" role="img" aria-label="Padding se input ke charo taraf zero border add hota hai">
+                <rect x="45" y="35" width="90" height="90" fill="#edf3ff" stroke="#3567e8" stroke-width="2"/>
+                <text x="90" y="145" font-size="11" text-anchor="middle" fill="#4b5871">original 5×5</text>
+                <rect x="245" y="20" width="120" height="120" fill="#fff3ec" stroke="#e0703a" stroke-width="2"/>
+                <rect x="260" y="35" width="90" height="90" fill="#edf3ff" stroke="#3567e8" stroke-width="2"/>
+                <text x="305" y="158" font-size="11" text-anchor="middle" fill="#4b5871">p=1 ke baad 7×7</text>
+                <path d="M155,80 L225,80" stroke="#7653d6" stroke-width="2" marker-end="url(#pada)"/>
+                <defs><marker id="pada" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#7653d6"/></marker></defs>
+                <text x="190" y="68" font-size="11" text-anchor="middle" fill="#7653d6">zero border</text>
+              </svg>
+              <div class="cap">Padding photo ko “thoda sa takiya” de deta hai, taaki filter border tak aaram se ja sake.</div>
+            </figure>
+
+            <h4>Same padding ke liye p = (f − 1)/2</h4>
+            <p>Stride 1 ho aur output ko same size rakhna ho, to formula se:</p>
+            <div class="formula"><code>n = n + 2p − f + 1  ⇒  p = (f − 1) / 2</code><ul>
+              <li>f = 3 ho to p = 1</li>
+              <li>f = 5 ho to p = 2</li>
+              <li>f = 7 ho to p = 3</li>
+            </ul></div>
+            <p>Isliye CNN mein odd filter sizes popular hain: 3×3, 5×5, 7×7. Odd f mein center pixel clear hota hai aur p integer aata hai. f = 4 pe p = 1.5, matlab half pixel ka border — ajeeb jugaad.</p>
+
+            <h4>Stride s: filter ke bade kadam</h4>
+            <p>Stride 1 = har next pixel pe khidki. Stride 2 = ek pixel skip karke. Jaise gully cricket mein ball dhundhne ke liye har ghar nahi, alternate ghar check karna — fast, par detail kam.</p>
+            <div class="visual-flow"><span>Input<br><small>10×10</small></span><b>→</b><span>pad p=1</span><b>→</b><span class="flow-highlight">stride s=2</span><b>→</b><span>Output<br><small>5×5</small></span></div>
+            <p>Stride se computation kam hota hai aur feature map chhota hota hai. Lekin bahut bada stride detail miss kar sakta hai. Chhote object traffic camera mein waise hi mushkil hote hain; stride unhe aur chhupa sakta hai.</p>
+
+            <h4>Worked output sizes</h4>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Input</th><th>f</th><th>p</th><th>s</th><th>Output calculation</th><th>Size</th></tr>
+              <tr><td>32</td><td>5</td><td>2</td><td>1</td><td>⌊(32 + 4 − 5)/1⌋ + 1</td><td class="good">32</td></tr>
+              <tr><td>31</td><td>5</td><td>0</td><td>2</td><td>⌊(31 − 5)/2⌋ + 1 = 13 + 1</td><td>14</td></tr>
+              <tr><td>64</td><td>3</td><td>1</td><td>2</td><td>⌊(64 + 2 − 3)/2⌋ + 1 = 31 + 1</td><td>32</td></tr>
+            </table></div>
+
+            <h4>Cross-correlation vs convolution — naam ka chhota kissa</h4>
+            <p>Maths wali “true convolution” mein filter ko pehle flip karte hain, phir slide karte hain. Deep learning libraries aam taur pe filter ko flip nahi karti; technically woh <strong>cross-correlation</strong> hai.</p>
+            <p>Par CNN duniya mein sab isko convolution hi bolte hain. Kyun? Kyunki filter ke numbers training mein seekhe jaate hain. Flip ho ya na ho, network apna useful filter adjust kar lega. Naam thoda historical hai, tension nahi.</p>
+            <pre class="code">def out_size(n, f, p=0, s=1):
+    return (n + 2*p - f) // s + 1
+
+print(out_size(32, 5, p=2, s=1))  <span class="cm"># 32: same conv</span>
+print(out_size(10, 3, p=1, s=2))  <span class="cm"># 5: strided conv</span></pre>
+
+            <div class="mistake"><b>Dhyan rakhna:</b> Agar formula ka numerator stride se exactly divide nahi hota, output floor hota hai. “4.5 positions” jaisi koi cheez nahi; last half-fit window ignore ho jaati hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Padding border bachata hai, stride output chhota karta hai, aur output size formula har CNN debugging ka calculator hai.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Padding mein zero hi kyu? Border ka copy kyu nahi?</summary><p>Zero padding simple aur common hai. Kabhi-kabhi reflection padding bhi use hoti hai, par CNN basics mein zero padding enough hai.</p></details>
+            <details class="qa"><summary>Same padding stride 2 pe bhi same size rakhega?</summary><p>Nahi. “Same” ka common meaning stride 1 ke liye input jaisa output. Stride 2 lagaoge to output roughly aadha ho jaayega.</p></details>
+            <details class="qa"><summary>Even filter kabhi use nahi karte?</summary><p>Use ho sakta hai, par 3×3 jaisa odd filter clean center deta hai, isliye bahut common hai.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>28×28 input, f=3, p=1, s=1. Output size?</summary><p>⌊(28 + 2 − 3)/1⌋ + 1 = 28. <b>28×28</b>.</p></details>
+              <details class="qa"><summary>15×15 input, f=5, p=0, s=2. Output size?</summary><p>⌊(15 − 5)/2⌋ + 1 = 5 + 1 = <b>6×6</b>.</p></details>
+              <details class="qa"><summary>3×3 filter ke saath same padding chahiye. p kitna?</summary><p>p = (3 − 1)/2 = <b>1</b>.</p></details>
+            </div>

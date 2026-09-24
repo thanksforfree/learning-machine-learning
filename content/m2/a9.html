@@ -1,0 +1,52 @@
+
+            <div class="chat">
+              <p class="msg me">Asli project mein ek baar train kiya aur done? LinkedIn post daal du?</p>
+              <p class="msg dost">Thoda ruk jao, dost. ML ka kaam loop hai: idea/architecture chuno → train karo → diagnose karo (bias, variance, error analysis) → sudharo → phir se. Jaise dal banate waqt chakh-chakh ke namak-mirch adjust karna.</p>
+            </div>
+            <div class="visual-flow"><span>Architecture chuno</span><b>→</b><span>Train</span><b>→</b><span class="flow-highlight">Diagnose</span><b>↻</b><span>Deploy</span><b>→</b><span>Monitor</span></div>
+            <h4>Error analysis — galtiyon ko khud dekho</h4>
+            <p>Spam filter ne CV set mein 100 emails galat classify kiye. Unko <em>haath se</em> padho aur category banao:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Galti ki category</th><th>Ginti</th><th>Faisla</th></tr>
+              <tr><td>Loan / finance wale spam</td><td>40</td><td class="good">Yahan mehnat karo — sabse bada fayda</td></tr>
+              <tr><td>Phishing links wale</td><td>25</td><td class="good">Ye bhi important</td></tr>
+              <tr><td>Sirf image wale spam</td><td>5</td><td>Baad mein</td></tr>
+              <tr><td>Jaan-boojh ke spelling galat</td><td>3</td><td>Abhi ignore — max 3% fayda</td></tr>
+            </table></div>
+            <p>Ek email kai categories mein aa sakta hai, no issue. Faayda ye hai ki tumhara time guesswork mein nahi jalta — seedha dikhta hai kahan mehnat ka <strong>fayda</strong> sabse zyada hai.</p>
+            <h4>Data badhane ke smart tareeke</h4>
+            <div class="compare-grid">
+              <div><b>Targeted data</b>Sab kuch nahi — bas us category ka zyada data laao jahan galti ho rahi (jaise finance spam).</div>
+              <div><b>Data augmentation</b>Purane example ko thoda badal ke naya banao: letter “A” ki photo ko ghumao, thoda tedha karo; awaaz mein background shor milao. Label wahi rehta hai.</div>
+              <div><b>Synthetic data</b>Computer se nakli par realistic data banao, jaise alag-alag fonts se text ki photos.</div>
+              <div><b>Data-centric soch</b>Kabhi model badalne se zyada fayda data sudharne se hota hai (galat labels theek karna).</div>
+            </div>
+            <div class="mistake"><b>Augmentation mein dhyan:</b> Wahi badlav karo jo asli duniya mein aata hai. Awaaz ko ulta chalana ya bilkul random pixel shor daalna aam taur pe madad nahi karta.</div>
+            <h4>Transfer learning — kisi aur ki mehnat ka fayda</h4>
+            <div class="chat">
+              <p class="msg me">Mere paas sirf 1000 photos hain. Chalega?</p>
+              <p class="msg dost">Kisi ne already 10 lakh photos pe ek bada network train kiya hai (billi, car, ped sab). Uski pehli layers edges, shapes pehchanna seekh chuki hain — ye har photo problem mein kaam aata hai. Tum bas aakhri layer apne kaam ke liye badlo aur apni 1000 photos pe <strong>fine-tune</strong> karo. Jaise gaadi chalana seekha hua insaan truck jaldi seekh leta hai.</p>
+            </div>
+            <div class="compare-grid">
+              <div><b>Option 1 (kam data)</b>Purani layers freeze, sirf nayi output layer train karo.</div>
+              <div><b>Option 2 (thoda zyada data)</b>Saari layers train karo, par pre-trained weights se shuru karke.</div>
+            </div>
+            <p>Shart: input same type ka ho (photo ke liye photo wala model, awaaz ke liye awaaz wala).</p>
+            <h4>Deployment aur zimmedari</h4>
+            <p><strong>Deploy:</strong> model ek server pe chalta hai, app usse request bhejta hai (“is photo mein kya hai?”) aur jawab leta hai. Kaam yahin khatam nahi. Phir <strong>monitor</strong> karna padta hai — duniya badalti hai, data badalta hai, model purana ho jaata hai. Isko MLOps kehte hain.</p>
+            <p><strong>Fairness aur ethics:</strong> model kisi group ke saath galat bhedbhaav (jaise loan approval mein) kar sakta hai, ya galat use ho sakta hai. Launch se pehle: alag-alag groups pe performance check karo, possible nuksaan ki list banao, aur kuch galat hua to kya karoge (rollback plan) — pehle se tay karo.</p>
+
+            <h4>Error analysis ka ROI calculate karo</h4>
+            <div class="chat"><p class="msg me">Galtiyan dekhna boring lagta hai. Direct bigger model try karun?</p><p class="msg dost">Bigger model try kar sakte ho, par pehle 100 galtiyan dekhna detective work hai. Wahi batata hai ki mehnat kahan lagani hai. Warna tum wrong problem solve kar sakte ho.</p></div>
+            <p>Maan lo CV set mein 200 errors hain. Tumne 100 random errors inspect kiye:</p>
+            <div class="table-wrap"><table class="calc"><tr><th>Category</th><th>Sample mein count</th><th>Approx total errors</th><th>Max possible improvement</th></tr><tr><td>Dhundhli photos</td><td>45/100</td><td>90/200</td><td class="good">Sabse pehle yahan</td></tr><tr><td>Wrong label</td><td>20/100</td><td>40/200</td><td class="good">Labels clean karo</td></tr><tr><td>Raat ki photos</td><td>8/100</td><td>16/200</td><td>Baad mein</td></tr><tr><td>Ulti photos</td><td>2/100</td><td>4/200</td><td>Abhi chhodo</td></tr></table></div>
+            <p>Ye exact science nahi, par direction clear karta hai. Agar dhundhli photos 45% errors hain, to blur augmentation ya better blur data model architecture se zyada help kar sakta hai.</p>
+            <h4>Monitoring ka chhota example</h4>
+            <div class="table-wrap"><table class="calc"><tr><th>Week</th><th>CV-like live accuracy</th><th>Signal</th></tr><tr><td>Launch</td><td>94%</td><td class="good">Normal</td></tr><tr><td>Week 4</td><td>93%</td><td>Thoda drift</td></tr><tr><td>Week 8</td><td>86%</td><td class="bad">Data badal gaya — retrain/check</td></tr></table></div>
+            <div class="oneliner"><b>Yaad rakhna:</b> ML ek loop hai — train, galtiyan dekho, sahi jagah sudharo, zimmedari se launch karo, aur nazar rakho.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>100 galtiyan haath se dekhna time waste nahi?</summary><p>Ulta! Ek-do ghante ka error analysis mahino ki galat mehnat bacha sakta hai. Galtiyan zyada ho to random 100–200 sample dekho.</p></details>
+            <details class="qa"><summary>Transfer learning mein kaunsa model lun?</summary><p>Jo tumhare jaise input pe train hua ho aur publicly available ho. Photo problem hai to image model, text problem hai to text model. Aajkal images, text, audio sab ke liye pre-trained models milte hain.</p></details>
+
+            <details class="qa"><summary>Kitni galtiyan inspect karni chahiye?</summary><p>Start mein 50–100 ka random sample kaafi signal de deta hai. Agar categories unclear hain, 200 tak jao. Poora dataset manually dekhna zaroori nahi.</p></details>
+            <details class="qa"><summary>Data-centric ka matlab model badalna mana hai?</summary><p>Nahi. Matlab model ke saath-saath data quality, labels, coverage aur distribution ko equal importance do. Kabhi-kabhi 1 ghanta label cleaning 1 hafte ke model tuning se better hota hai.</p></details>

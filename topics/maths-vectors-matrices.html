@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Vectors, matrices aur dot product: List, table aur bill ka hisaab. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Vectors, matrices aur dot product (Maths) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a class="active" href="../maths.html">Maths</a><a href="../ml.html">ML</a><a href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-green">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../maths.html">Maths: Maths — zero se deep learning tak</a> › Topic 6 / 16</nav>
+        <p class="eyebrow">MATHS · TOPIC 06 · LEVEL 2 · DATA AUR BADLAAV</p>
+        <h1>Vectors, matrices aur dot product</h1>
+        <p>List, table aur bill ka hisaab</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>Maths ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="z1" href="maths-symbols.html"><span>01</span>Symbols aur formula padhna</a>
+            <a data-topic-link="z2" href="maths-graphs.html"><span>02</span>Graph, line aur slope</a>
+            <a data-topic-link="z3" href="maths-functions.html"><span>03</span>Function = input-output machine</a>
+            <a data-topic-link="z4" href="maths-powers-e-log.html"><span>04</span>Power, e aur log</a>
+            <a data-topic-link="z5" href="maths-average-probability.html"><span>05</span>Average, phailaav aur probability</a>
+            <a data-topic-link="z6" class="current" aria-current="page" href="maths-vectors-matrices.html"><span>06</span>Vectors, matrices aur dot product</a>
+            <a data-topic-link="z7" href="maths-slope-derivative.html"><span>07</span>Slope, derivative aur chain rule</a>
+            <a data-topic-link="z8" href="maths-python-numpy.html"><span>08</span>Python aur NumPy crash course</a>
+            <a data-topic-link="z9" href="maths-broadcasting-shapes.html"><span>09</span>Broadcasting, shapes aur reshape</a>
+            <a data-topic-link="z10" href="maths-computation-graph.html"><span>10</span>Computation graph aur activation ke derivatives</a>
+            <a data-topic-link="z11" href="maths-matrix-gradients.html"><span>11</span>Matrix gradients aur dimensions ka hisaab</a>
+            <a data-topic-link="z12" href="maths-norms-similarity.html"><span>12</span>Norms, distance aur cosine similarity</a>
+            <a data-topic-link="z13" href="maths-moving-average.html"><span>13</span>Exponentially weighted (moving) average</a>
+            <a data-topic-link="z14" href="maths-probability-2.html"><span>14</span>Probability level 2: conditional, likelihood, cross-entropy</a>
+            <a data-topic-link="z15" href="maths-randomness-scale.html"><span>15</span>Randomness, variance aur scale</a>
+            <a data-topic-link="z16" href="maths-convolution.html"><span>16</span>Convolution: sliding dot product</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="z1,z2,z3,z4,z5,z6,z7,z8,z9,z10,z11,z12,z13,z14,z15,z16"><span>Maths progress</span><strong data-progress-label>0 / 16 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Data ek table (matrix) hai, ek example ek list (vector) hai, aur model ka hisaab dot product hai. Neural network ki har layer ek matrix multiply hai.</div>
+        
+        
+        <article class="lesson-card single" id="z6">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Vector aur matrix sunke engineering wala dar lagta hai.</p>
+              <p class="msg dost">Excel kholo. Ek <strong>row</strong> ya ek <strong>column</strong> = vector. Poori <strong>table</strong> = matrix. Bas! Itna hi. Numbers ko line mein ya table mein sajana.</p>
+              <p class="msg me">To naam bade hain, cheez simple table wali?</p>
+              <p class="msg dost">Bilkul. Maths ne fancy naam de diye, par tum Excel wali aankh se dekho. Row, column, table — kaam ho gaya.</p>
+            </div>
+            <div class="compare-grid">
+              <div><b>Vector = list</b>Ek ghar: [1200, 3, 2, 10] → size, bedrooms, floors, umar. 4 numbers ki list.</div>
+              <div><b>Matrix = table</b>100 ghar × 4 features = 100 rows, 4 columns. “Shape” = (100, 4).</div>
+            </div>
+            <h4>Dot product — sabse important operation</h4>
+            <p>Do lists lo, <strong>pair-by-pair multiply</strong> karo, <strong>sab jodo</strong>. Ek number aata hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th></th><th>Item 1</th><th>Item 2</th><th>Item 3</th></tr>
+              <tr><td>Daam (w)</td><td>₹40</td><td>₹10</td><td>₹25</td></tr>
+              <tr><td>Quantity (x)</td><td>2</td><td>5</td><td>1</td></tr>
+              <tr><td>w × x</td><td>80</td><td>50</td><td>25</td></tr>
+              <tr><td colspan="4"><b>Dot product = 80 + 50 + 25 = ₹155</b> — ye tumhara bill hai!</td></tr>
+            </table></div>
+            <p>Linear regression ka <strong>w · x + b</strong> yahi hai: har feature × uska weight, sab jodo, + b. Bill + delivery charge.</p>
+            <h4>Matrix multiplication — bahut saare dot products ek saath</h4>
+            <div class="chat">
+              <p class="msg dost">Socho 3 customers ke carts hain, aur tum sabka bill ek saath nikalna chahte ho. Har customer ki quantities ek row, daam ek column. Har row × daam column = us customer ka bill. Ye <strong>matrix × vector</strong> hai.</p>
+            </div>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Customer</th><th>Item 1</th><th>Item 2</th><th>Item 3</th><th>Bill (daam [40, 10, 25] se)</th></tr>
+              <tr><td>Asha</td><td>2</td><td>5</td><td>1</td><td>80 + 50 + 25 = 155</td></tr>
+              <tr><td>Bilal</td><td>0</td><td>3</td><td>2</td><td>0 + 30 + 50 = 80</td></tr>
+              <tr><td>Chetan</td><td>1</td><td>0</td><td>4</td><td>40 + 0 + 100 = 140</td></tr>
+            </table></div>
+            <p>Neural network ki ek layer mein kai neurons hote hain, har ek ke apne weights. Weights ko bhi table (matrix W) bana do — har column ek neuron. Tab <strong>data matrix × W</strong> = har example ka har neuron ke liye z, ek hi jhatke mein.</p>
+            <h4>Shape ka rule — sabse zyada errors yahin aate hain</h4>
+            <div class="formula"><code>(rows₁, cols₁) × (rows₂, cols₂)   chalega tabhi jab  cols₁ = rows₂
+Answer ki shape = (rows₁, cols₂)</code><ul>
+              <li>(3 customers, 3 items) × (3 items, 1 daam) → (3, 1) = 3 bills ✓</li>
+              <li>(100 ghar, 4 features) × (4, 25 neurons) → (100, 25) ✓</li>
+              <li>(100, 4) × (5, 25) → error! 4 ≠ 5</li>
+            </ul></div>
+            <h4>Transpose — table ko palat dena</h4>
+            <p>Rows ko columns bana do. Shape (2, 3) → (3, 2). Code mein <code>A.T</code>. Jab shapes match na hon to aksar transpose se theek hota hai.</p>
+            <p>Bas transpose ko “table ghumana” samjho. Jaise attendance sheet mein students rows mein the, ab subjects rows mein aa gaye.</p>
+            <div class="oneliner"><b>Yaad rakhna:</b> Vector = list, matrix = table, dot product = pair-multiply-jodo, matrix multiply = bahut saare dot products ek saath.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Ye sab haath se karna padega?</summary><p>Kabhi nahi. <code>np.dot(w, x)</code> aur <code>np.matmul(X, W)</code> (ya <code>X @ W</code>). Tumhe bas shapes ka dhyan rakhna hai.</p></details>
+            <details class="qa"><summary>Computer isse fast kaise karta hai?</summary><p>Modern CPU/GPU ek saath bahut saare multiply-add kar sakte hain (parallel). Loop mein ek-ek karo to woh power bekaar jaati hai. Isko vectorization kehte hain.</p></details>
+            <details class="qa"><summary>1D aur 2D array mein farak?</summary><p>1D = sirf list: shape (4,). 2D = table: shape (1, 4) ya (4, 1) bhi ho sakti hai. TensorFlow aam taur pe 2D maangta hai — ek row wala table bhi.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>[1, 2, 3] · [4, 0, −1] kitna?</summary><p>4 + 0 − 3 = <b>1</b>.</p></details>
+              <details class="qa"><summary>(50, 3) × (3, 10) ka shape? Aur (50, 3) × (4, 10)?</summary><p>Pehla (50, 10). Doosra error, kyunki 3 ≠ 4.</p></details>
+            </div>
+            <div class="used-box"><h4>Ye maths aage kahan kaam aayegi</h4><div class="chips"><a class="chip" data-topic-link="s5" href="multiple-features.html"><small>ML · 1</small>Multiple features aur vectorization</a><a class="chip" data-topic-link="a2" href="forward-propagation.html"><small>ML · 2</small>Forward propagation</a><a class="chip" data-topic-link="u2" href="k-means.html"><small>ML · 3</small>K-means algorithm</a><a class="chip" data-topic-link="u6" href="recommender-features.html"><small>ML · 3</small>Recommender: item features ke saath</a><a class="chip" data-topic-link="u7" href="collaborative-filtering.html"><small>ML · 3</small>Collaborative filtering aur binary labels</a><a class="chip" data-topic-link="u9" href="content-based-filtering.html"><small>ML · 3</small>Content-based filtering aur deep learning</a><a class="chip" data-topic-link="u10" href="pca.html"><small>ML · 3</small>PCA — bahut features ko kam mein samet-na</a><a class="chip" data-topic-link="n2" href="dl-binary-classification.html"><small>DL · 1</small>Binary classification aur notation</a><a class="chip" data-topic-link="n7" href="dl-shallow-network.html"><small>DL · 1</small>Shallow neural network: ek hidden layer</a><a class="chip" data-topic-link="c15" href="dl-neural-style-transfer.html"><small>DL · 4</small>Neural style transfer aur ConvNet andar kya seekhta hai</a><a class="chip" data-topic-link="q14" href="dl-transformer-self-attention.html"><small>DL · 5</small>Transformer intuition aur self-attention</a></div></div>
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="z6"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="maths-average-probability.html"><small>← Pichhla</small>Average, phailaav aur probability</a>
+          <a class="pager-next" href="maths-slope-derivative.html"><small>Agla →</small>Slope, derivative aur chain rule</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

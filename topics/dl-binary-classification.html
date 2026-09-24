@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Binary classification aur notation: Photo ko numbers ki lambi list banana. Hinglish mein dost jaisi explanation, examples aur Q&amp;A.">
+  <title>Binary classification aur notation (DL · 1) — Machine Learning, Visually</title>
+  <link rel="stylesheet" href="../styles.css">
+  <script src="../app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">ML</span><span>Machine Learning, <em>Visually</em></span></a><nav aria-label="Main navigation"><a href="../index.html">Learning map</a><a href="../maths.html">Maths</a><a href="../ml.html">ML</a><a class="active" href="../dl.html">DL</a></nav></header>
+  <main id="main" class="module-blue">
+    <section class="topic-hero">
+      <div class="topic-hero-inner">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="../index.html">Learning map</a> › <a href="../dl.html">Deep Learning Specialization</a> › <a href="../dl-neural-networks.html">DL · 1: Neural Networks and Deep Learning</a> › Topic 2 / 11</nav>
+        <p class="eyebrow">DL · 1 · TOPIC 02 · EK NEURON</p>
+        <h1>Binary classification aur notation</h1>
+        <p>Photo ko numbers ki lambi list banana</p>
+      </div>
+    </section>
+    <div class="lesson-layout">
+      <aside class="lesson-sidebar">
+        <details class="toc" open><summary>DL · 1 ke topics</summary>
+          <nav aria-label="Module topics">
+            <a data-topic-link="n1" href="dl-what-is-deep-learning.html"><span>01</span>Deep learning kya hai, aur ab hi kyu chal pada?</a>
+            <a data-topic-link="n2" class="current" aria-current="page" href="dl-binary-classification.html"><span>02</span>Binary classification aur notation</a>
+            <a data-topic-link="n3" href="dl-logistic-regression-neuron.html"><span>03</span>Logistic regression — ek neuron wala network</a>
+            <a data-topic-link="n4" href="dl-computation-graph.html"><span>04</span>Gradient descent aur computation graph</a>
+            <a data-topic-link="n5" href="dl-logistic-gradients.html"><span>05</span>Logistic regression ke gradients</a>
+            <a data-topic-link="n6" href="dl-vectorization.html"><span>06</span>Vectorization aur broadcasting</a>
+            <a data-topic-link="n7" href="dl-shallow-network.html"><span>07</span>Shallow neural network: ek hidden layer</a>
+            <a data-topic-link="n8" href="dl-activation-functions.html"><span>08</span>Activation functions aur unke derivatives</a>
+            <a data-topic-link="n9" href="dl-shallow-backprop.html"><span>09</span>Shallow network ka backprop aur random initialization</a>
+            <a data-topic-link="n10" href="dl-deep-network.html"><span>10</span>Deep L-layer network aur dimensions</a>
+            <a data-topic-link="n11" href="dl-why-deep-building-blocks.html"><span>11</span>Deep kyu? Building blocks, parameters aur hyperparameters</a>
+          </nav>
+        </details>
+        <div class="progress-box" data-module-topics="n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11"><span>DL · 1 progress</span><strong data-progress-label>0 / 11 topics</strong><div class="progress-track"><span data-progress-bar></span></div></div>
+      </aside>
+      <div class="lesson-content">
+        <div class="why-box"><b>Ye kyu seekh rahe hain?</b>Poore course ki notation yahin set hoti hai. X ka shape, m, nₓ — ye clear ho gaya to aage ke formulas padhna aasan ho jaayega.</div>
+        <div class="prereq-box"><b>Maths mein atko to pehle ye dekh lo</b><div class="chips"><a class="chip" data-topic-link="z6" href="maths-vectors-matrices.html"><small>Maths</small>Vectors, matrices aur dot product</a><a class="chip" data-topic-link="z9" href="maths-broadcasting-shapes.html"><small>Maths</small>Broadcasting, shapes aur reshape</a></div></div>
+        <details class="covers-box" open><summary>Is page mein kya-kya hai</summary><ul><li>Billi hai ya nahi — binary classification</li><li>Photo ko pixels ki lambi list mein kholna (apne size ke saath, jaise 32×32×3)</li><li>nₓ, m, (x⁽ⁱ⁾, y⁽ⁱ⁾) notation</li><li>X ka shape (nₓ, m): examples columns mein</li><li>Y ka shape (1, m)</li><li>Ye convention kyu (vectorization mein aasani)</li></ul></details>
+        <article class="lesson-card single" id="n2">
+          <div class="lesson-body">
+            <div class="chat">
+              <p class="msg me">Mere phone mein photo to photo dikhti hai. Model ko woh kaise dikhate hain?</p>
+              <p class="msg dost">Model ko photo nahi, numbers ki plate milti hai. Har pixel ke red-green-blue values. Bas wahi uski duniya hai.</p>
+              <p class="msg me">To kya hum photo ko tod-phod ke list bana dete hain?</p>
+              <p class="msg dost">Haan, bilkul. Jaise suitcase pack karne ke liye kapde fold karke ek line mein rakhte ho. Cheez wahi, arrangement alag.</p>
+              <p class="msg me">Aur label bas 1/0? Thoda zyada simple nahi?</p>
+              <p class="msg dost">Simple hi strength hai. “Cup hai ya nahi”, “defect hai ya nahi”, “spam hai ya nahi” — duniya ke kaafi kaam haan/na se shuru hote hain.</p>
+              <p class="msg me">Notation mein x⁽ⁱ⁾, nₓ, m dekh ke thoda darr lag raha hai.</p>
+              <p class="msg dost">Darr normal hai. Aaj in symbols ko naam aur ghar de dete hain. Phir aage formulas kam scary lagenge.</p>
+            </div>
+            <h4>Binary classification: ek switch wala sawaal</h4>
+            <p>Binary classification ka matlab output do options mein se ek. Spam ya not spam. Defective ya okay. Photo mein cat hai ya nahi. Page pe “cat” example common hai, par tum isko “chai ki photo mein cup hai ya nahi” bhi soch sakte ho. Model ka kaam chance dena hai, phir threshold se 0/1 decide karna.</p>
+            <div class="formula"><code>ŷ = P(y = 1 | x), y ∈ {0, 1}</code><ul>
+              <li><b>x</b> = input features, photo ke pixels ki list</li>
+              <li><b>y</b> = true label, 1 ya 0</li>
+              <li><b>ŷ</b> = model ka estimated chance ki label 1 hai</li>
+            </ul></div>
+            <h4>32×32×3 photo ko 3072 numbers banana</h4>
+            <p>Colour photo mein har pixel ke 3 values hote hain: red, green, blue. Agar photo 32 by 32 hai, total numbers = 32 × 32 × 3 = 3072. Ye numbers ek vector mein khul jaate hain. Jaise kapdon ki almari ko ek lambi line mein rakh diya.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Cheez</th><th>Shape</th><th>Count</th></tr>
+              <tr><td>Height × width</td><td>32 × 32</td><td>1024 pixels</td></tr>
+              <tr><td>RGB channels</td><td>× 3</td><td>3072 values</td></tr>
+              <tr><td>Flattened x</td><td>(3072, 1)</td><td class="good">nₓ = 3072</td></tr>
+            </table></div>
+            <figure class="figure">
+              <svg viewBox="0 0 430 210" role="img" aria-label="Photo cube ko lambi vector list mein flatten karna">
+                <rect x="35" y="45" width="95" height="95" fill="#edf3ff" stroke="#3567e8"/>
+                <rect x="55" y="25" width="95" height="95" fill="#f2edff" stroke="#7653d6" opacity="0.85"/>
+                <rect x="75" y="65" width="95" height="95" fill="#e9f7f3" stroke="#159477" opacity="0.85"/>
+                <path d="M185,100 C220,100 220,100 250,100" stroke="#8a96aa" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+                <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 Z" fill="#8a96aa"/></marker></defs>
+                <rect x="270" y="25" width="45" height="155" rx="10" fill="#fff3ec" stroke="#e0703a"/>
+                <g stroke="#e0703a"><line x1="270" y1="55" x2="315" y2="55"/><line x1="270" y1="85" x2="315" y2="85"/><line x1="270" y1="115" x2="315" y2="115"/><line x1="270" y1="145" x2="315" y2="145"/></g>
+                <g font-size="11" text-anchor="middle" fill="#273142"><text x="102" y="178">32×32×3 photo</text><text x="292" y="198">3072×1 vector</text><text x="292" y="48">x₁</text><text x="292" y="78">x₂</text><text x="292" y="108">...</text><text x="292" y="138">x₃₀₇₂</text></g>
+              </svg>
+              <div class="cap">Flattening sirf arrangement badalta hai; information wahi rehti hai.</div>
+            </figure>
+            <h4>Notation: nₓ, m, x⁽ⁱ⁾, y⁽ⁱ⁾</h4>
+            <p><strong>nₓ</strong> features ki ginti hai. Ek 32×32×3 photo ke liye nₓ = 3072. <strong>m</strong> training examples ki ginti hai. <strong>x⁽ⁱ⁾</strong> i-th photo ka vector, aur <strong>y⁽ⁱ⁾</strong> uska label. Superscript example number batata hai, power nahi. Haan, notation pehli baar thoda khichdi lagti hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Symbol</th><th>Meaning</th><th>Example</th></tr>
+              <tr><td>nₓ</td><td>features per example</td><td>3072</td></tr>
+              <tr><td>m</td><td>examples count</td><td>500 photos</td></tr>
+              <tr><td>x⁽³⁾</td><td>3rd example ka input</td><td>ek photo vector</td></tr>
+              <tr><td>y⁽³⁾</td><td>3rd example ka label</td><td>0 ya 1</td></tr>
+            </table></div>
+            <h4>X aur Y ka shape</h4>
+            <p>Course convention mein examples columns mein rakhe jaate hain. Matlab X ka har column ek x⁽ⁱ⁾. Isliye X shape hota hai <strong>(nₓ, m)</strong>. Y ek row hai jisme labels columns ke saath align hote hain, to Y ka shape <strong>(1, m)</strong>.</p>
+            <div class="formula"><code>X = [x⁽¹⁾ x⁽²⁾ ... x⁽ᵐ⁾], shape = (nₓ, m)
+Y = [y⁽¹⁾ y⁽²⁾ ... y⁽ᵐ⁾], shape = (1, m)</code><ul>
+              <li><b>Rows</b> = features</li>
+              <li><b>Columns</b> = examples</li>
+            </ul></div>
+            <p>Example: 500 photos hain, har photo 3072 numbers ki. X shape = (3072, 500). Y shape = (1, 500). Ye convention vectorization mein kaam aata hai, kyunki ek matrix operation se saare examples ka prediction nikal sakte ho.</p>
+            <pre class="code">import numpy as np
+image = np.zeros((32, 32, 3))
+x = image.reshape(32 * 32 * 3, 1)  <span class="cm"># (3072, 1)</span>
+X = np.zeros((3072, 500))          <span class="cm"># 500 photos columns mein</span>
+Y = np.zeros((1, 500))              <span class="cm"># 500 labels</span></pre>
+            <h4>Convention ka payoff: columns examples kyu?</h4>
+            <p>Jab examples columns mein hote hain, ek wᵀX se sab predictions ek saath nikalte hain. Agar tum rows-examples style use karte ho to bhi maths possible hai, par formulas transpose ho jaate. Course mein ek convention pakad ke chalna mental load kam karta hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Data</th><th>Shape</th><th>Use</th></tr>
+              <tr><td>Ek image x</td><td>(3072, 1)</td><td>single column</td></tr>
+              <tr><td>100 images X</td><td>(3072, 100)</td><td>100 columns</td></tr>
+              <tr><td>Labels Y</td><td>(1, 100)</td><td>prediction row se match</td></tr>
+            </table></div>
+            <div class="mistake"><b>Dhyan rakhna:</b> (m, nₓ) aur (nₓ, m) ko mix mat karna. Dono valid styles hain, par is course mein columns examples hain. Shape print karte rehna.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Ek photo vector x hai; poora dataset X hai; X mein columns examples hain.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Flatten karne se photo ka 2D structure lost nahi hota?</summary><p>Is first model mein haan, nearby pixels ka special relation use nahi hota. CNN later isi weakness ko fix karega. Abhi notation seekhna goal hai.</p></details>
+            <details class="qa"><summary>y ko row vector kyu rakha?</summary><p>Taaki predictions A bhi (1, m) aaye aur A − Y seedha ho jaye. Broadcasting aur vectorization clean rehte hain.</p></details>
+            <details class="qa"><summary>Pixel values 0 se 255 rahenge?</summary><p>Usually unhe 255 se divide karke 0–1 range mein laate hain. Training ko numbers chhote aur stable pasand aate hain.</p></details>
+            <details class="qa"><summary>32×32 hi kyu? Real photos to bade hote hain.</summary><p>32×32 teaching ke liye manageable size hai. Real projects mein photos 224×224, 512×512 ya aur bade ho sakte hain. Principle same: height × width × channels.</p></details>
+            <details class="qa"><summary>Examples columns mein rakhna compulsory hai?</summary><p>Nahi, libraries mein rows-as-examples bhi common hai. Par is course ke formulas columns convention follow karte hain. Ek convention pakadna debugging ko easy banata hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>32×32×3 image ka nₓ kitna?</summary><p>32 × 32 × 3 = <b>3072</b>.</p></details>
+              <details class="qa"><summary>nₓ = 3072 aur m = 800 ho to X aur Y shapes?</summary><p>X = <b>(3072, 800)</b>, Y = <b>(1, 800)</b>.</p></details>
+              <details class="qa"><summary>x⁽¹⁰⁾ ka matlab kya hai?</summary><p>10th training example ka input vector. Ye x ki power nahi hai.</p></details>
+            </div>
+            
+            
+            <div class="done-row"><label class="complete-control big"><input type="checkbox" data-topic="n2"> Haan, ye samajh aa gaya ✓</label></div>
+          </div>
+        </article>
+        <nav class="pager" aria-label="Topic navigation">
+          <a class="pager-prev" href="dl-what-is-deep-learning.html"><small>← Pichhla</small>Deep learning kya hai, aur ab hi kyu chal pada?</a>
+          <a class="pager-next" href="dl-logistic-regression-neuron.html"><small>Agla →</small>Logistic regression — ek neuron wala network</a>
+        </nav>
+      </div>
+    </div>
+  </main>
+  <footer class="site-footer"><span>Ratne ke liye nahi, samajhne ke liye banaya hai. Saari explanations apni hain — video ka transcript nahi.</span><span>Courses: <a href="https://www.deeplearning.ai/specializations/machine-learning">Machine Learning</a> · <a href="https://www.deeplearning.ai/specializations/deep-learning">Deep Learning</a></span></footer>
+</body>
+</html>

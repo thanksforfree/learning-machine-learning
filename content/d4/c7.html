@@ -1,0 +1,84 @@
+            <div class="chat">
+              <p class="msg me">1×1 convolution sunke mujhe lagta hai ye kya mazaak hai. Ek pixel ka filter kya seekhega?</p>
+              <p class="msg dost">Spatially ek pixel dekhta hai, haan. Par depth mein poore channels dekhta hai. Agar input 32×32×128 hai, to 1×1 filter actually 1×1×128 hota hai.</p>
+              <p class="msg me">To woh channels mix karta hai?</p>
+              <p class="msg dost">Bilkul. Jaise 128 chutney bottles mein se 40 useful mixes bana do. Height-width same, channels kam. Ye computation bachane ka zabardast trick hai.</p>
+              <p class="msg me">Aur Inception?</p>
+              <p class="msg dost">Inception bolta hai: “3×3 chahiye ya 5×5? Pata nahi. Sab try karo, phir outputs jod do.” Smart part: pehle 1×1 bottleneck laga ke cost kam karo.</p>
+            </div>
+
+            <h4>1×1 conv: channels ghatana, information mix karna</h4>
+            <p>Input 32×32×128 hai. Agar 40 filters of size 1×1×128 lagaye, output 32×32×40 hoga. Spatial size same, depth 128 se 40.</p>
+            <div class="formula"><code>32×32×128  --(40 filters of 1×1×128)-->  32×32×40</code><ul>
+              <li><b>1×1</b> spatial window hai</li>
+              <li><b>128</b> depth poori previous channels ko dekhta hai</li>
+              <li><b>40 filters</b> = output ke 40 channels</li>
+            </ul></div>
+            <p>Har pixel location pe ye chhota fully-connected layer jaisa kaam karta hai: 128 channel values ko 40 naye channel values mein mix karta hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Cheez</th><th>Calculation</th><th>Value</th></tr>
+              <tr><td>Params</td><td>1×1×128×40 + 40 bias</td><td>5,160</td></tr>
+              <tr><td>Output activations</td><td>32×32×40</td><td>40,960 numbers</td></tr>
+            </table></div>
+
+            <h4>Inception ka idea: sab filter sizes ek saath</h4>
+            <p>Ek single layer mein kya choose karein — 1×1, 3×3, 5×5, ya pooling? Inception module kehta hai: sab branches chalao, phir channel dimension mein concatenate karo.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 430 240" role="img" aria-label="Inception module mein multiple branches parallel chalte hain">
+                <rect x="30" y="95" width="70" height="40" rx="8" fill="#edf3ff" stroke="#3567e8"/>
+                <text x="65" y="119" font-size="11" text-anchor="middle" fill="#3567e8">Input</text>
+                <rect x="150" y="28" width="80" height="32" rx="8" fill="#e9f7f3" stroke="#159477"/><text x="190" y="49" font-size="11" text-anchor="middle" fill="#159477">1×1</text>
+                <rect x="150" y="78" width="80" height="32" rx="8" fill="#f2edff" stroke="#7653d6"/><text x="190" y="99" font-size="11" text-anchor="middle" fill="#7653d6">1×1 → 3×3</text>
+                <rect x="150" y="128" width="80" height="32" rx="8" fill="#fff3ec" stroke="#e0703a"/><text x="190" y="149" font-size="11" text-anchor="middle" fill="#c2410c">1×1 → 5×5</text>
+                <rect x="150" y="178" width="80" height="32" rx="8" fill="#edf3ff" stroke="#3567e8"/><text x="190" y="199" font-size="11" text-anchor="middle" fill="#3567e8">pool → 1×1</text>
+                <rect x="310" y="95" width="90" height="40" rx="8" fill="#f2edff" stroke="#7653d6"/>
+                <text x="355" y="119" font-size="11" text-anchor="middle" fill="#7653d6">Concat</text>
+                <path d="M100,115 C125,45 125,45 148,45" stroke="#8a96aa" fill="none"/>
+                <path d="M100,115 L148,95" stroke="#8a96aa"/>
+                <path d="M100,115 L148,145" stroke="#8a96aa"/>
+                <path d="M100,115 C125,195 125,195 148,195" stroke="#8a96aa" fill="none"/>
+                <path d="M230,45 C275,45 275,115 310,115" stroke="#8a96aa" fill="none"/>
+                <path d="M230,95 L310,115" stroke="#8a96aa"/>
+                <path d="M230,145 L310,115" stroke="#8a96aa"/>
+                <path d="M230,195 C275,195 275,115 310,115" stroke="#8a96aa" fill="none"/>
+              </svg>
+              <div class="cap">Branches alag-alag scale ke patterns dekhte hain; output channels mein stack ho jaate hain.</div>
+            </figure>
+
+            <h4>Computation cost: plain 5×5 vs bottleneck</h4>
+            <p>Yahan asli maza aata hai. Input 32×32×128. Hume 40 filters of 5×5 chahiye.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Approach</th><th>Multiplications</th><th>Approx</th></tr>
+              <tr><td>Direct 5×5 conv</td><td>32×32×128×5×5×40</td><td class="bad">131,072,000 ≈ 13.11 crore</td></tr>
+              <tr><td>1×1 reduce to 24 channels</td><td>32×32×128×24</td><td>3,145,728</td></tr>
+              <tr><td>Then 5×5 conv to 40</td><td>32×32×24×5×5×40</td><td>24,576,000</td></tr>
+              <tr><td>Bottleneck total</td><td>3,145,728 + 24,576,000</td><td class="good">27,721,728 ≈ 2.77 crore</td></tr>
+            </table></div>
+            <p>Same style ka 5×5 feature, par cost lagbhag 4.7x kam. 1×1 bottleneck ne 128 channels ko pehle 24 mein compress kar diya.</p>
+
+            <h4>Inception module aur side branches</h4>
+            <p>Full Inception network aise modules stack karta hai. Kuch versions mein beech se side classifiers nikle the — chhoti auxiliary branches. Unka kaam tha training ke dauraan signal ko deeper layers tak help dena. Final prediction main branch se hoti hai.</p>
+            <p>Module ka benefit: network khud decide kar sakta hai ki kis layer pe small detail important hai ya bigger 5×5 context. Hum manually single filter size pe shaadi fix nahi kar rahe.</p>
+
+            <h4>Naam ka filmi kissa</h4>
+            <p>“Inception” naam thoda movie-inspired joke bhi tha: network ke andar network jaisa module. Matlab ek layer ke andar parallel mini-network branches. Naam yaad reh jaata hai, par concept yaad rakho: multi-scale filters + 1×1 bottlenecks.</p>
+            <pre class="code"># Inception-style branch idea
+branch5 = Conv2D(24, 1, activation="relu")(x)  <span class="cm"># bottleneck</span>
+branch5 = Conv2D(40, 5, padding="same", activation="relu")(branch5)
+branch3 = Conv2D(40, 3, padding="same", activation="relu")(x)
+out = concatenate([branch3, branch5], axis=-1)</pre>
+
+            <div class="mistake"><b>Dhyan rakhna:</b> 1×1 conv spatial size nahi badalta-ghatata, jab tak stride 1 ho. Uska main kaam channels mix/resize karna hai.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Inception ka dil hai “parallel choices”, aur uska budget manager hai “1×1 bottleneck”.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>1×1 conv non-linearity bhi de sakta hai?</summary><p>Haan. 1×1 conv ke baad ReLU lagao, to har pixel location pe channels ka non-linear mix ban jaata hai.</p></details>
+            <details class="qa"><summary>Concatenate aur add mein farak?</summary><p>Inception branches ko channels mein concatenate karta hai, depth badh jaati hai. ResNet shortcut usually add karta hai, shape same chahiye.</p></details>
+            <details class="qa"><summary>5×5 filter expensive kyu?</summary><p>3×3 mein 9 spatial weights, 5×5 mein 25. Channels aur filters ke saath multiply hote hi cost bada jump leti hai.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>14×14×64 input pe 1×1 conv ke 20 filters. Output size?</summary><p>Height-width same, filters 20. <b>14×14×20</b>.</p></details>
+              <details class="qa"><summary>1×1 conv: 64 input channels, 20 filters, bias ke saath params?</summary><p>1×1×64×20 + 20 = 1,280 + 20 = <b>1,300</b>.</p></details>
+              <details class="qa"><summary>Inception mein 1×1 bottleneck ka simple purpose?</summary><p>Expensive 3×3/5×5 se pehle channels kam karna, taaki <b>computation cost ghate</b>.</p></details>
+            </div>

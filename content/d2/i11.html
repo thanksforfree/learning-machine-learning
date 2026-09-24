@@ -1,0 +1,65 @@
+            <div class="chat">
+              <p class="msg me">Training start mein fast thi, end mein loss ke aas-paas ghoom rahi hai. Jaise auto parking spot miss kar raha ho.</p>
+              <p class="msg dost">Perfect analogy. Pehle road khaali thi to bada accelerator theek. Parking mein wahi speed rakhi to gaadi aage-peeche hoti rahegi.</p>
+              <p class="msg me">To learning rate dheere-dheere kam?</p>
+              <p class="msg dost">Haan. Start mein bade kadam, end mein chhote kadam. Isko learning rate decay bolte hain.</p>
+              <p class="msg me">Aur local minimum ka darr? Kahin galat gaddhe mein phas gaye to?</p>
+              <p class="msg dost">Deep learning mein asli villain aksar local minimum nahi, <strong>saddle point</strong> aur plateau hote hain. Ab woh bhi dekhenge.</p>
+            </div>
+            <h4>Decay kyu: end mein finesse chahiye</h4>
+            <p>Mini-batch training noisy hoti hai. Fixed α rakho to network optimum ke paas bhi thoda hilta rahega. Decay α ko time ke saath kam karta hai, taaki last mein model chhote, sambhal ke kadam le.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 420 210" role="img" aria-label="Learning rate decay se bade steps pehle aur chhote steps baad mein">
+                <path d="M40,40 Q210,315 380,40" fill="none" stroke="#b8c2d3" stroke-width="3"/>
+                <polyline points="70,75 150,140 195,168 215,176 225,179" fill="none" stroke="#3567e8" stroke-width="3"/>
+                <g fill="#3567e8"><circle cx="70" cy="75" r="6"/><circle cx="150" cy="140" r="6"/><circle cx="195" cy="168" r="5"/><circle cx="215" cy="176" r="4"/><circle cx="225" cy="179" r="4"/></g>
+                <text x="75" y="62" font-size="11" fill="#3567e8">bada step</text><text x="230" y="174" font-size="11" fill="#3567e8">chhota step</text>
+              </svg>
+              <div class="cap">Start mein jaldi neeche. End mein halka kadam, warna gaddhe ke aas-paas uchhalna.</div>
+            </figure>
+            <h4>Ek common schedule: α = α₀ / (1 + decay_rate × epoch)</h4>
+            <div class="formula"><code>α = α₀ / (1 + decay_rate × epoch)</code><ul>
+              <li><b>α₀</b> = starting learning rate</li>
+              <li><b>decay_rate</b> = kitni speed se α ghatega</li>
+              <li><b>epoch</b> = poore training data ka ek chakkar</li>
+            </ul></div>
+            <p>Example: α₀ = 0.1, decay_rate = 0.05.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Epoch</th><th>Formula</th><th>α</th></tr>
+              <tr><td>0</td><td>0.1 / (1 + 0)</td><td>0.1000</td></tr>
+              <tr><td>10</td><td>0.1 / (1 + 0.5)</td><td>0.0667</td></tr>
+              <tr><td>20</td><td>0.1 / (1 + 1.0)</td><td>0.0500</td></tr>
+              <tr><td>50</td><td>0.1 / (1 + 2.5)</td><td>0.0286</td></tr>
+            </table></div>
+            <h4>Decay ke aur flavours</h4>
+            <p>Ek hi recipe nahi hoti. Project ke hisaab se schedule choose hota hai.</p>
+            <div class="compare-grid">
+              <div><b>Exponential</b>α = α₀ × 0.95ᵉᵖᵒᶜʰ. Har epoch 5% kam.</div>
+              <div><b>1/√epoch</b>α = α₀ / √epoch. Shuru mein tez drop, baad mein dheere.</div>
+              <div><b>Staircase</b>10 epochs tak same α, phir achanak aadha. Exam ke chapters jaisa: block khatam, pace badlo.</div>
+              <div><b>Manual</b>Loss plateau ho gaya? Engineer khud α kam karta hai. Old-school, par kabhi useful.</div>
+            </div>
+            <pre class="code">alpha0 = 0.1
+decay_rate = 0.05
+for epoch in range(60):
+    alpha = alpha0 / (1 + decay_rate * epoch)
+    train_one_epoch(alpha)  <span class="cm"># optimizer ko chhota step do</span></pre>
+            <h4>Local optima ka sach</h4>
+            <p>2D graph mein local minimum easy dikhta hai: ek chhota gaddha jahan ball phas gayi. Par deep networks mein parameters lakhon-crores hote hain. High dimensions mein sab directions mein upar hona rare hai. Zyada common scene: kuch directions mein upar, kuch mein neeche — ghode ki saddle jaisa.</p>
+            <div class="tree-visual"><span class="tree-node">Gradient near zero?</span><div class="tree-branches"><div><small>Sab taraf upar</small><span class="tree-leaf">local minimum</span></div><div><small>Kuch upar, kuch neeche</small><span class="tree-leaf">saddle point</span></div></div></div>
+            <p>Saddle point pe slope zero ke paas lag sakta hai, to optimizer slow ho jaata hai. Par ek direction milte hi woh nikal sakta hai. Isliye “har problem local minimum hai” wala darr thoda purana ho chuka hai.</p>
+            <h4>Plateaus: training slow kyu hoti hai</h4>
+            <p>Plateau matlab zameen lagbhag flat. Gradient chhota, update chhota, progress slow. Momentum aur Adam yahan help kar sakte hain, kyunki woh recent directions ki memory rakhte hain. Learning rate decay end mein help karta hai, par plateau ke beech mein kabhi-kabhi α bahut chhota kar dena training ko aur slow kar sakta hai.</p>
+            <div class="lesson-callout"><b>Practical flow:</b> Pehle ek achha α find karo. Phir agar training end mein noisy settle ho rahi hai, decay add karo. Decay bad optimizer ya wrong α ka replacement nahi hai.</div>
+            <div class="mistake"><b>Dhyan rakhna:</b> Decay ko start se bahut aggressive mat rakho. α jaldi chhota ho gaya to model parking spot tak pahunchne se pehle hi cycle ki speed pe aa jayega.</div>
+            <div class="oneliner"><b>Yaad rakhna:</b> Learning rate decay training ke end mein kadam chhote karta hai. Deep nets mein local minima se zyada saddle points aur plateaus training ko slow karte hain.</div>
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>Decay hamesha lagana chahiye?</summary><p>Nahi. Pehle fixed α se baseline banao. Agar loss end mein bounce kar raha hai ya validation improve nahi ho raha, decay try karo.</p></details>
+            <details class="qa"><summary>Epoch aur iteration mein farak?</summary><p>Iteration = ek mini-batch update. Epoch = poore training set ka ek full pass. Decay schedule dono ke basis pe ban sakta hai, par formula mein kya use ho raha hai clear rakho.</p></details>
+            <details class="qa"><summary>Plateau mein patience kitna?</summary><p>Loss, dev metric aur learning rate teeno dekho. Kabhi bas wait karna padta hai, kabhi α adjust, kabhi architecture/normalization ki zaroorat hoti hai.</p></details>
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>α₀ = 0.2, decay_rate = 0.1, epoch = 5. α kitna?</summary><p>α = 0.2 / (1 + 0.1 × 5) = 0.2 / 1.5 = <b>0.1333</b>.</p></details>
+              <details class="qa"><summary>High dimensions mein local minima se zyada kaunsa point common hota hai?</summary><p><b>Saddle point</b>: kuch directions mein neeche ja sakte ho, kuch mein upar.</p></details>
+              <details class="qa"><summary>Training start se hi bahut slow hai. Decay pehla fix hai?</summary><p>Nahi. Pehle α, initialization, normalization, optimizer check karo. Decay start ko aur slow kar sakta hai.</p></details>
+            </div>

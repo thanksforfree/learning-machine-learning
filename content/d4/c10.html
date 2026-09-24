@@ -1,0 +1,80 @@
+            <div class="chat">
+              <p class="msg me">Classifier bolta hai “car hai”. Par self-driving car ko to yeh bhi chahiye ki car kahan hai, na?</p>
+              <p class="msg dost">Bilkul. “Kitchen mein chai hai” useful hai, par cup table ke kis kone pe hai ye bhi chahiye. Computer vision mein isko <strong>localization</strong> bolte hain.</p>
+              <p class="msg me">To model ek label ke saath rectangle bhi dega?</p>
+              <p class="msg dost">Haan. Pehle “object hai ya nahi”, phir box ka center aur size, phir class. Ek hi output vector mein sab aa sakta hai.</p>
+            </div>
+
+            <h4>Classification + localization</h4>
+            <p>Normal classification mein answer hota hai: “ye photo ambulance hai.” Localization mein answer thoda richer hota hai: “ambulance hai, aur box yahan se yahan tak hai.” Traffic camera, warehouse robot, medical scan — sab jagah “kya” ke saath “kahan” bhi chahiye.</p>
+            <figure class="figure">
+              <svg viewBox="0 0 420 220" role="img" aria-label="Image mein ek car ke around bounding box">
+                <rect x="30" y="30" width="360" height="150" rx="12" fill="#edf3ff" stroke="#b8c2d3" stroke-width="2"/>
+                <path d="M110,120 L145,82 H250 L290,120 Z" fill="#8a96aa"/>
+                <rect x="100" y="118" width="210" height="34" rx="8" fill="#3567e8"/>
+                <circle cx="145" cy="154" r="15" fill="#4b5871"/><circle cx="265" cy="154" r="15" fill="#4b5871"/>
+                <rect x="88" y="72" width="235" height="96" fill="none" stroke="#e0703a" stroke-width="3"/>
+                <circle cx="205" cy="120" r="5" fill="#c2410c"/>
+                <g font-size="11" fill="#4b5871"><text x="90" y="66">bounding box</text><text x="214" y="116">center</text></g>
+              </svg>
+              <div class="cap">Model ko class ke saath box ka center (bₓ,bᵧ) aur size (bₕ,b_w) predict karna hai.</div>
+            </figure>
+
+            <h4>Output vector: ek dabbe mein saari baat</h4>
+            <p>Maan lo 3 classes hain: pedestrian, car, bike. Output vector aisa rakh sakte hain:</p>
+            <div class="formula"><code>y = [p_c, b_x, b_y, b_h, b_w, c₁, c₂, c₃]</code><ul>
+              <li><b>p_c</b> = object present? 1 matlab haan, 0 matlab nahi</li>
+              <li><b>b_x, b_y</b> = box center ka x,y position (aksar image ke width/height se normalized)</li>
+              <li><b>b_h, b_w</b> = box height aur width</li>
+              <li><b>c₁,c₂,c₃</b> = class one-hot, jaise car ke liye [0,1,0]</li>
+            </ul></div>
+            <p>Example: 200×100 image mein box left=50, top=20, right=150, bottom=70 hai. Center x=(50+150)/2=100, center y=(20+70)/2=45. Normalize karo:</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Quantity</th><th>Calculation</th><th>Value</th></tr>
+              <tr><td>bₓ</td><td>100 ÷ 200</td><td>0.50</td></tr>
+              <tr><td>bᵧ</td><td>45 ÷ 100</td><td>0.45</td></tr>
+              <tr><td>b_w</td><td>(150 − 50) ÷ 200</td><td>0.50</td></tr>
+              <tr><td>bₕ</td><td>(70 − 20) ÷ 100</td><td>0.50</td></tr>
+            </table></div>
+            <p>Agar class car hai, target vector banega: <code>[1, 0.50, 0.45, 0.50, 0.50, 0, 1, 0]</code>. Notice karo: order fixed hai. bₕ aur b_w ko ulta kar diya to model ki duniya hil jayegi.</p>
+
+            <h4>Loss: jab object hi nahi, box ka homework mat check karo</h4>
+            <p>Agar photo mein koi object nahi hai, target <code>p_c = 0</code>. Tab bₓ, bᵧ, bₕ, b_w aur class labels ka matlab hi nahi. Loss sirf p_c pe lagao. Warna model ko random boxes ke liye saza milegi, jo unfair hai.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Case</th><th>Loss mein kya include?</th><th>Reason</th></tr>
+              <tr><td>p_c = 1</td><td>object + box + class</td><td>Object hai, saari details meaningful</td></tr>
+              <tr><td>p_c = 0</td><td>sirf object score</td><td>Box/class undefined, ignore</td></tr>
+            </table></div>
+            <p>Mini numeric check: true vector <code>[1,.50,.45,.50,.50,0,1,0]</code> aur prediction <code>[.8,.55,.40,.45,.60,.1,.7,.2]</code>. Squared errors ka sum:</p>
+            <div class="formula"><code>0.2² + 0.05² + 0.05² + 0.05² + 0.10² + 0.10² + 0.30² + 0.20² = 0.1975</code><ul>
+              <li>Object present hai, isliye box aur class dono count hue.</li>
+            </ul></div>
+
+            <h4>Landmark detection: rectangle nahi, points</h4>
+            <p>Kabhi box enough nahi hota. Face filter app ko aankhon ke corners, nose tip, mouth corners chahiye. Fitness app ko shoulder, elbow, wrist points chahiye. Isko <strong>landmark detection</strong> bolte hain.</p>
+            <p>Output vector mein har landmark ke x,y coordinates jod do: <code>[eye_left_x, eye_left_y, eye_right_x, eye_right_y, ...]</code>. Agar 68 face landmarks hain, to 136 coordinate numbers. Saath mein face present score bhi rakh sakte ho.</p>
+            <div class="mistake"><b>Dhyan rakhna:</b> Labels har photo mein same order mein hone chahiye. Photo A mein point 1 left eye aur Photo B mein point 1 nose ho gaya, to model ko lagta hai teacher khud confused hai.</div>
+
+            <h4>Labels banana boring hai, par wahi gold hai</h4>
+            <p>Localization ke liye har training image mein box draw karna padta hai. Landmark detection ke liye same points mark karne padte hain. Ye data labeling ka kaam thoda shaadi ke invitation list jaisa hai — boring, par galti hui to baad mein bahut phone aate hain.</p>
+            <pre class="code"># target vector banane ka simple idea
+pc = 1
+bx = (x1 + x2) / 2 / image_w
+by = (y1 + y2) / 2 / image_h
+bw = (x2 - x1) / image_w
+bh = (y2 - y1) / image_h
+y = [pc, bx, by, bh, bw, 0, 1, 0]  <span class="cm"># class = car</span></pre>
+
+            <div class="oneliner"><b>Yaad rakhna:</b> Localization classifier ka bada bhai hai: “object hai?” ke saath “box kahan hai?” aur “class kya hai?” ek vector mein predict karo.</div>
+
+            <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
+            <details class="qa"><summary>bₓ,bᵧ top-left corner kyu nahi rakhte?</summary><p>Rakh sakte ho, par center + height/width object detection mein common aur convenient hai. Center se object ko grid cell assign karna bhi easy hota hai, jo YOLO mein kaam aayega.</p></details>
+            <details class="qa"><summary>Agar image mein do cars hain to?</summary><p>Ye simple localization setup ek main object ke liye hai. Multiple objects ke liye detection algorithms chahiye, jahan grid cells, anchors ya proposals use hote hain.</p></details>
+            <details class="qa"><summary>Coordinates 0 se 1 ke beech kyu normalize karte hain?</summary><p>Training stable hoti hai. 0.45 jaise numbers model ke liye 183 pixels se zyada friendly hote hain, aur different image sizes pe same idea chal sakta hai.</p></details>
+
+            <div class="practice">
+              <h4>✍️ Ab tumhari baari <small>(pehle khud socho, phir answer kholna)</small></h4>
+              <details class="qa"><summary>300×200 image mein box left=60, top=50, right=210, bottom=150. bₓ,bᵧ,b_w,bₕ?</summary><p>Center x=135, center y=100. bₓ=135/300=<b>0.45</b>, bᵧ=100/200=<b>0.50</b>, b_w=150/300=<b>0.50</b>, bₕ=100/200=<b>0.50</b>.</p></details>
+              <details class="qa"><summary>p_c = 0 wali image mein class loss include karna chahiye?</summary><p>Nahi. Jab object hi nahi, class ka answer meaningful nahi. Sirf object-present score ko train karo.</p></details>
+              <details class="qa"><summary>5 landmarks predict karne hain. Sirf coordinates ke liye output size kitna?</summary><p>Har landmark ke x aur y — 2 numbers. 5 × 2 = <b>10</b> coordinate outputs.</p></details>
+            </div>
