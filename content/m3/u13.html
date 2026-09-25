@@ -17,10 +17,10 @@
             <p>Ek baar network chalao aur chaaron actions ke Q ek saath mil jaate hain — max wala chuno. (Shuru mein state + action dono input dene ka idea aa sakta hai, par 4 outputs wala design zyada efficient hai.)</p>
             <h4>Training data kahan se? Bellman se khud banao!</h4>
             <div class="chat">
-              <p class="msg dost">Lander ko khelne do. Har step pe note karo: (s, a, R(s), s') — “yahan tha, ye kiya, itna mila, yahan pahuncha”. Is tuple ko <strong>experience</strong> kehte hain. Aakhri 10,000 experiences ek dabbe mein rakho — <strong>replay buffer</strong>.</p>
-              <p class="msg dost">Ab supervised learning jaisa banao: input x = s (aur a), target y = R(s) + γ × max Q(s', a') — ye Q current network se hi nikaalo. Phir network ko x → y pe train karo. Network thoda better hua → agli baar targets better → aur better. Bellman ko baar baar lagaana.</p>
+              <p class="msg dost">Lander ko khelne do. Har step pe note karo: <strong>(s, a, r, s', done)</strong> — “yahan tha, ye kiya, itna reward mila, yahan pahuncha, aur kya episode khatam hua?” Is tuple ko <strong>experience</strong> kehte hain. Aakhri 10,000 experiences ek dabbe mein rakho — <strong>replay buffer</strong>.</p>
+              <p class="msg dost">Ab supervised learning jaisa banao. <strong>Online network</strong> state s dekh ke chaaron actions ke Q deta hai; update mein sirf liye hue action a ka Q sudhaarte hain. Target network se target banao: <strong>y = r + γ × (1 − done) × max Q_target(s', a')</strong>. done = 1 ho to episode khatam, aage ka reward nahi jodna. Online network ko Q(s,a) target y ke kareeb lana hai — baar-baar Bellman update.</p>
             </div>
-            <div class="visual-flow"><span>Khelo, experiences jama karo</span><b>→</b><span>Buffer se (s, a, R, s') lo</span><b>→</b><span>y = R + γ·max Q(s')</span><b>→</b><span class="flow-highlight">Network ko y pe train</span><b>↻</b></div>
+            <div class="visual-flow"><span>Khelo, experiences jama karo</span><b>→</b><span>Buffer se (s, a, r, s', done) lo</span><b>→</b><span>y = r + γ(1−done) max Q<sub>target</sub>(s')</span><b>→</b><span class="flow-highlight">Q<sub>online</sub>(s,a) ko y ke paas lao</span><b>↻</b></div>
             <h4>ε-greedy — naya try karo ya jaana-pehchana?</h4>
             <div class="chat">
               <p class="msg me">Hamesha best Q wala action hi kyu na lein?</p>
@@ -30,7 +30,7 @@
             <h4>Do aur sudhaar</h4>
             <div class="compare-grid">
               <div><b>Mini-batch</b>Har step pe poore 10,000 experiences pe train karna slow. Random 1000 lo aur unpe update. Thoda shor wala par bahut fast. (Supervised learning mein bhi yahi trick use hoti hai.)</div>
-              <div><b>Soft update (target network)</b>Naye network se purana ek jhatke mein replace karne se targets achanak badalte hain aur training hil jaati hai. Isliye dheere: Q_purana = 0.01 × Q_naya + 0.99 × Q_purana. Stable learning.</div>
+              <div><b>Soft update (target network)</b>Target network ko online network se har baar ek jhatke mein badalne se targets achanak hilte hain. Isliye weights dheere update hote hain: θ<sub>target</sub> ← 0.01 × θ<sub>online</sub> + 0.99 × θ<sub>target</sub>. Yahan θ network ke saare weights/biases hain; dheere badalte targets training stable rakhte hain.</div>
             </div>
             <h4>RL ki limitations — sach bolna zaroori</h4>
             <ul>

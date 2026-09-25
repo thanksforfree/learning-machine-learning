@@ -69,6 +69,19 @@ db[1] = (1/m) sum(dZ[1], axis=1, keepdims=True)</code><ul>
             </ul></div>
             <h4>dZ[1] ka matlab</h4>
             <p><code>W[2]ᵀ dZ[2]</code> output error ko hidden neurons mein baantta hai: kis hidden neuron ne output ko kitna influence kiya. Phir <code>* g′(Z[1])</code> check karta hai ki hidden activation us point pe slope de raha tha ya gate band tha. ReLU negative side pe ho to gate 0.</p>
+            <h4>Ek hidden neuron ka numeric backprop</h4>
+            <p>Ek example aur ek hidden neuron lo: input <code>x=2</code>, hidden weight <code>W[1]=0.1</code>, bias <code>b[1]=0</code>. Isliye <code>Z[1]=0.1×2=0.2</code> aur <code>A[1]=tanh(0.2)≈0.1974</code>. Forward pass se output <code>A[2]=0.6</code> aaya; true label <code>Y=1</code> aur output weight <code>W[2]=0.5</code> hai. Tanh ka slope <code>1−A[1]²≈0.9610</code>.</p>
+            <div class="table-wrap"><table class="calc">
+              <tr><th>Step</th><th>Hisaab</th><th>Result</th></tr>
+              <tr><td>Output error</td><td>dZ[2] = A[2] − Y = 0.6 − 1</td><td>−0.4</td></tr>
+              <tr><td>Error hidden tak</td><td>W[2] × dZ[2] = 0.5 × (−0.4)</td><td>−0.2</td></tr>
+              <tr><td>Activation ka gate</td><td>dZ[1] = −0.2 × 0.9610</td><td>−0.1922</td></tr>
+              <tr><td>Hidden weight</td><td>dW[1] = x × dZ[1] = 2 × (−0.1922)</td><td>−0.3844</td></tr>
+              <tr><td>Hidden bias</td><td>db[1] = dZ[1]</td><td>−0.1922</td></tr>
+              <tr><td>Output weight</td><td>dW[2] = A[1] × dZ[2] = 0.1974 × (−0.4)</td><td>−0.0790</td></tr>
+              <tr><td>Output bias</td><td>db[2] = dZ[2]</td><td>−0.4</td></tr>
+            </table></div>
+            <p>Yahan sirf ek example hai, isliye <code>m=1</code> aur average lene se values nahi badalti. Learning rate <code>α=0.1</code> ho to update se <code>W[1]=0.1384</code>, <code>b[1]=0.0192</code>, <code>W[2]=0.5079</code> honge. Gradients negative hain, aur update ka minus sign unhe positive direction mein le jaata hai.</p>
             <figure class="figure">
               <svg viewBox="0 0 430 200" role="img" aria-label="Backprop output error ko hidden layer tak W transpose aur activation derivative se bhejta hai">
                 <circle cx="70" cy="100" r="30" fill="#e9f7f3" stroke="#159477"/>

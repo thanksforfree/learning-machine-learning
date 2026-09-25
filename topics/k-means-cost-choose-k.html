@@ -51,7 +51,8 @@
               <p class="msg me">K-means ka bhi cost function hota hai? Matlab clustering mein bhi marks milte hain?</p>
               <p class="msg dost">Haan! Har point apne center se kitna door hai — un dooriyon ke square ka average. Isko <strong>distortion</strong> kehte hain. Achhe groups ka simple sign: point apne center ke paas, distortion kam.</p>
             </div>
-            <div class="formula"><code>J = (1/m) × Σ (point − uska center)²</code><ul>
+            <div class="formula"><code>J = (1/m) × Σ ||point − uska center||²</code><ul>
+              <li><b>||point − center||²</b> = har feature ka farak square karke jodo — yani squared Euclidean distance.</li>
               <li><b>Step 2</b> (points ko paas wale center pe bhejna) → J kam hota hai, kyunki har point ne sabse kam doori wala center chuna.</li>
               <li><b>Step 3</b> (center ko average pe le jaana) → J kam hota hai, kyunki average hi woh jagah hai jahan squares ka total sabse kam hota hai.</li>
               <li>Isliye J har round ya to ghatega ya same rahega — kabhi nahi badhega. Badhe to code mein bug hai!</li>

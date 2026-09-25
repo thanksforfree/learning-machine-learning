@@ -6,6 +6,7 @@
             </div>
             <h4>1D convolution — chalti hui khidki</h4>
             <p>Signal lo <code>[2, 5, 1, 3, 4]</code> aur filter <code>[1, 0, −1]</code>. Khidki length 3 ki hai, stride 1.</p>
+            <p>DL libraries mein is operation ko “convolution” bolte hain; aam implementation mein filter ko ulta nahi karte, seedha patch ke saath dot product lete hain. Yahan bhi wahi convention use kar rahe hain.</p>
             <div class="table-wrap"><table class="calc">
               <tr><th>Window</th><th>Dot with [1,0,−1]</th><th>Output</th></tr>
               <tr><td>[2, 5, 1]</td><td>2×1 + 5×0 + 1×(−1)</td><td><b>1</b></td></tr>
@@ -34,6 +35,7 @@
             <h4>Filter / kernel ka matlab</h4>
             <p>Filter chhoti number table hai. CNN ke first layers mein filters edges ya simple textures pakad sakte hain. Later layers mein combinations — eyes, wheels, patterns. Important: CNN mein filter ke numbers haath se nahi bharte; training unhe seekhti hai.</p>
             <h4>Output size formula</h4>
+            <p>Yahan <code>n</code> input ki length, <code>p</code> border par padding, <code>f</code> filter ki length aur <code>s</code> har move ke kadam hain. <code>⌊x⌋</code> ka matlab x se chhota ya barabar sabse bada poora number — yani fraction neeche round karo.</p>
             <div class="formula"><code>output size = ⌊(n + 2p − f) / s⌋ + 1</code><ul>
               <li><b>n</b> = input height/width.</li>
               <li><b>p</b> = padding, border pe extra zeros.</li>

@@ -80,8 +80,9 @@ A = A / keep_prob</code><ul>
               <li><b>keep_prob</b> = neuron ko rakhne ka chance</li>
               <li><b>A / keep_prob</b> = test time scale match karne ki trick</li>
             </ul></div>
+            <p>Table mein arithmetic ko saaf dekhne ke liye keep_prob = 0.60 lete hain; isliye jo activation bachta hai use 0.60 se divide karenge.</p>
             <div class="table-wrap"><table class="calc">
-              <tr><th>Activation A</th><th>Mask D</th><th>A × D</th><th>Divide by keep_prob = 0.60</th></tr>
+              <tr><th>Activation A</th><th>Mask D</th><th>A × D</th><th>After ÷ 0.60</th></tr>
               <tr><td>1.20</td><td>1</td><td>1.20</td><td>2.00</td></tr>
               <tr><td>0.50</td><td>0</td><td>0</td><td>0</td></tr>
               <tr><td>2.00</td><td>1</td><td>2.00</td><td>3.33</td></tr>

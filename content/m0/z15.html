@@ -20,7 +20,7 @@ print(W.shape)                    <span class="cm"># (3, 2)</span></pre>
               <tr><td>2</td><td>2² = <b>4</b></td><td>Numbers bade, spread 4 guna</td></tr>
             </table></div>
             <h4>n random cheezon ka sum — variance badh jaati hai</h4>
-            <p>Neuron dot product mein kai terms jodta hai: <code>w₁x₁ + w₂x₂ + ...</code>. Agar 100 independent terms hain aur har term ki variance 0.01 hai, sum ki variance ≈ 100 × 0.01 = <strong>1</strong>. Isi idea se weights ki variance ko input count ke hisaab se chhota rakhte hain.</p>
+            <p>Neuron dot product mein kai terms jodta hai: <code>w₁x₁ + w₂x₂ + ...</code>. Agar 100 independent terms hain aur har term ki variance 0.01 hai, sum ki variance ≈ 100 × 0.01 = <strong>1</strong>. Independent hone par variances add hoti hain; isi idea se weights ki variance ko input count ke hisaab se chhota rakhte hain.</p>
             <div class="formula"><code>n terms ka sum variance ≈ n × term_variance
 Stable rakhne ke liye weight variance ≈ 1/n
 ReLU ke liye common: Var(W) ≈ 2/n</code><ul>

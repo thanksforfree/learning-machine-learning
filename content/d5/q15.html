@@ -54,8 +54,8 @@ PE(pos, 2i+1) = cos(pos / 10000<sup>2i/d</sup>)</code><ul>
             <p>Decoder ka final vector vocabulary ke size ke logits mein map hota hai. Agar vocabulary 50,000 words ki hai, linear layer 50,000 scores degi. Softmax in scores ko probabilities banata hai. Training mein cross-entropy next correct token ko reward/punish karta hai.</p>
             <pre class="code"># decoder hidden: [batch, d_model]
 logits = hidden @ W_vocab + b_vocab   <span class="cm"># [batch, vocab_size]</span>
-probs = softmax(logits)               <span class="cm"># next-token probabilities</span>
-loss = cross_entropy(probs, target)   <span class="cm"># teacher forcing ke saath</span></pre>
+probs = softmax(logits)               <span class="cm"># next-token probabilities, inference ke liye</span>
+loss = cross_entropy(logits, target)  <span class="cm"># logits seedhe do; teacher forcing ke saath</span></pre>
 
             <h4>Training mein masking do jagah</h4>
             <ul>

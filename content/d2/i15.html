@@ -43,20 +43,20 @@ Update: optimizer.apply_gradients(...)</code><ul>
 w = tf.Variable(0.0)
 optimizer = tf.keras.optimizers.Adam(learning_rate=0.1)
 
-for step in range(40):
+for step in range(200):
     with tf.GradientTape() as tape:
         loss = (w - 5.0) ** 2
     grad = tape.gradient(loss, [w])
     optimizer.apply_gradients(zip(grad, [w]))
 
-print(w.numpy(), loss.numpy())  <span class="cm"># w 5 ke paas, loss 0 ke paas</span></pre>
+print(w.numpy(), loss.numpy())  <span class="cm"># w lagbhag 5, loss lagbhag 0</span></pre>
             <div class="table-wrap"><table class="calc">
               <tr><th>Manual GD intuition</th><th>w</th><th>loss</th><th>gradient 2(w − 5)</th><th>α = 0.1 update</th></tr>
               <tr><td>Start</td><td>0</td><td>25</td><td>−10</td><td>w = 1</td></tr>
               <tr><td>Next</td><td>1</td><td>16</td><td>−8</td><td>w = 1.8</td></tr>
               <tr><td>Next</td><td>1.8</td><td>10.24</td><td>−6.4</td><td>w = 2.44</td></tr>
             </table></div>
-            <p>Code Adam use karta hai, isliye exact path manual GD table jaisa nahi hoga. Par concept same: gradient nikalo, optimizer se w update karo, repeat.</p>
+            <p>Code Adam use karta hai, isliye exact path manual GD table jaisa nahi hoga. 200 steps baad <code>w</code> lagbhag 5 aur loss lagbhag 0 hona chahiye. Par concept same: gradient nikalo, optimizer se <code>w</code> update karo, repeat.</p>
             <h4>Framework forward se backward khud bana leta hai</h4>
             <p>GradientTape ke andar jo TensorFlow operations chalte hain, tape unka computation graph record karta hai. Jab tum <code>tape.gradient(loss, variables)</code> bolte ho, TensorFlow chain rule laga ke gradients nikaal deta hai. Yahi wajah hai ki tum custom loss bhi likh sakte ho.</p>
             <div class="lesson-callout"><b>Important:</b> Tape sirf TensorFlow operations ko track karta hai. Beech mein value ko Python number ya NumPy array bana ke graph tod diya, to gradient None aa sakta hai.</div>

@@ -50,7 +50,7 @@
             <p>Corpus mein common words bahut zyada aate hain: “the”, “ka”, “hai”. Agar unko equally training pairs banane do, model ka time common fillers pe kharch ho jaata hai. Isliye frequent words ko downsample karte hain — kabhi-kabhi skip kar dete hain — taaki informative words zyada sunai dein.</p>
             <div class="lesson-callout"><b>Intuition:</b> Agar class mein ek student har 2 second “sir sir” bol raha hai, teacher kabhi-kabhi ignore karega taaki baaki meaningful sawaal bhi sun sake.</div>
             <h4>Negative sampling: 1 sahi + k galat</h4>
-            <p>Full softmax ke bajay simple binary games banao. Context “chai” diya. Positive target “garam” hai: label 1. Phir random negative words “metro”, “pencil”, “raja” lo: label 0. Model k+1 binary classifiers train karta hai.</p>
+            <p>Full softmax ke bajay simple binary games banao. Context “chai” diya. Positive target “garam” hai: label 1. Phir random negative words “metro”, “pencil”, “raja” lo: label 0. Isse k+1 labeled pairs milte hain; har pair ko wahi shared scoring function binary classifier ki tarah judge karta hai.</p>
             <div class="table-wrap"><table class="calc">
               <tr><th>Context</th><th>Word</th><th>Label</th><th>Question</th></tr>
               <tr><td>chai</td><td>garam</td><td class="good">1</td><td>Kya ye real neighbor tha?</td></tr>

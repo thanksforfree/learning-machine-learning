@@ -49,7 +49,7 @@
 
             <div class="chat">
               <p class="msg me">Cost function wahi squared error wala use kar lein?</p>
-              <p class="msg dost">Sigmoid ke saath squared error lagao to katori nahi banti — lehrati hui zameen banti hai jisme bahut saare chhote gaddhe hote hain. Gradient descent kisi galat gaddhe mein phas sakta hai.</p>
+              <p class="msg dost">Sigmoid ke saath squared error lagao to cost ki shape seedhi, clean katori hone ki guarantee nahi — gradient descent ko raasta mushkil mil sakta hai.</p>
               <p class="msg me">To naya cost kaisa?</p>
               <p class="msg dost">Idea bahut insaani hai. Ek dost bola “100% pakka kal baarish nahi hogi” aur baarish ho gayi — uski baat pe bharosa zero. Doosra bola “50-50 hai” — woh utna galat nahi tha. To: <strong>confident ho ke galat nikle to bahut badi saza</strong>, thoda unsure ho ke galat nikle to chhoti saza.</p>
               <p class="msg me">Matlab overconfidence pe fine lag raha hai?</p>
@@ -77,7 +77,7 @@
             <p>Agar asli answer y = 0 hai (spam nahi), to ulta: loss = −log(1 − f). Model jitna zyada “spam” bolega, utni zyada saza.</p>
             <div class="formula"><code>L = −y · log(f) − (1 − y) · log(1 − f)</code><ul>
               <li><b>Trick:</b> y = 1 ho to doosra hissa (1 − y = 0) gayab. y = 0 ho to pehla hissa gayab. Ek formula, dono case.</li>
-              <li>Cost J = saare examples ke L ka average. Ye katori jaisa hota hai → gradient descent safe.</li>
+              <li>Cost J = saare examples ke L ka average. Linear logistic regression mein ye weights ke hisaab se convex hota hai — chhote local gaddhon ka issue nahi. Phir bhi learning rate sahi rakhna padta hai.</li>
             </ul></div>
             <p>Gradient descent ka update formula dikhne mein <strong>bilkul linear regression jaisa</strong> hi lagta hai — bas ab f ke andar sigmoid hai.</p>            <h4>Cost = losses ka average</h4>
             <p>Teen emails pe mini calculation dekho:</p>

@@ -78,6 +78,7 @@ Same number chalega, ya ek dimension 1 ho to repeat ho sakta hai.</code><ul>
               <li><code>(2,3) + (1,3)</code> chalega: row 2 baar repeat hogi.</li>
               <li><code>(2,3) + (2,1)</code> chalega: column 3 baar repeat hoga.</li>
               <li><code>(2,3) + (2,2)</code> error: 3 aur 2 match nahi, aur koi 1 bhi nahi.</li>
+              <li>Shapes ki rank alag ho to chhoti shape ke left mein 1 maan lo: <code>(3,) + (2,3)</code> ko <code>(1,3) + (2,3)</code> ki tarah compare karte hain.</li>
             </ul></div>
             <h4>axis=0 / axis=1 — kis direction mein jodna?</h4>
             <p>Axis ko lift/elevator ki tarah socho. <code>axis=0</code> rows ke through neeche jaata hai, isliye har column ka total. <code>axis=1</code> columns ke through side mein jaata hai, isliye har row ka total.</p>

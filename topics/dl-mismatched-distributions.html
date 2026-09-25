@@ -56,12 +56,13 @@
             <p>Maan lo sneaker-authentication model ke liye 75,000 clean catalog photos mile. Mall kiosk users se 6,000 messy counter photos mile: glass reflection, tilted shoe, mixed lighting. Final product kiosk users ke liye hai.</p>
             <div class="table-wrap"><table class="calc">
               <tr><th>Set</th><th>Data</th><th>Purpose</th></tr>
-              <tr><td>Train</td><td>75,000 catalog + 3,000 kiosk</td><td>Model ko zyada examples do</td></tr>
-              <tr><td>Train-dev</td><td>3,000 training-distribution examples, train mein use nahi</td><td>Variance vs mismatch diagnose</td></tr>
+              <tr><td>Train</td><td>72,000 catalog + 2,880 kiosk</td><td>Model ko zyada examples do</td></tr>
+              <tr><td>Train-dev</td><td>3,000 catalog + 120 kiosk (held out)</td><td>Variance vs mismatch diagnose</td></tr>
               <tr><td>Dev</td><td>1,500 kiosk</td><td class="good">Model choices target users pe</td></tr>
               <tr><td>Test</td><td>1,500 kiosk</td><td class="good">Final honest target number</td></tr>
             </table></div>
             <p>Important: dev/test kiosk distribution se. Catalog photos ko dev/test mein daalne se metric pretty lagega, product nahi.</p>
+            <p>Counts bhi match karte hain: 72,000 + 3,000 = 75,000 catalog; 2,880 + 120 + 1,500 + 1,500 = 6,000 kiosk. Train-dev ka catalog/kiosk mix bhi train jaisa hai, bas un photos par model train nahi hua.</p>
 
             <h4>Loading-dock scanner ka example</h4>
             <p>Barcode model office desk photos pe 4% error de raha hai. Dusty loading dock pe 21%. Agar final use loading dock mein hai, desk-photo dev set tumhe jhoothi tasalli dega. Training mein desk data ka use karo, par dev/test loading-dock scans se rakho.</p>

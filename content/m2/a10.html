@@ -28,7 +28,7 @@
             <div class="mistake"><b>Dhyan rakhna:</b> Threshold test set pe tune mat karo. CV set pe threshold chuno, test pe final report do.</div>
             <h4>Accuracy rare cases mein kyu dhokha deti hai?</h4>
             <p>Ek aur numeric check: 1000 transactions mein 10 fraud. Model A sabko non-fraud bolta hai. Model B 8 fraud pakadta hai, par 20 false alarms deta hai.</p>
-            <div class="table-wrap"><table class="calc"><tr><th>Model</th><th>Accuracy</th><th>Recall</th><th>Business feel</th></tr><tr><td>A: sab safe</td><td>990/1000 = <b>99%</b></td><td>0/10 = <b>0%</b></td><td class="bad">Fraud pakda hi nahi</td></tr><tr><td>B: alert model</td><td>972/1000 = <b>97.2%</b></td><td>8/10 = <b>80%</b></td><td class="good">Useful despite lower accuracy</td></tr></table></div>
+            <div class="table-wrap"><table class="calc"><tr><th>Model</th><th>Accuracy</th><th>Recall</th><th>Business feel</th></tr><tr><td>A: sab safe</td><td>990/1000 = <b>99%</b></td><td>0/10 = <b>0%</b></td><td class="bad">Fraud pakda hi nahi</td></tr><tr><td>B: alert model</td><td>(8 TP + 970 TN)/1000 = <b>97.8%</b></td><td>8/10 = <b>80%</b></td><td class="good">Useful despite lower accuracy</td></tr></table></div>
             <p>Isliye rare positive problems mein “highest accuracy” winner nahi hota. Kaam ka metric choose karo.</p>
             <div class="lesson-callout"><b>Beginner checkpoint:</b> Metric choose karne se pehle positive class define karo. Fraud detection mein “fraud” positive hai; spam filter mein “spam” positive ho sakta hai.</div>
             <div class="oneliner"><b>Yaad rakhna:</b> Precision = “jo bola woh sahi tha?”, Recall = “jo tha woh pakda?”. Rare cases mein accuracy ki jagah ye dekho.</div>

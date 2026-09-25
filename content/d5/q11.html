@@ -7,7 +7,7 @@
 
             <h4>Products chhote hote hain, logs friendly hote hain</h4>
             <p>Probability multiply karte karte 0.0000002 jaise numbers aa jaate hain. Computer underflow kar sakta hai, aur compare karna awkward hota hai. Log trick: product ka log = logs ka sum.</p>
-            <div class="formula"><code>log score(y) = Σ⟨t⟩ log P(y⟨t⟩ | y&lt;⟨t⟩, x)</code><ul>
+            <div class="formula"><code>log score(y) = Σ⟨t⟩ log P(y⟨t⟩ | y⟨1⟩, ..., y⟨t−1⟩, x)</code><ul>
               <li><b>Product</b> maximize karna aur <b>log product</b> maximize karna same ordering deta hai.</li>
               <li>Log probabilities negative hoti hain, par add karna stable hota hai.</li>
             </ul></div>

@@ -91,7 +91,7 @@
             </ul></div>
 
             <h4>CTC: lambi awaaz ko chhote text se align karna</h4>
-            <p>Speech mein exact alignment mushkil hai. “chai” ke kis millisecond pe “ch” khatam aur “ai” start? CTC ek clever shortcut deta hai: har audio frame pe character ya blank predict karo. Baad mein repeats collapse karo, blanks hatao.</p>
+            <p>Speech mein exact alignment mushkil hai. “chai” ke kis millisecond pe “ch” khatam aur “ai” start? CTC ek clever shortcut deta hai: har audio frame pe character ya blank predict karo. Baad mein <strong>lagataar</strong> repeats collapse karo, phir blanks hatao. Beech ka blank do same letters ko alag rakhta hai, jaise <code>n _ n</code> se “nn”.</p>
             <div class="formula"><code>CTC collapse: repeat characters ko merge karo, phir blank “_” hatao</code><ul>
               <li><b>Blank</b> = “is frame pe naya character nahi”</li>
               <li><b>Repeats</b> = same sound several frames tak stretch ho sakta hai</li>

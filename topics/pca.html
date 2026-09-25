@@ -65,7 +65,7 @@
               </svg>
               <div class="cap">Hari line = pehla principal component. Har dot ko is line pe “projection” karo — ek number z. 2 numbers ki jagah 1, aur zyada information nahi khoi.</div>
             </figure>
-            <div class="visual-flow"><span>1. Features ko scale + average 0 karo</span><b>→</b><span>2. Woh direction dhundho jahan spread sabse zyada</span><b>→</b><span class="flow-highlight">3. Har point ko us line pe project karo</span></div>
+            <div class="visual-flow"><span>1. Average 0 karo; zaroorat ho to scale</span><b>→</b><span>2. Woh direction dhundho jahan spread sabse zyada</span><b>→</b><span class="flow-highlight">3. Har point ko us line pe project karo</span></div>
             <p><strong>Project karna</strong> = har dot se line pe seedha (90°) shadow girana. Shadow ki jagah = naya number z. Jaise dopahar mein dhoop padti hai aur cheez ki shadow zameen pe aati hai. Doosra component pehle ke 90° pe hota hai, teesra dono ke 90° pe… jitne chahiye utne.</p>
             <h4>Code mein</h4>
 <pre class="code">from sklearn.decomposition import PCA
@@ -82,10 +82,10 @@ X_approx = pca.inverse_transform(Z)      <span class="cm"># wapas original ka an
 
             <h4>Projection ka numeric feel</h4>
             <div class="chat"><p class="msg me">Shadow wali baat achhi hai, par z number nikalta kaise hai?</p><p class="msg dost">Agar direction unit vector ho, to z = point · direction. Dot product hi shadow ki length deta hai.</p></div>
-            <p>Direction maan lo u = [0.71, 0.71] — roughly 45° line. Points ko is line pe project karte hain.</p>
+            <p>Direction maan lo u = [0.71, 0.71] — roughly 45° ka unit vector. Is chhote hisaab mein points pehle se average-0 centered hain; PCA projection se pehle data ko center karta hai.</p>
             <div class="table-wrap"><table class="calc"><tr><th>Point x</th><th>z = x·u</th><th>Meaning</th></tr><tr><td>[2, 2]</td><td>2×0.71 + 2×0.71 = <b>2.84</b></td><td>Line pe aage</td></tr><tr><td>[3, 1]</td><td>3×0.71 + 1×0.71 = <b>2.84</b></td><td>Same shadow length</td></tr><tr><td>[1, 0]</td><td>1×0.71 + 0 = <b>0.71</b></td><td>Chhota projection</td></tr></table></div>
             <p>Notice [2,2] aur [3,1] ka z same aaya. PCA compression mein kuch detail lost hoti hai — dono original points alag the, par 1D shadow same. Trade-off yahi hai: kam dimensions, thodi information loss.</p>
-            <div class="lesson-callout"><b>Scale pe dhyan:</b> PCA se pehle features scale karo. Height centimeters aur income rupees mein ho to income spread dominate karega, aur “best angle” biased ho jaayega.</div>
+            <div class="lesson-callout"><b>Scale pe dhyan:</b> PCA har feature ko automatically center karta hai, scale nahi. Agar units/ranges bahut alag hon — jaise height centimeters aur income rupees — to pehle scale karo; warna income spread “best angle” pe haavi ho sakta hai.</div>
             <div class="oneliner"><b>Yaad rakhna:</b> PCA = data ki best “photo angle” dhundh ke bahut features ko kam naye features mein samet-na.</div>
             <h4 class="qa-heading">Dimaag mein aaye sawaal</h4>
             <details class="qa"><summary>Naye features (z₁, z₂) ka matlab kya hai?</summary><p>Aksar mix hota hai (jaise z₁ ≈ “gaadi ka overall size”). Kabhi naam de pate ho, kabhi nahi.</p></details>

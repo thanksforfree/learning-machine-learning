@@ -68,7 +68,7 @@
               <li><b>vₜ</b> = smooth average jo hum maintain kar rahe hain.</li>
               <li><b>β</b> = purani memory kitni rakhein. 0.9 matlab 90% purana, 10% naya.</li>
             </ul></div>
-            <p>Shuru mein <code>v₀ = 0</code>. β = 0.9 lete hain.</p>
+            <p>Shuru mein <code>v₀ = 0</code>, aur har naye din ka θ us din ka input hai. β = 0.9 lete hain: naya din average ko 10% apni taraf kheenchta hai, purani memory ka 90% bachta hai.</p>
             <div class="table-wrap"><table class="calc">
               <tr><th>Din</th><th>θ (cups)</th><th>v = 0.9v + 0.1θ</th><th>Bias-corrected v ÷ (1 − 0.9ᵗ)</th></tr>
               <tr><td>1</td><td>10</td><td>0.9×0 + 0.1×10 = <b>1.000</b></td><td>1 ÷ 0.1 = <b>10.000</b></td></tr>
@@ -96,7 +96,7 @@
               <div class="cap">Moving average spike ko ignore nahi karta, bas usse thoda shaant kar deta hai.</div>
             </figure>
             <h4>Bias correction — shuru ke values chhote kyu?</h4>
-            <p>Table mein raw v din 1 pe sirf 1 aaya, jabki asli number 10 tha. Kyun? Kyunki hum <code>v₀ = 0</code> se start kar rahe hain, zero average ko neeche kheenchta hai. Bias correction <code>vₜ ÷ (1 − βᵗ)</code> se shuru ka pull theek karta hai.</p>
+            <p>Table mein raw v din 1 pe sirf 1 aaya, jabki us din ka input 10 tha. Kyun? Kyunki hum <code>v₀ = 0</code> se start kar rahe hain, zero average ko neeche kheenchta hai. Bias correction <code>vₜ ÷ (1 − βᵗ)</code> se shuru ka pull theek karta hai; yahan <code>t</code> update number hai, aur <code>βᵗ</code> ka matlab <code>β</code> ko t baar multiply karna.</p>
 <pre class="code">beta = 0.9
 v = 0                         <span class="cm"># smooth memory yahin rakhenge</span>
 for t, theta in enumerate([10, 12, 11, 30, 13], start=1):

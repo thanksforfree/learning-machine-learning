@@ -7,6 +7,7 @@
             <h4>Computation graph — forward left se right</h4>
             <p>Ek example lo: <code>J = (a + b) c</code>. Pehle chhote steps banao.</p>
             <div class="visual-flow"><span>a = 5<br>b = 1</span><b>→</b><span>u = a + b = 6</span><b>→</b><span class="flow-highlight">J = u c = 18<br><small>c = 3</small></span></div>
+            <p>Yahan <code>J</code> final result hai. <code>dJ/du</code> ka matlab: <code>u</code> ko thoda badalne se <code>J</code> kitna badlega. Aise hi <code>dJ/da</code> poochta hai ki <code>a</code> badalne se final result par kitna asar padega.</p>
             <div class="table-wrap"><table class="calc">
               <tr><th>Forward node</th><th>Value</th><th>Local slope</th></tr>
               <tr><td><code>u = a + b</code></td><td>5 + 1 = 6</td><td>a aur b dono ke liye slope 1</td></tr>

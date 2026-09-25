@@ -56,14 +56,15 @@
             <h4>Delivery robot ke Q values (γ = 0.5)</h4>
             <div class="table-wrap"><table class="calc">
               <tr><th>Ghar</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
-              <tr><td>Q(s, ←)</td><td rowspan="2">50<br><small>(end)</small></td><td class="good">25</td><td class="good">12.5</td><td>6.25</td><td rowspan="2">20<br><small>(end)</small></td></tr>
+              <tr><td>Q(s, ←)</td><td rowspan="2">50<br><small>(terminal value)</small></td><td class="good">25</td><td class="good">12.5</td><td>6.25</td><td rowspan="2">20<br><small>(terminal value)</small></td></tr>
               <tr><td>Q(s, →)</td><td>6.25</td><td>5</td><td class="good">10</td></tr>
               <tr><td>Best action</td><td></td><td>←</td><td>←</td><td>→</td><td></td></tr>
             </table></div>
             <h4>Bellman equation — “abhi ka inaam + aage ka best”</h4>
             <div class="formula"><code>Q(s, a) = R(s) + γ × max Q(s', a')</code><ul>
-              <li><b>R(s)</b> = abhi wali state ka reward (turant milne wala)</li>
+              <li><b>R(s)</b> = abhi wali state ka reward (is gali ke example mein ghar par milta hai)</li>
               <li><b>s'</b> = action lene ke baad nayi state</li>
+              <li><b>a'</b> = nayi state s' par mumkin agla action; max ka matlab unmein se sabse bada Q lena</li>
               <li><b>max Q(s', a')</b> = wahan se aage best khelne ka value</li>
               <li>Matlab: “aaj ki kamai + kal se best tarike se kamaane ka discounted value”.</li>
             </ul></div>
@@ -75,7 +76,7 @@
               <tr><td>Q(4, →)</td><td>0</td><td>5 (end, 20)</td><td>20</td><td>0 + 0.5 × 20 = <b>10</b></td></tr>
               <tr><td>Q(4, ←)</td><td>0</td><td>3</td><td>12.5</td><td>0 + 0.5 × 12.5 = <b>6.25</b></td></tr>
             </table></div>
-            <p>Pichle page wale returns se exactly match! Bellman equation ka comfort yahi hai: badi future-planning problem ko <strong>chhote ek-kadam wale</strong> tukdon mein tod deta hai. Ab tak theek?</p>
+            <p>Pichle page wale returns se exactly match! Jaise ghar 2 se left jaane par abhi ka reward 0 hai, aur agle ghar (1) ki terminal value 50: <strong>0 + 0.5 × 50 = 25</strong>. Ghar 1 aur 5 pe kahani khatam, isliye unke aage future value 0 hai; table mein 50 aur 20 terminal values hain, wahan se lene wale action ke Q nahi. Bellman equation badi future-planning problem ko chhote ek-kadam wale tukdon mein tod deti hai. Ab tak theek?</p>
             <h4>Random (stochastic) duniya</h4>
             <div class="chat">
               <p class="msg dost">Asli duniya mein robot ko “left” bolo to shayad 90% baar left jaaye aur 10% baar pair phisal ke right. Train bhi kabhi platform badal deti hai, life hai. Tab ek hi policy har baar alag return degi. To hum <strong>expected return</strong> (bahut baar chalane pe average) maximize karte hain.</p>

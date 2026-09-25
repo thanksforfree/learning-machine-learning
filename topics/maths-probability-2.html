@@ -77,11 +77,11 @@
               <li>Sentence chance = 0.8 × 0.5 × 0.25 = <b>0.1</b>.</li>
             </ul></div>
             <h4>Likelihood — data dekh ke model ko score dena</h4>
-            <p>Likelihood ka mood: “Agar model ye bol raha hai, to hamara observed data kitna believable hai?” Coin example: 10 toss mein 8 heads, 2 tails aaye.</p>
+            <p>Likelihood ka mood: “Agar model ye bol raha hai, to hamara observed data kitna believable hai?” Coin example: 10 toss mein 8 heads, 2 tails aaye. Heads ka chance <code>p</code> ho to tails ka <code>1 − p</code>; har toss ka chance multiply karke poore observed result ka likelihood milta hai.</p>
             <div class="table-wrap"><table class="calc">
               <tr><th>Model</th><th>Likelihood for 8H, 2T</th><th>Value</th></tr>
-              <tr><td>Coin heads chance 0.7</td><td>0.7⁸ × 0.3²</td><td><b>0.00519</b></td></tr>
-              <tr><td>Coin heads chance 0.5</td><td>0.5¹⁰</td><td><b>0.00098</b></td></tr>
+              <tr><td>Coin heads chance 0.7</td><td>0.7⁸ × (1 − 0.7)² = 0.7⁸ × 0.3²</td><td><b>0.00519</b></td></tr>
+              <tr><td>Coin heads chance 0.5</td><td>0.5⁸ × (1 − 0.5)² = 0.5¹⁰</td><td><b>0.00098</b></td></tr>
             </table></div>
             <p>0.7 wala model is data ko zyada believable banata hai. Maximum likelihood training ka idea: parameters aise choose karo jo training labels ko high probability dein.</p>
             <h4>Negative log-likelihood = cross-entropy loss</h4>

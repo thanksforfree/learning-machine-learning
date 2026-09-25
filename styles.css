@@ -486,10 +486,10 @@ a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visibl
   .hero { gap: 30px; padding-top: 42px; padding-bottom: 46px; }
   .hero h1 { font-size: clamp(38px, 11vw, 48px); }
   .hero-intro { font-size: 15.5px; line-height: 1.75; }
-  .hero::before { top: 260px; right: -35vw; width: 90vw; height: 90vw; }
+  .hero::before { top: 260px; right: 0; width: 90vw; height: 90vw; }
   .section { padding: 42px 18px; }
   .module-card { border-radius: 14px; }
-  .module-hero, .topic-hero { overflow: visible; }
+  .module-hero, .topic-hero { overflow: hidden; }
   .module-hero::after, .topic-hero::after { right: -180px; bottom: -220px; }
   .topic-hero { padding: 30px 18px 26px; }
   .topic-hero h1 { font-size: clamp(29px, 8vw, 38px); }

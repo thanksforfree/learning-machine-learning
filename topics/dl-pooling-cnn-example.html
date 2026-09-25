@@ -128,7 +128,7 @@ Parameters = 0</code><ul>
             <p>Dense layer mein har input pixel har neuron se connected hota. CNN bolta hai: “pehle local clues pakdo; global decision baad mein.” Ye photos ke nature se match karta hai.</p>
 
             <h4>Translation invariance: thoda khisak gaya to bhi chalega</h4>
-            <p>Socho traffic sign image mein 3 pixels right shift ho gaya. Dense network ke liye input vector bilkul alag positions mein values dega. CNN mein same filter har jagah ghoomta hai, to woh sign ka edge right side pe bhi pakad lega. Pooling thodi aur tolerance de deta hai.</p>
+            <p>Socho traffic sign image mein 3 pixels right shift ho gaya. Dense network ke liye input vector bilkul alag positions mein values dega. CNN mein same filter har jagah ghoomta hai, to edge response bhi right taraf shift hoga — ise <strong>translation equivariance</strong> kehte hain. Pooling paas-paas ki positions ka summary lekar chhote shifts ko kuch had tak tolerate karta hai; poori translation invariance ki guarantee nahi deta.</p>
             <pre class="code"># One common CNN block
 model.add(Conv2D(16, kernel_size=3, activation="relu"))
 model.add(MaxPool2D(pool_size=2, strides=2))
